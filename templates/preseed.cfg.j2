@@ -1,0 +1,48 @@
+# locales
+d-i debian-installer/language string en
+d-i debian-installer/country string FR
+d-i debian-installer/locale string en_US.UTF-8
+d-i keyboard-configuration/xkb-keymap select fr(mac)
+d-i time/zone string Europe/Paris
+
+# firmware
+d-i hw-detect/load_firmware boolean false
+
+# network
+d-i netcfg/choose_interface select {{ preseed.network_interface }}
+d-i netcfg/hostname string {{ preseed.host_name }}
+
+# user
+d-i passwd/make-user boolean false
+d-i passwd/root-password-crypted password {{ preseed.root_password }}
+
+# partitionning
+d-i partman-auto/method string regular
+d-i partman-auto/expert_recipe_file string /cdrom/.config/recipe
+d-i partman-auto/choose_recipe select {{ preseed.partman_recipe_name }}
+d-i partman/early_command string debconf-set partman-auto/disk $(realpath "{{ preseed.partman_disk }}")
+
+# force partitionning
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-md/confirm boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman-efi/non_efi_system boolean true
+
+# install script
+d-i preseed/late_command string \
+  /bin/bash -c 'ln -sfr /target/boot/initrd.img-* /target/boot/initrd.img'; \
+  /bin/bash -c 'ln -sfr /target/boot/vmlinuz-* /target/boot/vmlinuz'; \
+  in-target /media/cdrom/.config/playbook.sh --tags bootstrap; \
+  touch /target/SIGNAL_BOOT
+
+# keep cdrom
+d-i cdrom-detect/eject boolean false
+
+# auto reboot
+d-i finish-install/reboot_in_progress note

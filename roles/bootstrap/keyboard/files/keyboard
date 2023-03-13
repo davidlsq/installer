@@ -1,0 +1,5 @@
+XKBMODEL="pc105"
+XKBLAYOUT="fr"
+XKBVARIANT="mac"
+XKBOPTIONS="lv3:lwin_switch,apple:badmap"
+BACKSPACE="guess"

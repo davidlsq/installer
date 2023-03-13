@@ -1,0 +1,52 @@
+# Bootstrap playbook
+# Run during debian install, before first boot
+
+- name: Bootstrap
+  hosts: virtual
+  gather_facts: no
+  become: true
+  tags: bootstrap # <- debian installer tag
+  roles:
+  - role: bootstrap/systemctl
+  - role: bootstrap/cdrom
+  - role: bootstrap/grub
+  - role: bootstrap/keyboard
+  - role: bootstrap/playbook
+
+# All playbooks below run automatically during first boot
+
+- name: Base
+  hosts: virtual
+  gather_facts: no
+  become: true
+  roles:
+  - role: network
+  - role: apt
+  - role: ssh-server
+    tags: ssh-server
+    ssh_server_key: virtual/ssh/server
+    ssh_server_key_pub: virtual/ssh/server.pub
+  - role: user
+    tags: user
+    user_name: root
+    user_password: '{{ password.root }}'
+    user_shell: /bin/zsh
+  - role: user
+    tags: user
+    user_password: '{{ password.user }}'
+    user_key_pub: virtual/ssh/user.pub
+    user_shell: /bin/zsh
+    user_sudo: true
+  - role: user
+    tags: user
+    user_name: ansible
+    user_password: '{{ password.ansible }}'
+    user_key_pub: virtual/ssh/ansible.pub
+    user_shell: /bin/zsh
+    user_sudo: yes-no-password
+  - role: ohmyzsh
+    ohmyzsh_user_name: root
+  - role: ohmyzsh
+    ohmyzsh_user_name: '{{ user_name }}'
+  - role: ohmyzsh
+    ohmyzsh_user_name: ansible

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+apt-get install -y python3 python3-pip python3-venv
+
+python3 -m venv /tmp/ansible
+source /tmp/ansible/bin/activate
+python3 -m pip install ansible
+
+ansible-playbook -i "{{ inventory_hostname }}," -c local "/media/cdrom/.config/ansible/{{ preseed.playbook }}" "$@"
+
+rm -r /tmp/ansible

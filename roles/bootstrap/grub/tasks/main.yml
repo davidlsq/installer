@@ -1,0 +1,7 @@
+- name: Create config
+  copy:
+    src: grub.cfg
+    dest: /boot/grub/grub.cfg
+    owner: root
+    group: root
+    mode: u=rw,go=r

@@ -1,0 +1,3 @@
+bootstrap/*.iso
+files/*/ssh/
+host_vars/*/password.yml

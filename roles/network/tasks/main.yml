@@ -1,0 +1,76 @@
+# Setup networkd
+
+- name: Create directory
+  file:
+    path: /etc/systemd/network
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: Create service
+  template:
+    src: network.j2
+    dest: /etc/systemd/network/interface.network
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_service
+
+- name: Enable
+  systemd:
+    name: systemd-networkd
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: systemd-networkd
+    state: restarted
+    daemon_reload: true
+  when: create_service.changed
+
+- name: Start
+  systemd:
+    name: systemd-networkd
+    state: started
+
+# Setup resolved
+
+- name: Config hostname
+  copy:
+    content: '{{ network_host_name }}'
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  register: config_hostname
+
+- name: Set hostname with systemd
+  hostname:
+    name: '{{ network_host_name }}'
+    use: systemd
+  when: not bootstrap
+
+- name: Set config link
+  file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+
+- name: Enable
+  systemd:
+    name: systemd-resolved
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: systemd-resolved
+    state: restarted
+    daemon_reload: true
+  when: config_hostname.changed
+
+- name: Start
+  systemd:
+    name: systemd-resolved
+    state: started

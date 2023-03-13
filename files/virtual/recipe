@@ -1,0 +1,31 @@
+partitionning ::
+
+128 128 128 fat32
+    $primary{ }
+    method{ efi }
+    format{ } .
+
+256 256 256 ext4
+    $primary{ }
+    $bootable{ }
+    method{ format }
+    format{ }
+    label{ BOOT }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ /boot } .
+
+4096 4096 4096 linux-swap
+    $primary{ }
+    method{ swap }
+    format{ }
+    label{ SWAP } .
+
+1 1 -1 ext4
+    $primary{ }
+    method{ format }
+    format{ }
+    label{ ROOT }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ / } .

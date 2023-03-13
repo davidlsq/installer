@@ -1,0 +1,68 @@
+# Install package
+
+- name: Package
+  apt:
+    name: openssh-server
+    state: latest
+    policy_rc_d: 101
+  register: package
+
+# Configure
+
+- name: Create config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_config
+
+- name: Remove default keys
+  file:
+    path: '/etc/ssh/{{ item }}'
+    state: absent
+  with_items:
+     - ssh_host_ecdsa_key
+     - ssh_host_ecdsa_key.pub
+     - ssh_host_ed25519_key
+     - ssh_host_ed25519_key.pub
+     - ssh_host_rsa_key
+     - ssh_host_rsa_key.pub
+
+- name: Copy private key
+  copy:
+    src: '{{ ssh_server_key }}'
+    dest: /etc/ssh/ssh_host_key
+    owner: root
+    group: root
+    mode: u=rw,go=
+
+- name: Copy public key
+  copy:
+    src: '{{ ssh_server_key_pub }}'
+    dest: /etc/ssh/ssh_host_key.pub
+    owner: root
+    group: root
+    mode: u=rw,go=r
+
+# Service
+
+- name: Enable
+  systemd: 
+    name: ssh
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: ssh
+    daemon_reload: true
+    state: restarted
+  when: >
+      package is changed or
+      create_config is changed
+
+- name: Start 
+  systemd: 
+    name: ssh
+    state: started

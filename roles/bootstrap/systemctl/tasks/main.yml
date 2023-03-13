@@ -1,0 +1,8 @@
+- name: Get current
+  command: systemctl get-default
+  changed_when: false
+  register: default
+
+- name: Set default
+  command: systemctl set-default multi-user.target
+  when: default.stdout != 'multi-user.target'

@@ -1,0 +1,1 @@
+virtual ansible_connection=ssh ansible_ssh_host=virtual.local ansible_user=ansible

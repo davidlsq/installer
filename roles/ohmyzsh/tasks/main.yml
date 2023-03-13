@@ -1,0 +1,30 @@
+# Install package
+
+- name: Package
+  apt:
+    name:
+      - zsh
+      - git
+    state: latest
+
+# Download
+    
+- name: Git clone
+  git:
+    repo: '{{ ohmyzsh_git }}'
+    dest: '~{{ ohmyzsh_user_name }}/.oh-my-zsh'
+
+# Configure
+
+- name: Create config
+  template:
+    src: zshrc.j2
+    dest: '~{{ ohmyzsh_user_name }}/.zshrc'
+    owner: '{{ ohmyzsh_user_name }}'
+    group: '{{ ohmyzsh_user_name }}'
+    mode: u=rw,go=r
+
+- name: Set shell
+  user:
+    name: '{{ ohmyzsh_user_name }}'
+    shell: /bin/zsh

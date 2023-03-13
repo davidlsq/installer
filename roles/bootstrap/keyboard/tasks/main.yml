@@ -1,0 +1,7 @@
+- name: Create config
+  copy:
+    src: keyboard
+    dest: /etc/default/keyboard
+    owner: root
+    group: root
+    mode: u=rw,go=r
