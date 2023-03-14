@@ -1,0 +1,18 @@
+[Unit]
+Description={{ qbittorrent_name }}
+After=network.target
+
+[Service]
+User={{ qbittorrent_user }}
+Group={{ qbittorrent_user }}
+
+Type=forking
+ExecStart=/usr/bin/qbittorrent-nox -d --webui-port={{ qbittorrent_port }} --profile={{ qbittorrent_var }}
+Restart=on-failure
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ qbittorrent_name }}
+
+[Install]
+WantedBy=multi-user.target

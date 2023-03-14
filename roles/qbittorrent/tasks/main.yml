@@ -1,0 +1,76 @@
+# Install package
+
+- name: Package
+  apt:
+    name: qbittorrent-nox
+    state: latest
+    policy_rc_d: 101
+  register: package
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ qbittorrent_user }}'
+    group: '{{ qbittorrent_user }}'
+    mode: ug=rwx,o=rx
+  with_items:
+    - '{{ qbittorrent_var }}'
+    - '{{ qbittorrent_var }}/qBittorrent'
+    - '{{ qbittorrent_var }}/qBittorrent/config'
+
+- name: Create config
+  ini_file:
+    path: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf'
+    owner: '{{ qbittorrent_user }}'
+    group: '{{ qbittorrent_user }}'
+    mode: ug=rw,o=r
+    section: '{{ item[0] }}'
+    option: '{{ item[1] }}'
+    value: '{{ item[2] }}'
+  loop: '{{ qbittorrent_config }}'
+  register: create_config
+
+- name: Fix permissions
+  shell: >
+    find {{ qbittorrent_var }} \
+      ! -user root \
+      ! -user {{ qbittorrent_user }} \
+      -print \
+      -exec chown {{ qbittorrent_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+
+# Create service
+
+- name: Create service
+  template:
+    src: service.j2
+    dest: '/etc/systemd/system/{{ qbittorrent_name }}.service'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_service
+
+- name: Enable
+  systemd: 
+    name: '{{ qbittorrent_name }}'
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: '{{ qbittorrent_name }}'
+    daemon_reload: true
+    state: restarted
+  when: >
+    package is changed or
+    create_config is changed or
+    create_service is changed
+
+- name: Start 
+  systemd: 
+    name: '{{ qbittorrent_name }}'
+    state: started

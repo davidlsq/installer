@@ -89,3 +89,11 @@
     tags: plex
     plex_user: media
     plex_var: /mnt/data/media/plex
+  - role: qbittorrent
+    tags: qbittorrent
+    qbittorrent_var: /mnt/data/media/qbittorrent
+    qbittorrent_user: media
+    qbittorrent_address: 0.0.0.0
+    qbittorrent_port: 8081
+    qbittorrent_peer_port: 50000
+    qbittorrent_interface: '{{ network_interface }}'
