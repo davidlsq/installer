@@ -4,3 +4,6 @@ network_host_name: '{{ inventory_hostname }}'
 private_domain: '{{ network_host_name }}.local'
 qbittorrent_port: 8081
 sabnzbd_port: 8082
+prowlarr_port: 8083
+radarr_port: 8084
+sonarr_port: 8085

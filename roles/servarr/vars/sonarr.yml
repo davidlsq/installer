@@ -1,0 +1,3 @@
+servarr_version: 4.0.0.397
+servarr_archive: 'https://services.sonarr.tv/v1/download/develop/latest?version={{ servarr_version }}&os=linux&arch=x64'
+servarr_executable: Sonarr

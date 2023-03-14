@@ -99,6 +99,24 @@
     tags: sabnzbd
     sabnzbd_var: /mnt/data/media/sabnzbd
     sabnzbd_user: media
+  - role: servarr
+    tags: [servarr, prowlarr]
+    servarr_software: prowlarr
+    servarr_var: /mnt/data/media/prowlarr
+    servarr_user: media
+    servarr_port: '{{ prowlarr_port }}'
+  - role: servarr
+    tags: [servarr, radarr]
+    servarr_software: radarr
+    servarr_var: /mnt/data/media/radarr
+    servarr_user: media
+    servarr_port: '{{ radarr_port }}'
+  - role: servarr
+    tags: [servarr, sonarr]
+    servarr_software: sonarr
+    servarr_var: /mnt/data/media/sonarr
+    servarr_user: media
+    servarr_port: '{{ sonarr_port }}'
 
 - name: NGINX
   hosts: server

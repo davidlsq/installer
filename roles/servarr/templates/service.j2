@@ -1,0 +1,21 @@
+[Unit]
+Description={{ servarr_name }}
+After=syslog.target network.target
+
+[Service]
+User={{ servarr_user }}
+Group={{ servarr_user }}
+
+Type=simple
+ExecStart={{ servarr_lib }}/{{ servarr_executable }} -nobrowser -data={{ servarr_var }}/
+
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ servarr_name }}
+
+[Install]
+WantedBy=multi-user.target

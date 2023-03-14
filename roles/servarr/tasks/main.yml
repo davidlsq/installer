@@ -1,0 +1,114 @@
+# Install package
+
+- name: Package
+  apt:
+    name:
+      - curl
+      - sqlite3
+      - python3-lxml
+    state: latest
+
+# Software vars
+
+- include_vars: '{{ servarr_software }}.yml'
+
+# Create lib
+
+- name: Create lib directory
+  file:
+    path: '{{ servarr_lib }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- debug:
+    msg: '{{ servarr_archive }}'
+
+- name: Create lib
+  unarchive:
+    src: '{{ servarr_archive }}'
+    remote_src: yes
+    dest: '{{ servarr_lib }}'
+    owner: root
+    group: root
+    mode: u+rw,go-w+r
+    creates: '{{ servarr_lib }}/{{ servarr_executable }}'
+    extra_opts:
+    - --transform
+    - 's/^{{ servarr_executable }}//'
+  register: create_lib
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ servarr_var }}'
+    state: directory
+    owner: '{{ servarr_user }}'
+    group: '{{ servarr_user }}'
+    mode: ug=rwx,o=rx
+
+- name: Check config
+  stat:
+    path: '{{ servarr_var }}/config.xml'
+  register: check_config
+
+- name: Init config
+  copy:
+    content: <Config></Config>
+    dest: '{{ servarr_var }}/config.xml'
+    owner: '{{ servarr_user }}'
+    group: '{{ servarr_user }}'
+    mode: u=rw,go=r
+  when: not check_config.stat.exists
+
+- name: Create config
+  xml:
+    path: '{{ servarr_var }}/config.xml'
+    xpath: '/Config/{{ item[0] }}'
+    value: '{{ item[1] | string }}'
+  loop: '{{ servarr_config }}'
+  register: create_config
+
+- name: Fix permissions
+  shell: >
+    find {{ servarr_var }} \
+      ! -user root \
+      ! -user {{ servarr_user }} \
+      -print \
+      -exec chown {{ servarr_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+
+# Create service
+
+- name: Create service
+  template:
+    src: service.j2
+    dest: '/etc/systemd/system/{{ servarr_name }}.service'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_service
+
+- name: Enable
+  systemd: 
+    name: '{{ servarr_name }}'
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: '{{ servarr_name }}'
+    daemon_reload: true
+    state: restarted
+  when: >
+    create_lib is changed or
+    create_config is changed or
+    create_service is changed
+
+- name: Start 
+  systemd: 
+    name: '{{ servarr_name }}'
+    state: started

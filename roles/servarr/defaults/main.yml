@@ -1,0 +1,11 @@
+servarr_name: '{{ servarr_software }}'
+servarr_var: '/var/lib/{{ servarr_name }}'
+servarr_lib: '/usr/lib/{{ servarr_software }}-{{ servarr_version }}'
+servarr_address: 127.0.0.1
+servarr_port: 8080
+servarr_config:
+- [BindAddress, '{{ servarr_address }}']
+- [Port, '{{ servarr_port }}']
+- [UrlBase, '/{{ servarr_name }}']
+- [InstanceName, '{{ servarr_name | capitalize }}']
+- [AnalyticsEnabled, false]

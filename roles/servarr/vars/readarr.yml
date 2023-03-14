@@ -1,0 +1,3 @@
+servarr_version: 0.1.4.1596
+servarr_archive: 'https://readarr.servarr.com/v1/update/develop/updatefile?version={{ servarr_version }}&os=linux&runtime=netcore&arch=x64'
+servarr_executable: Readarr
