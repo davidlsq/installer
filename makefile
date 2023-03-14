@@ -1,4 +1,5 @@
-SCRIPT_PASSWORD       = bootstrap/scripts/password.py
+SCRIPT_PASSWORD_CRYPT = bootstrap/scripts/password-crypt.py
+SCRIPT_PASSWORD_CLEAR = bootstrap/scripts/password-clear.py
 SCRIPT_SSH_KEYGEN     = bootstrap/scripts/ssh-keygen.sh
 SCRIPT_SSH_KNOWN_HOST = bootstrap/scripts/ssh-known-host.sh
 SCRIPT_SSH_IDENTITY   = bootstrap/scripts/ssh-identity.sh
@@ -11,9 +12,9 @@ $(DEBIAN_AARCH64) :
 VIRTUAL_PASSWORD = host_vars/virtual/password.yml
 $(VIRTUAL_PASSWORD) :
 	@echo "password:" > $@
-	@$(SCRIPT_PASSWORD) virtual root $@
-	@$(SCRIPT_PASSWORD) virtual user $@
-	@$(SCRIPT_PASSWORD) virtual ansible $@
+	@$(SCRIPT_PASSWORD_CRYPT) virtual root $@
+	@$(SCRIPT_PASSWORD_CRYPT) virtual user $@
+	@$(SCRIPT_PASSWORD_CRYPT) virtual ansible $@
 
 VIRTUAL_SSH = files/virtual/ssh
 $(VIRTUAL_SSH) :
@@ -39,9 +40,10 @@ $(DEBIAN_X86_64) :
 SERVER_PASSWORD = host_vars/server/password.yml
 $(SERVER_PASSWORD) :
 	@echo "password:" > $@
-	@$(SCRIPT_PASSWORD) server root $@
-	@$(SCRIPT_PASSWORD) server user $@
-	@$(SCRIPT_PASSWORD) server ansible $@
+	@$(SCRIPT_PASSWORD_CRYPT) server root $@
+	@$(SCRIPT_PASSWORD_CRYPT) server user $@
+	@$(SCRIPT_PASSWORD_CRYPT) server ansible $@
+	@$(SCRIPT_PASSWORD_CLEAR) server ddclient $@
 
 SERVER_SSH = files/server/ssh
 $(SERVER_SSH) :

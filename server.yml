@@ -128,5 +128,11 @@
   become: true
   tags: nginx
   roles:
+  - role: ddclient
+    tags: ddclient
+    ddclient_login: davidlsq.fr-server
+    ddclient_domains:
+    - '{{ public_domain }}'
+    ddclient_password: '{{ password.ddclient }}'
   - role: nginx
     nginx_config: server/nginx.conf.j2

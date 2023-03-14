@@ -1,0 +1,37 @@
+# Install package
+
+- name: Package
+  apt:
+    name: ddclient
+    state: latest
+    policy_rc_d: 101
+
+# Create config
+
+- name: Create config
+  template:
+    src: ddclient.conf.j2
+    dest: /etc/ddclient.conf
+    owner: root
+    group: root
+    mode: u=rw,go=
+  register: create_config
+
+# Create service
+
+- name: Enable
+  systemd:
+    name: ddclient 
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: ddclient
+    state: restarted
+    daemon_reload: true
+  when: create_config is changed
+
+- name: Start
+  systemd: 
+    name: ddclient
+    state: started
