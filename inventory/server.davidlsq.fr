@@ -1,0 +1,1 @@
+server ansible_connection=ssh ansible_ssh_host=server.davidlsq.fr ansible_user=ansible

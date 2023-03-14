@@ -61,6 +61,9 @@ $(SERVER_INSTALL) : $(SERVER_SSH)
 	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH)/server server.local
 	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/user server.local david
 	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/ansible server.local ansible
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH)/server server.davidlsq.fr
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/user server.davidlsq.fr david
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/ansible server.davidlsq.fr ansible
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
 CONFIGURE = $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH) $(SERVER_PASSWORD) $(SERVER_SSH)
