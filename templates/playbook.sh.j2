@@ -8,6 +8,6 @@ python3 -m venv /tmp/ansible
 source /tmp/ansible/bin/activate
 python3 -m pip install ansible
 
-ansible-playbook -i "{{ inventory_hostname }}," -c local "/media/cdrom/.config/ansible/{{ preseed.playbook }}" "$@"
+ansible-playbook -i "{{ inventory_hostname }}," -c local "/media/cdrom/.config/ansible/{{ bootstrap.playbook }}" "$@"
 
 rm -r /tmp/ansible

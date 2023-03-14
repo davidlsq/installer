@@ -32,10 +32,38 @@ $(VIRTUAL_INSTALL) : $(VIRTUAL_SSH)
 	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH)/user virtual.local david
 	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH)/ansible virtual.local ansible
 
-DOWNLOAD  = $(DEBIAN_AARCH64)
-CONFIGURE = $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH)
-IMAGE     = $(VIRTUAL_IMAGE)
-INSTALL   = $(VIRTUAL_INSTALL)
+DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
+$(DEBIAN_X86_64) :
+	@wget -q https://cdimage.debian.org/images/release/11.6.0/amd64/iso-cd/debian-11.6.0-amd64-netinst.iso -O $@
+
+SERVER_PASSWORD = host_vars/server/password.yml
+$(SERVER_PASSWORD) :
+	@echo "password:" > $@
+	@$(SCRIPT_PASSWORD) server root $@
+	@$(SCRIPT_PASSWORD) server user $@
+	@$(SCRIPT_PASSWORD) server ansible $@
+
+SERVER_SSH = files/server/ssh
+$(SERVER_SSH) :
+	@mkdir $@
+	@$(SCRIPT_SSH_KEYGEN) $@/server
+	@$(SCRIPT_SSH_KEYGEN) $@/user
+	@$(SCRIPT_SSH_KEYGEN) $@/ansible
+
+SERVER_IMAGE = bootstrap/server.iso
+$(SERVER_IMAGE) : $(DEBIAN_X86_64) $(SERVER_PASSWORD) $(SERVER_SSH)
+	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
+
+SERVER_INSTALL = server.install
+$(SERVER_INSTALL) : $(SERVER_SSH)
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH)/server server.local
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/user server.local david
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/ansible server.local ansible
+
+DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
+CONFIGURE = $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH) $(SERVER_PASSWORD) $(SERVER_SSH)
+IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
+INSTALL   = $(VIRTUAL_INSTALL) $(SERVER_INSTALL)
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := configure
