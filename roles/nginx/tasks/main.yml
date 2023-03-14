@@ -21,7 +21,7 @@
     name: nginx
     enabled: true
 
-- name: Restart
+- name: Reload
   systemd:
     name: nginx
     state: reloaded
