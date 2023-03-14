@@ -9,3 +9,4 @@ servarr_config:
 - [UrlBase, '/{{ servarr_name }}']
 - [InstanceName, '{{ servarr_name | capitalize }}']
 - [AnalyticsEnabled, false]
+- [AuthenticationMethod, External]

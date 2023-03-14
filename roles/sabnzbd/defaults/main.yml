@@ -6,9 +6,12 @@ sabnzbd_lib: '/usr/lib/sabnzbd-{{ sabnzbd_version }}'
 sabnzbd_venv: '/usr/lib/sabnzbd-{{ sabnzbd_version }}-venv'
 sabnzbd_address: 127.0.0.1
 sabnzbd_port: 8080
+sabnzbd_host_whitelist: []
 sabnzbd_config:
 - [misc, host, '{{ sabnzbd_address }}']
 - [misc, port, '{{ sabnzbd_port }}']
+- [misc, url_base, '/{{ sabnzbd_name }}']
+- [misc, host_whitelist, '{{ sabnzbd_host_whitelist | join(",") }}']
 - [misc, nzb_backup_dir, history]
 - [misc, flat_unpack, 1]
 - [misc, deobfuscate_final_filenames, 1]

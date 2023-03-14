@@ -99,6 +99,9 @@
     tags: sabnzbd
     sabnzbd_var: /mnt/data/media/sabnzbd
     sabnzbd_user: media
+    sabnzbd_host_whitelist:
+    - '{{ private_domain }}'
+    - '{{ public_domain }}'
   - role: servarr
     tags: [servarr, prowlarr]
     servarr_software: prowlarr
@@ -147,5 +150,9 @@
     ddclient_domains:
     - '{{ public_domain }}'
     ddclient_password: '{{ password.ddclient }}'
+  - role: htpasswd
+    tags: htpasswd
+    htpasswd_users:
+    - ['{{ user_name }}', '{{ password.user }}']
   - role: nginx
-    nginx_config: server/nginx.conf.j2
+    nginx_config: server/nginx/nginx.conf.j2
