@@ -1,3 +1,10 @@
 servarr_version: 4.0.0.397
 servarr_archive: 'https://services.sonarr.tv/v1/download/develop/latest?version={{ servarr_version }}&os=linux&arch=x64'
 servarr_executable: Sonarr
+servarr_config:
+- [BindAddress, '{{ servarr_address }}']
+- [Port, '{{ servarr_port }}']
+- [UrlBase, '/{{ servarr_name }}']
+- [InstanceName, '{{ servarr_name | capitalize }}']
+- [AnalyticsEnabled, false]
+- [AuthenticationMethod, External]

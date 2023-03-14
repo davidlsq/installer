@@ -1,3 +1,10 @@
 servarr_version: 0.1.4.1596
 servarr_archive: 'https://readarr.servarr.com/v1/update/develop/updatefile?version={{ servarr_version }}&os=linux&runtime=netcore&arch=x64'
 servarr_executable: Readarr
+servarr_config:
+- [BindAddress, '{{ servarr_address }}']
+- [Port, '{{ servarr_port }}']
+- [UrlBase, '/{{ servarr_name }}']
+- [InstanceName, '{{ servarr_name | capitalize }}']
+- [AnalyticsEnabled, false]
+- [AuthenticationMethod, External]
