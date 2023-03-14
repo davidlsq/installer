@@ -75,3 +75,10 @@
     lv_name: media
     lv_size: 3T
     lv_opts: --type raid1 --nosync
+  - role: user-service
+    tags: data
+    user_service_name: media
+  - role: user-service
+    tags: data
+    user_service_name: media
+    

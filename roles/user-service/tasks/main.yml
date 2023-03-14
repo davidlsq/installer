@@ -1,0 +1,13 @@
+- name: Create group
+  group:
+    name: '{{ user_service_name }}'
+    system: true
+
+- name: Create user
+  user:
+    name: '{{ user_service_name }}'
+    group: '{{ user_service_name }}'
+    shell: /usr/sbin/nologin
+    home: /nonexistent
+    create_home: false
+    system: true
