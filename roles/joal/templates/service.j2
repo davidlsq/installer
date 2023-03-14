@@ -1,0 +1,20 @@
+[Unit]
+Description={{ joal_name }}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ joal_user }}
+Group={{ joal_user }}
+
+SuccessExitStatus=143
+Type=simple
+WorkingDirectory={{ joal_var }}
+
+ExecStart=java -jar {{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar --joal-conf={{ joal_var }}
+ExecStop=/bin/kill -15 $MAINPID
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

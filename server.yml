@@ -117,6 +117,10 @@
     servarr_var: /mnt/data/media/sonarr
     servarr_user: media
     servarr_port: '{{ sonarr_port }}'
+  - role: joal
+    tags: joal
+    joal_user: media
+    joal_var: /mnt/data/media/joal
 
 - name: NGINX
   hosts: server

@@ -1,0 +1,8 @@
+joal_name: joal
+joal_version: 2.1.33
+joal_archive: 'https://github.com/anthonyraymond/joal/releases/download/{{ joal_version }}/joal.tar.gz'
+joal_var: '/var/lib/{{ joal_name }}'
+joal_lib: '/usr/lib/joal-{{ joal_version }}'
+joal_client: transmission-3.00
+joal_upload_min: 30000
+joal_upload_max: 40000
