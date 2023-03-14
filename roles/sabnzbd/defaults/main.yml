@@ -1,0 +1,19 @@
+sabnzbd_name: sabnzbd
+sabnzbd_version: 4.0.0Alpha3
+sabnzbd_archive: 'https://github.com/sabnzbd/sabnzbd/releases/download/{{ sabnzbd_version }}/SABnzbd-{{ sabnzbd_version }}-src.tar.gz'
+sabnzbd_var: '/var/lib/{{ sabnzbd_name }}'
+sabnzbd_address: 127.0.0.1
+sabnzbd_port: 8080
+sabnzbd_lib: '/usr/lib/sabnzbd-{{ sabnzbd_version }}'
+sabnzbd_venv: '/usr/lib/sabnzbd-{{ sabnzbd_version }}-venv'
+sabnzbd_config:
+- [misc, host, '{{ sabnzbd_address }}']
+- [misc, port, '{{ sabnzbd_port }}']
+- [misc, nzb_backup_dir, history]
+- [misc, flat_unpack, 1]
+- [misc, deobfuscate_final_filenames, 1]
+- [misc, new_nzb_on_failure, 1]
+- [misc, no_dupes, 4]
+- [misc, no_series_dupes, 4]
+- [misc, auto_sort, 4]
+- [misc, direct_unpack, 4]

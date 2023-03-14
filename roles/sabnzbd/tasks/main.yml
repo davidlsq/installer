@@ -1,0 +1,110 @@
+# Install unrar
+- include_role:
+    name: unrar
+
+# Install package
+
+- name: Package
+  apt:
+    name:
+    - python3
+    - python3-venv
+    - par2
+    - git
+    state: latest
+
+# Create lib
+
+- name: Create lib directory
+  file:
+    path: '{{ sabnzbd_lib }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: Create lib
+  unarchive:
+    src: '{{ sabnzbd_archive }}'
+    remote_src: yes
+    dest: '{{ sabnzbd_lib }}'
+    owner: root
+    group: root
+    mode: u+rw,go-w+r
+    creates: '{{ sabnzbd_lib }}/SABnzbd.py'
+    extra_opts:
+    - --transform
+    - 's/^SABnzbd-{{ sabnzbd_version }}//'
+  register: create_lib
+
+- name: Create venv
+  pip:
+    requirements: '{{ sabnzbd_lib }}/requirements.txt'
+    virtualenv: '{{ sabnzbd_venv }}'
+    virtualenv_command: python3 -m venv
+  register: create_venv
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ sabnzbd_var }}'
+    state: directory
+    owner: '{{ sabnzbd_user }}'
+    group: '{{ sabnzbd_user }}'
+    mode: ug=rwx,o=rx
+
+- name: Create config
+  ini_file:
+    path: '{{ sabnzbd_var }}/sabnzbd.ini'
+    owner: '{{ sabnzbd_user }}'
+    group: '{{ sabnzbd_user }}'
+    mode: ug=rw,o=r
+    section: '{{ item[0] }}'
+    option: '{{ item[1] }}'
+    value: '{{ item[2] }}'
+  loop: '{{ sabnzbd_config }}'
+  register: create_config
+
+- name: Fix permissions
+  shell: >
+    find {{ sabnzbd_var }} \
+      ! -user root \
+      ! -user {{ sabnzbd_user }} \
+      -print \
+      -exec chown {{ sabnzbd_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+
+# Create service
+
+- name: Create service
+  template:
+    src: service.j2
+    dest: '/etc/systemd/system/{{ sabnzbd_name }}.service'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_service
+
+- name: Enable
+  systemd: 
+    name: '{{ sabnzbd_name }}'
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: '{{ sabnzbd_name }}'
+    state: restarted
+    daemon_reload: true
+  when: >
+    create_lib is changed or
+    create_venv is changed or
+    create_config is changed or
+    create_service is changed
+
+- name: Start 
+  systemd: 
+    name: '{{ sabnzbd_name }}'
+    state: started

@@ -96,6 +96,12 @@
     qbittorrent_port: 8081
     qbittorrent_peer_port: 50000
     qbittorrent_interface: '{{ network_interface }}'
+  - role: sabnzbd
+    tags: sabnzbd
+    sabnzbd_name: sabnzbd
+    sabnzbd_user: media
+    sabnzbd_opt: /mnt/data/cache/sabnzbd
+    sabnzbd_var: /mnt/data/media/sabnzbd
 
 - name: NGINX
   hosts: server

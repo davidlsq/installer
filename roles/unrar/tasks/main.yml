@@ -1,0 +1,34 @@
+# Install Package
+
+- name: Package
+  apt:
+    name: make
+    state: latest
+
+# Create lib
+
+- name: Create lib directory
+  file:
+    path: '{{ unrar_lib }}'
+    state: directory
+    owner: root
+    group: root
+    mode: ug=rwx,o=rx
+
+- name: Create lib
+  unarchive:
+    src: '{{ unrar_archive }}'
+    remote_src: yes
+    dest: '{{ unrar_lib }}'
+    creates: '{{ unrar_lib }}/makefile'
+    extra_opts:
+    - --transform
+    - 's/^unrar//'
+
+- name: Build lib
+  shell: |
+    make -j 8
+    make install
+  args:
+    chdir: '{{ unrar_lib }}'
+    creates: '{{ unrar_lib }}/unrar'

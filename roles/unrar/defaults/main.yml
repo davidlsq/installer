@@ -1,0 +1,3 @@
+unrar_version: 6.2.6
+unrar_archive: 'https://rarlab.com/rar/unrarsrc-{{ unrar_version }}.tar.gz'
+unrar_lib: '/usr/lib/unrar-{{ unrar_version }}'

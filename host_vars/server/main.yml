@@ -3,3 +3,4 @@ network_interface: enp0s31f6
 network_host_name: '{{ inventory_hostname }}'
 private_domain: '{{ network_host_name }}.local'
 qbittorrent_port: 8081
+sabnzbd_port: 8082
