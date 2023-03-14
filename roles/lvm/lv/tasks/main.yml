@@ -1,0 +1,23 @@
+# Create VG
+
+- name: Create
+  lvol:
+    vg: '{{ vg_name }}'
+    lv: '{{ lv_name }}'
+    size: '{{ lv_size }}'
+    opts: '{{ lv_opts }}'
+    resizefs: true
+
+- name: Format
+  filesystem:
+    dev: '/dev/{{ vg_name }}/{{ lv_name }}'
+    fstype: ext4
+    force: false
+
+- name: Mount
+  mount:
+    src: '/dev/mapper/{{ vg_name }}-{{ lv_name }}'
+    path: '{{ lv_mount }}'
+    fstype: ext4
+    opts: rw,relatime
+    state: mounted

@@ -1,0 +1,14 @@
+# Install package
+
+- name: Package
+  apt: 
+    name: lvm2 
+    state: latest
+
+# Create VG
+
+- name: Create
+  lvg:
+    vg: '{{ vg_name }}'
+    pesize: 64
+    pvs: '{{ vg_pvs | join(",") }}'

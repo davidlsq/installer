@@ -1,0 +1,2 @@
+lv_mount: '/mnt/{{ vg_name }}/{{ lv_name }}'
+lv_service: '{{ lv_mount | replace("/", " ") | trim | replace(" ", "-") }}.mount'
