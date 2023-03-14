@@ -93,7 +93,15 @@
     tags: qbittorrent
     qbittorrent_var: /mnt/data/media/qbittorrent
     qbittorrent_user: media
-    qbittorrent_address: 0.0.0.0
     qbittorrent_port: 8081
     qbittorrent_peer_port: 50000
     qbittorrent_interface: '{{ network_interface }}'
+
+- name: NGINX
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: nginx
+  roles:
+  - role: nginx
+    nginx_config: server/nginx.conf.j2

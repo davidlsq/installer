@@ -1,0 +1,35 @@
+# Install package
+
+- name: Package
+  apt:
+    name: nginx
+    state: latest
+    policy_rc_d: 101
+  register: package
+
+- name: Create config
+  template:
+    src: '{{ nginx_config }}'
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_config
+
+- name: Enable
+  systemd: 
+    name: nginx
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: nginx
+    state: reloaded
+  when: >
+    package is changed or
+    create_config is changed
+
+- name: Start 
+  systemd: 
+    name: nginx
+    state: started
