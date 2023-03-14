@@ -1,0 +1,62 @@
+# Install package
+
+- name: Package apt
+  apt:
+    name: python3-pip
+    state: latest
+
+- name: Package pip
+  pip:
+    name:
+    - certbot
+    - certbot-dns-ovh
+    state: latest
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+  with_items:
+  - '{{ certbot_var }}'
+  - '{{ certbot_var }}/config'
+  - '{{ certbot_var }}/work'
+
+- name: Create config
+  template:
+    src: ovh-credentials.conf.j2
+    dest: '{{ certbot_ovh_credentials }}'
+    owner: root
+    group: root
+    mode: u=rw,go=
+  register: create_config
+
+- name: Create script
+  template:
+    src: certbot.sh.j2
+    dest: '{{ certbot_script }}'
+    owner: root
+    group: root
+    mode: u=rwx,go=r
+  register: create_config
+
+# Create certificate
+
+- name: Init certificate
+  command: '{{ certbot_script }}'
+  args:
+    creates: '{{ certbot_var }}/config/live/{{ certbot_domain }}/fullchain.pem'
+
+- name: Add cron
+  cron:
+    name: 'certbot-{{ item }}'
+    special_time: '{{ item }}'
+    job: '{{ certbot_script }}'
+  with_items:
+  - 'monthly'
+  - 'reboot'
+

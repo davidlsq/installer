@@ -128,6 +128,19 @@
   become: true
   tags: nginx
   roles:
+  - role: lvm/lv
+    tags: [data, certbot]
+    vg_name: data
+    lv_name: certbot
+    lv_size: 64M
+    lv_opts: --type raid1 --nosync
+  - role: certbot
+    tags: certbot
+    certbot_var: /mnt/data/certbot
+    certbot_domain: '{{ public_domain }}'
+    certbot_ovh_application_key: '{{ password.ovh_application_key }}'
+    certbot_ovh_application_secret: '{{ password.ovh_application_secret }}'
+    certbot_ovh_consumer_key: '{{ password.ovh_consumer_key }}'
   - role: ddclient
     tags: ddclient
     ddclient_login: davidlsq.fr-server

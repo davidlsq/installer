@@ -1,0 +1,8 @@
+#!/bin/bash
+
+certbot certonly -n \
+  --agree-tos --email {{ certbot_email }} --no-eff-email \
+  --dns-ovh --dns-ovh-credentials {{ certbot_ovh_credentials }} \
+  --config-dir {{ certbot_var }}/config \
+  --work-dir {{ certbot_var }}/work \
+  -d {{ certbot_domain }} -d '*.{{ certbot_domain }}'

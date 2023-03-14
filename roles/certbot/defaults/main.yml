@@ -1,0 +1,5 @@
+certbot_name: certbot
+certbot_var: '/var/lib/{{ certbot_name }}'
+certbot_email: 'contact@{{ certbot_domain }}'
+certbot_ovh_credentials: '{{ certbot_var }}/ovh-credentials.{{ certbot_domain }}'
+certbot_script: '{{ certbot_var }}/certbot.{{ certbot_domain }}.sh'

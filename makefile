@@ -44,6 +44,9 @@ $(SERVER_PASSWORD) :
 	@$(SCRIPT_PASSWORD_CRYPT) server user $@
 	@$(SCRIPT_PASSWORD_CRYPT) server ansible $@
 	@$(SCRIPT_PASSWORD_CLEAR) server ddclient $@
+	@$(SCRIPT_PASSWORD_CLEAR) server ovh_application_key $@
+	@$(SCRIPT_PASSWORD_CLEAR) server ovh_application_secret $@
+	@$(SCRIPT_PASSWORD_CLEAR) server ovh_consumer_key $@
 
 SERVER_SSH = files/server/ssh
 $(SERVER_SSH) :
