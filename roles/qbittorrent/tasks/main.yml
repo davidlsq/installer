@@ -17,9 +17,9 @@
     group: '{{ qbittorrent_user }}'
     mode: ug=rwx,o=rx
   with_items:
-    - '{{ qbittorrent_var }}'
-    - '{{ qbittorrent_var }}/qBittorrent'
-    - '{{ qbittorrent_var }}/qBittorrent/config'
+  - '{{ qbittorrent_var }}'
+  - '{{ qbittorrent_var }}/qBittorrent'
+  - '{{ qbittorrent_var }}/qBittorrent/config'
 
 - name: Create config
   ini_file:

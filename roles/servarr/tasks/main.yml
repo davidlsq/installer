@@ -3,9 +3,9 @@
 - name: Package
   apt:
     name:
-      - curl
-      - sqlite3
-      - python3-lxml
+    - curl
+    - sqlite3
+    - python3-lxml
     state: latest
 
 # Software vars

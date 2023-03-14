@@ -6,9 +6,9 @@
     group: '{{ library_user }}'
     mode: ug=rwx,o=rx
   with_items:
-    - '{{ library_var }}'
-    - '{{ library_var }}/films'
-    - '{{ library_var }}/shows'
+  - '{{ library_var }}'
+  - '{{ library_var }}/films'
+  - '{{ library_var }}/shows'
 
 - name: Fix permissions
   shell: >
