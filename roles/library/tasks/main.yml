@@ -1,0 +1,22 @@
+- name: Create directories
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ library_user }}'
+    group: '{{ library_user }}'
+    mode: ug=rwx,o=rx
+  with_items:
+    - '{{ library_var }}'
+    - '{{ library_var }}/films'
+    - '{{ library_var }}/shows'
+
+- name: Fix permissions
+  shell: >
+    find {{ library_var }} \
+      ! -user root \
+      ! -user {{ library_user }} \
+      -print \
+      -exec chown {{ library_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'

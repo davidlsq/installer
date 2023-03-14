@@ -81,4 +81,11 @@
   - role: user-service
     tags: data
     user_service_name: media
-    
+  - role: library
+    tags: data
+    library_user: media
+    library_var: /mnt/data/media/library
+  - role: plex
+    tags: plex
+    plex_user: media
+    plex_var: /mnt/data/media/plex

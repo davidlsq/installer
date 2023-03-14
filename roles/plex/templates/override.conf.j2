@@ -1,0 +1,9 @@
+[Service]
+User={{ plex_user }}
+Group={{ plex_user }}
+
+Environment="PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR={{ plex_var }}"
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=plex
