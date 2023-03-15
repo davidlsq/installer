@@ -7,14 +7,58 @@
     policy_rc_d: 101
   register: package
 
-- name: Create config
-  template:
-    src: '{{ nginx_config }}'
-    dest: /etc/nginx/nginx.conf
+# Create cookie
+  
+- name: Check cookie
+  stat:
+    path: '{{ nginx_cookie_path }}'
+  register: check_cookie
+
+- name: Create cookie
+  copy:
+    content: '{{ lookup("password", "/dev/null length=32 chars=ascii_letters,digits") }}'
+    dest: '{{ nginx_cookie_path }}'
     owner: root
     group: root
     mode: u=rw,go=r
+  no_log: true
+  when: not check_cookie.stat.exists
+
+# Create htpasswd
+  
+- name: Create htpasswd
+  template:
+    src: htpasswd.j2
+    dest: '{{ nginx_htpasswd_path }}'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  no_log: true
+
+# Create config
+  
+- name: Get cookie
+  command: 'cat {{ nginx_cookie_path }}'
+  register: cat_cookie
+  changed_when: false
+  no_log: true
+
+- set_fact:
+    cookie: '{{ cat_cookie.stdout }}'
+    htpasswd: '{{ nginx_htpasswd_path }}'
+  no_log: true
+
+- name: Create config
+  template:
+    src: '{{ nginx_site_conf }}'
+    dest: '/etc/nginx/sites-enabled/{{ nginx_site_name }}.conf'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  no_log: true
   register: create_config
+
+# Create service
 
 - name: Enable
   systemd: 

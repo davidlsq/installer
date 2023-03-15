@@ -150,9 +150,7 @@
     ddclient_domains:
     - '{{ public_domain }}'
     ddclient_password: '{{ password.ddclient }}'
-  - role: htpasswd
-    tags: htpasswd
-    htpasswd_users:
-    - ['{{ user_name }}', '{{ password.user }}']
   - role: nginx
-    nginx_config: server/nginx/nginx.conf.j2
+    nginx_site_conf: server/nginx/site.conf.j2
+    nginx_htpasswd_users:
+    - ['{{ user_name }}', '{{ password.user }}']

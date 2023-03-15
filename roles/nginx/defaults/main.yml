@@ -1,0 +1,4 @@
+nginx_site_name: site
+nginx_htpasswd_path: '/etc/nginx/htpasswd_{{ nginx_site_name }}'
+nginx_htpasswd_users: []
+nginx_cookie_path: '/etc/nginx/cookie_{{ nginx_site_name }}'

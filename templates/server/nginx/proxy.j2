@@ -1,0 +1,9 @@
+{% include "qbittorrent.j2" %}
+
+{% include "sabnzbd.j2" %}
+
+{% with port=8083,name="prowlarr" %}{% include "servarr.j2" %}{% endwith %}
+
+{% with port=8084,name="radarr" %}{% include "servarr.j2" %}{% endwith %}
+
+{% with port=8085,name="sonarr" %}{% include "servarr.j2" %}{% endwith %}
