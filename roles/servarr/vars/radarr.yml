@@ -1,5 +1,5 @@
-servarr_version: 4.4.2.6956
-servarr_archive: 'https://github.com/Radarr/Radarr/releases/download/v{{ servarr_version }}/Radarr.develop.{{ servarr_version }}.linux-core-x64.tar.gz'
+servarr_version: 4.3.2.6857
+servarr_archive: 'https://github.com/Radarr/Radarr/releases/download/v{{ servarr_version }}/Radarr.master.{{ servarr_version }}.linux-core-x64.tar.gz'
 servarr_executable: Radarr
 servarr_config:
 - [BindAddress, '{{ servarr_address }}']
