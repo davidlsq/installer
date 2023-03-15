@@ -1,0 +1,21 @@
+[Unit]
+Description={{ sonarr_name }}
+After=syslog.target network.target
+
+[Service]
+User={{ sonarr_user }}
+Group={{ sonarr_user }}
+
+Type=simple
+ExecStart=mono --debug {{ sonarr_lib }}/Sonarr.exe -nobrowser -data={{ sonarr_var }}/
+
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ sonarr_name }}
+
+[Install]
+WantedBy=multi-user.target

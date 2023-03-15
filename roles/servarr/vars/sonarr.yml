@@ -5,6 +5,6 @@ servarr_config:
 - [BindAddress, '{{ servarr_address }}']
 - [Port, '{{ servarr_port }}']
 - [UrlBase, '/{{ servarr_name }}']
-- [InstanceName, '{{ servarr_name | capitalize }}']
+- [InstanceName, '{{ servarr_name }}']
 - [AnalyticsEnabled, false]
 - [AuthenticationMethod, External]

@@ -91,13 +91,21 @@
     plex_var: /mnt/data/media/plex
   - role: qbittorrent
     tags: qbittorrent
-    qbittorrent_var: /mnt/data/media/qbittorrent
+    qbittorrent_name: '{{ qbittorrent_1_name }}'
+    qbittorrent_port: '{{ qbittorrent_1_port }}'
+    qbittorrent_var: '/mnt/data/media/{{ qbittorrent_1_name }}'
     qbittorrent_user: media
     qbittorrent_peer_port: 50000
     qbittorrent_interface: '{{ network_interface }}'
+  - role: joal
+    tags: joal
+    joal_user: media
+    joal_var: /mnt/data/media/joal
   - role: sabnzbd
     tags: sabnzbd
-    sabnzbd_var: /mnt/data/media/sabnzbd
+    sabnzbd_name: '{{ sabnzbd_1_name }}'
+    sabnzbd_port: '{{ sabnzbd_1_port }}'
+    sabnzbd_var: '/mnt/data/media/{{ sabnzbd_1_name }}'
     sabnzbd_user: media
     sabnzbd_host_whitelist:
     - '{{ private_domain }}'
@@ -105,29 +113,42 @@
   - role: servarr
     tags: [servarr, prowlarr]
     servarr_software: prowlarr
-    servarr_var: /mnt/data/media/prowlarr
+    servarr_name: '{{ prowlarr_1_name }}'
+    servarr_port: '{{ prowlarr_1_port }}'
+    servarr_var: '/mnt/data/media/{{ prowlarr_1_name }}'
     servarr_user: media
-    servarr_port: '{{ prowlarr_port }}'
+  - role: jackett
+    tags: jackett
+    jackett_name: '{{ jackett_1_name }}'
+    jackett_port: '{{ jackett_1_port }}'
+    jackett_var: '/mnt/data/media/{{ jackett_1_name }}'
+    jackett_user: media
   - role: servarr
     tags: [servarr, radarr]
     servarr_software: radarr
-    servarr_var: /mnt/data/media/radarr
+    servarr_name: '{{ radarr_1_name }}'
+    servarr_port: '{{ radarr_1_port }}'
+    servarr_var: '/mnt/data/media/{{ radarr_1_name }}'
     servarr_user: media
-    servarr_port: '{{ radarr_port }}'
   - role: servarr
-    tags: [servarr, sonarr]
-    servarr_software: sonarr
-    servarr_var: /mnt/data/media/sonarr
+    tags: [servarr, radarr]
+    servarr_software: radarr
+    servarr_name: '{{ radarr_2_name }}'
+    servarr_port: '{{ radarr_2_port }}'
+    servarr_var: '/mnt/data/media/{{ radarr_2_name }}'
     servarr_user: media
-    servarr_port: '{{ sonarr_port }}'
-  - role: joal
-    tags: joal
-    joal_user: media
-    joal_var: /mnt/data/media/joal
-  - role: jackett
-    tags: jackett
-    jackett_user: media
-    jackett_var: /mnt/data/media/jackett
+  - role: sonarr
+    tags: sonarr
+    sonarr_name: '{{ sonarr_1_name }}'
+    sonarr_port: '{{ sonarr_1_port }}'
+    sonarr_var: '/mnt/data/media/{{ sonarr_1_name }}'
+    sonarr_user: media
+  - role: sonarr
+    tags: sonarr
+    sonarr_name: '{{ sonarr_2_name }}'
+    sonarr_port: '{{ sonarr_2_port }}'
+    sonarr_var: '/mnt/data/media/{{ sonarr_2_name }}'
+    sonarr_user: media
 
 - name: NGINX
   hosts: server

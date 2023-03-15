@@ -3,20 +3,18 @@
 - name: Package
   apt:
     name:
+    - mono-devel
     - curl
     - sqlite3
     - python3-lxml
+    - mediainfo
     state: latest
-
-# Software vars
-
-- include_vars: '{{ servarr_software }}.yml'
 
 # Create lib
 
 - name: Create lib directory
   file:
-    path: '{{ servarr_lib }}'
+    path: '{{ sonarr_lib }}'
     state: directory
     owner: root
     group: root
@@ -24,57 +22,57 @@
 
 - name: Create lib
   unarchive:
-    src: '{{ servarr_archive }}'
+    src: '{{ sonarr_archive }}'
     remote_src: yes
-    dest: '{{ servarr_lib }}'
+    dest: '{{ sonarr_lib }}'
     owner: root
     group: root
     mode: u+rw,go-w+r
-    creates: '{{ servarr_lib }}/{{ servarr_executable }}'
+    creates: '{{ sonarr_lib }}/Sonarr.exe'
     extra_opts:
     - --transform
-    - 's/^{{ servarr_executable }}//'
+    - 's/^Sonarr//'
   register: create_lib
 
 # Create var
 
 - name: Create var directory
   file:
-    path: '{{ servarr_var }}'
+    path: '{{ sonarr_var }}'
     state: directory
-    owner: '{{ servarr_user }}'
-    group: '{{ servarr_user }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_user }}'
     mode: ug=rwx,o=rx
 
 - name: Check config
   stat:
-    path: '{{ servarr_var }}/config.xml'
+    path: '{{ sonarr_var }}/config.xml'
   register: check_config
 
 - name: Init config
   copy:
     content: <Config></Config>
-    dest: '{{ servarr_var }}/config.xml'
-    owner: '{{ servarr_user }}'
-    group: '{{ servarr_user }}'
+    dest: '{{ sonarr_var }}/config.xml'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_user }}'
     mode: u=rw,go=r
   when: not check_config.stat.exists
 
 - name: Create config
   xml:
-    path: '{{ servarr_var }}/config.xml'
+    path: '{{ sonarr_var }}/config.xml'
     xpath: '/Config/{{ item[0] }}'
     value: '{{ item[1] | string }}'
-  loop: '{{ servarr_config }}'
+  loop: '{{ sonarr_config }}'
   register: create_config
 
 - name: Fix permissions
   shell: >
-    find {{ servarr_var }} \
+    find {{ sonarr_var }} \
       ! -user root \
-      ! -user {{ servarr_user }} \
+      ! -user {{ sonarr_user }} \
       -print \
-      -exec chown {{ servarr_user }}. {} \; \
+      -exec chown {{ sonarr_user }}. {} \; \
       | wc -l
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
@@ -84,7 +82,7 @@
 - name: Create service
   template:
     src: service.j2
-    dest: '/etc/systemd/system/{{ servarr_name }}.service'
+    dest: '/etc/systemd/system/{{ sonarr_name }}.service'
     owner: root
     group: root
     mode: u=rw,go=r
@@ -92,12 +90,12 @@
 
 - name: Enable
   systemd: 
-    name: '{{ servarr_name }}'
+    name: '{{ sonarr_name }}'
     enabled: true
 
 - name: Restart
   systemd:
-    name: '{{ servarr_name }}'
+    name: '{{ sonarr_name }}'
     daemon_reload: true
     state: restarted
   when: >
@@ -107,5 +105,5 @@
 
 - name: Start 
   systemd: 
-    name: '{{ servarr_name }}'
+    name: '{{ sonarr_name }}'
     state: started

@@ -7,8 +7,10 @@
     mode: ug=rwx,o=rx
   with_items:
   - '{{ library_var }}'
-  - '{{ library_var }}/films'
-  - '{{ library_var }}/shows'
+  - '{{ library_var }}/radarr-1'
+  - '{{ library_var }}/radarr-2'
+  - '{{ library_var }}/sonarr-1'
+  - '{{ library_var }}/sonarr-2'
 
 - name: Fix permissions
   shell: >

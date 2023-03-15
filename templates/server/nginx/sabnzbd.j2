@@ -1,4 +1,4 @@
-location ^~ /sabnzbd/ {
+location ^~ /{{ name }}/ {
   client_max_body_size 16M;
   client_body_buffer_size 128k;
 
@@ -23,5 +23,5 @@ location ^~ /sabnzbd/ {
   proxy_no_cache $cookie_session;
   proxy_buffers 32 4k;
 
-  proxy_pass http://127.0.0.1:{{ sabnzbd_port }};
+  proxy_pass http://127.0.0.1:{{ port }};
 }

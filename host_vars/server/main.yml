@@ -3,9 +3,28 @@ network_interface: enp0s31f6
 network_host_name: '{{ inventory_hostname }}'
 private_domain: '{{ network_host_name }}.local'
 public_domain: server.davidlsq.fr
-qbittorrent_port: 8081
-sabnzbd_port: 8082
-prowlarr_port: 8083
-radarr_port: 8084
-sonarr_port: 8085
-jackett_port: 8086
+
+qbittorrent_1_name: qbittorrent
+qbittorrent_1_port: 8010
+
+sabnzbd_1_name: sabnzbd
+sabnzbd_1_port: 8020
+
+prowlarr_1_name: prowlarr
+prowlarr_1_port: 8031
+
+jackett_1_name: jackett
+jackett_1_port: 8041
+
+radarr_1_name: radarr-1
+radarr_1_port: 8051
+
+radarr_2_name: radarr-2
+radarr_2_port: 8052
+
+sonarr_1_name: sonarr-1
+sonarr_1_port: 8061
+
+sonarr_2_name: sonarr-2
+sonarr_2_port: 8062
+
