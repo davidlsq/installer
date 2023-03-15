@@ -1,0 +1,115 @@
+# Install package
+
+- name: Package
+  apt:
+    name:
+      - libicu67
+      - libssl1.1
+      - jq
+    state: latest
+
+# Create lib
+
+- name: Create lib directory
+  file:
+    path: '{{ jackett_lib }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: Create lib
+  unarchive:
+    src: '{{ jackett_archive }}'
+    remote_src: yes
+    dest: '{{ jackett_lib }}'
+    owner: root
+    group: root
+    mode: u+rw,go-w+r
+    creates: '{{ jackett_lib }}/jackett'
+    extra_opts:
+    - --transform
+    - s/^Jackett//
+  register: create_lib
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ jackett_var }}'
+    state: directory
+    owner: '{{ jackett_user }}'
+    group: '{{ jackett_user }}'
+    mode: ug=rwx,o=rx
+
+- name: Check config
+  stat:
+    path: '{{ jackett_var }}/ServerConfig.json'
+  register: check_config
+
+- name: Init config
+  copy:
+    content: '{}'
+    dest: '{{ jackett_var }}/ServerConfig.json'
+    owner: '{{ jackett_user }}'
+    group: '{{ jackett_user }}'
+    mode: u=rw,go=r
+  when: not check_config.stat.exists
+
+- name: Create ansible config
+  copy:
+    content: '{{ jackett_config | to_json }}'
+    dest: '{{ jackett_var }}/ServerConfig.json.ansible'
+    owner: '{{ jackett_user }}'
+    group: '{{ jackett_user }}'
+    mode: u=rw,go=r
+  register: create_config
+
+- name: Update config
+  shell: >
+    jq -s '.[0] * .[1]' {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible \
+      > {{ jackett_var }}/ServerConfig.json.tmp
+    mv {{ jackett_var }}/ServerConfig.json.tmp {{ jackett_var }}/ServerConfig.json
+  when: create_config is changed
+
+- name: Fix permissions
+  shell: >
+    find {{ jackett_var }} \
+      ! -user root \
+      ! -user {{ jackett_user }} \
+      -print \
+      -exec chown {{ jackett_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+
+# Create service
+
+- name: Create service
+  template:
+    src: service.j2
+    dest: '/etc/systemd/system/{{ jackett_name }}.service'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_service
+
+- name: Enable
+  systemd: 
+    name: '{{ jackett_name }}'
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: '{{ jackett_name }}'
+    daemon_reload: true
+    state: restarted
+  when: >
+    create_lib is changed or
+    create_config is changed or
+    create_service is changed
+
+- name: Start 
+  systemd: 
+    name: '{{ jackett_name }}'
+    state: started

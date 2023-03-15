@@ -1,0 +1,21 @@
+[Unit]
+Description={{ jackett_name }}
+After=syslog.target network.target
+
+[Service]
+User={{ jackett_user }}
+Group={{ jackett_user }}
+
+Type=simple
+ExecStart=/bin/sh -c "{{ jackett_lib }}/jackett_launcher.sh -d {{ jackett_var }}"
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ jackett_name }}
+
+[Install]
+WantedBy=multi-user.target

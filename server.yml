@@ -124,6 +124,10 @@
     tags: joal
     joal_user: media
     joal_var: /mnt/data/media/joal
+  - role: jackett
+    tags: jackett
+    jackett_user: media
+    jackett_var: /mnt/data/media/jackett
 
 - name: NGINX
   hosts: server
