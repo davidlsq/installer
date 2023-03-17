@@ -67,9 +67,9 @@
 
 - name: Update config
   shell: >
-    jq -s '.[0] * .[1]' {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible \
-      > {{ jackett_var }}/ServerConfig.json.tmp
-    mv {{ jackett_var }}/ServerConfig.json.tmp {{ jackett_var }}/ServerConfig.json
+    cat {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible | jq -s add > {{ jackett_var }}/ServerConfig.json.tmp;
+    cat {{ jackett_var }}/ServerConfig.json.tmp > {{ jackett_var }}/ServerConfig.json;
+    rm {{ jackett_var }}/ServerConfig.json.tmp
   when: create_config is changed
 
 - name: Fix permissions
