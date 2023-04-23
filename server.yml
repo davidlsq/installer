@@ -181,3 +181,15 @@
     nginx_site_conf: server/nginx/site.conf.j2
     nginx_htpasswd_users:
     - ['{{ user_name }}', '{{ password.user }}']
+
+- name: APT Upgrade
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: apt-upgrade
+  tasks:
+  - name: Upgrade
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 3600

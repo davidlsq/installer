@@ -52,3 +52,15 @@
     ohmyzsh_user_name: '{{ user_name }}'
   - role: ohmyzsh
     ohmyzsh_user_name: ansible
+
+- name: APT Upgrade
+  hosts: virtual
+  gather_facts: false
+  become: true
+  tags: apt-upgrade
+  tasks:
+  - name: Upgrade
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 3600
