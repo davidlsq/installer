@@ -21,7 +21,9 @@
   become: true
   roles:
   - role: network
+    tags: network
   - role: apt
+    tags: apt
   - role: ssh-server
     tags: ssh-server
     ssh_server_key: server/ssh/server
