@@ -1,0 +1,4 @@
+netatalk_name: netatalk
+netatalk_var: '/var/lib/{{ netatalk_name }}'
+netatalk_size: 980000
+netatalk_user: '{{ netatalk_name }}'

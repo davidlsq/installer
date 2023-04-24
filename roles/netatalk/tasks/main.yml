@@ -1,0 +1,69 @@
+# Install Package
+
+- name: Package
+  apt:
+    name: netatalk
+    state: latest
+  register: package
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ netatalk_var }}'
+    state: directory
+    owner: '{{ netatalk_user }}'
+    group: '{{ netatalk_user }}'
+    mode: u=rwx,go=rx
+
+- name: Fix permissions
+  shell: >
+    find {{ netatalk_var }} \
+      ! -user root \
+      ! -user {{ netatalk_user }} \
+      -print \
+      -exec chown {{ netatalk_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+
+# Configure
+
+- name: Create config
+  template:
+    src: afp.conf.j2
+    dest: /etc/netatalk/afp.conf
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: config
+
+# Start service
+
+- name: Enable
+  systemd: 
+    name: '{{ item }}'
+    enabled: true
+  with_items:
+  - avahi-daemon
+  - netatalk
+
+- name: Restart
+  systemd:
+    name: '{{ item }}'
+    state: restarted
+    daemon_reload: true
+  when: >
+    package is changed or
+    config is changed
+  with_items:
+  - avahi-daemon
+  - netatalk
+
+- name: Start 
+  systemd: 
+    name: '{{ item }}'
+    state: started
+  with_items:
+  - avahi-daemon
+  - netatalk
