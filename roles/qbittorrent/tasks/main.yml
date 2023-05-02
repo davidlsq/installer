@@ -30,6 +30,7 @@
     section: '{{ item[0] }}'
     option: '{{ item[1] }}'
     value: '{{ item[2] }}'
+    no_extra_spaces: true
   loop: '{{ qbittorrent_config }}'
   register: create_config
 
