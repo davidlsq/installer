@@ -9,7 +9,7 @@
   roles:
   - role: bootstrap/systemctl
   - role: bootstrap/cdrom
-  - role: bootstrap/grub
+  - role: bootstrap/upgrade
   - role: bootstrap/keyboard
   - role: bootstrap/playbook
 
@@ -52,15 +52,3 @@
     ohmyzsh_user_name: '{{ user_name }}'
   - role: ohmyzsh
     ohmyzsh_user_name: ansible
-
-- name: APT Upgrade
-  hosts: virtual
-  gather_facts: false
-  become: true
-  tags: apt-upgrade
-  tasks:
-  - name: Upgrade
-    apt:
-      upgrade: yes
-      update_cache: yes
-      cache_valid_time: 3600

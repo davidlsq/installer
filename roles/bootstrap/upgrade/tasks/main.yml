@@ -1,0 +1,50 @@
+# Upgrade
+
+- name: Update
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Upgrade
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+
+# Create kernel symlinks
+
+- name: Find initrd
+  find:
+    paths: /boot
+    patterns: initrd.img-*
+  register: initrd
+
+- name: Create initrd.img link 
+  file:
+    src: '{{ (initrd.files | sort(attribute="path"))[-1]["path"] | basename }}'
+    dest: /boot/initrd.img
+    state: link
+    force: true
+
+- name: Find vmlinuz
+  find:
+    paths: /boot
+    patterns: vmlinuz-*
+  register: vmlinuz
+
+- name: Create vmlinuz link 
+  file:
+    src: '{{ (vmlinuz.files | sort(attribute="path"))[-1]["path"] | basename }}'
+    dest: /boot/vmlinuz
+    state: link
+    force: true
+
+# Create grub config
+
+- name: Create config
+  copy:
+    src: grub.cfg
+    dest: /boot/grub/grub.cfg
+    owner: root
+    group: root
+    mode: u=rw,go=r
