@@ -27,7 +27,7 @@
     name: systemd-networkd
     state: restarted
     daemon_reload: true
-  when: create_service.changed
+  when: create_service is changed
 
 - name: Start
   systemd:
@@ -68,7 +68,7 @@
     name: systemd-resolved
     state: restarted
     daemon_reload: true
-  when: config_hostname.changed
+  when: config_hostname is changed
 
 - name: Start
   systemd:

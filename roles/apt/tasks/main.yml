@@ -23,7 +23,7 @@
 - name: Update cache
   apt:
     update_cache: true
-  when: sources.changed
+  when: sources is changed
 
 - name: Update old cache
   apt:
