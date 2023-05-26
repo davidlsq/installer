@@ -40,6 +40,7 @@
       | wc -l
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
+  tags: fix_permissions
 
 # Create service override
 
