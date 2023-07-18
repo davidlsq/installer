@@ -1,5 +1,5 @@
 sabnzbd_name: sabnzbd
-sabnzbd_version: 4.0.1
+sabnzbd_version: 4.0.3
 sabnzbd_archive: 'https://github.com/sabnzbd/sabnzbd/releases/download/{{ sabnzbd_version }}/SABnzbd-{{ sabnzbd_version }}-src.tar.gz'
 sabnzbd_var: '/var/lib/{{ sabnzbd_name }}'
 sabnzbd_lib: '/usr/lib/sabnzbd-{{ sabnzbd_version }}'
