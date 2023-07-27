@@ -96,7 +96,7 @@
     tags: data
     vg_name: data
     lv_name: media
-    lv_size: 7T
+    lv_size: 8T
     lv_opts: --type raid1 --nosync
   - role: user-service
     tags: data
