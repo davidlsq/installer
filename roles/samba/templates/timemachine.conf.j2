@@ -1,0 +1,9 @@
+[{{ samba_section }}]
+    valid users = {{ samba_user }}
+    comment = {{ samba_section }}
+    path = {{ samba_var }}
+    browseable = yes
+    read only = no
+    spotlight = yes
+    vfs objects = catia fruit streams_xattr
+    fruit:time machine = yes

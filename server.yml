@@ -68,23 +68,24 @@
     - /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
     - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
 
-- name: Netatalk
+- name: Time Machine
   hosts: server
   gather_facts: false
   become: true
-  tags: netatalk
+  tags: timemachine
   roles:
   - role: lvm/lv
     tags: data
     vg_name: data
-    lv_name: netatalk
+    lv_name: timemachine
     lv_size: 1T
     lv_opts: --type raid1 --nosync
-  - role: netatalk
-    netatalk_var: /mnt/data/netatalk
-    netatalk_size: 1000000
-    netatalk_user: '{{ user_name }}'
-    netatalk_network_interface: '{{ network_interface }}'
+  - role: samba
+    samba_var: /mnt/data/timemachine
+    samba_user: '{{ user_name }}'
+    samba_password: '{{ password.user }}'
+    samba_section: TimeMachine
+    samba_section_conf: timemachine.conf.j2
 
 - name: Media Softwares
   hosts: server

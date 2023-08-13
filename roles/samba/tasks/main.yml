@@ -1,0 +1,99 @@
+# Install Package
+
+- name: Package
+  apt:
+    name:
+    - samba
+    - smbclient
+    state: latest
+  register: package
+
+# Create var
+
+- name: Create var directory
+  file:
+    path: '{{ samba_var }}'
+    state: directory
+    owner: '{{ samba_user }}'
+    group: '{{ samba_user }}'
+    mode: u=rwx,go=rx
+
+- name: Fix permissions
+  shell: >
+    find {{ samba_var }} \
+      ! -user root \
+      ! -user {{ samba_user }} \
+      -print \
+      -exec chown {{ samba_user }}. {} \; \
+      | wc -l
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+  tags: fix_permissions
+
+# Configure
+
+- name: Create config
+  template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_config
+
+- name: Create section directory
+  file:
+    path: /etc/samba/section.d
+    state: directory
+    owner: root
+    group: root
+    mode: ug=rwx,o=rx
+
+- name: Create section config
+  template:
+    src: '{{ samba_section_conf }}'
+    dest: '/etc/samba/section.d/{{ samba_section }}.conf'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_section_config
+
+- name: Add section config
+  lineinfile:
+    path: /etc/samba/section.conf
+    line: 'include = /etc/samba/section.d/{{ samba_section }}.conf'
+    create: yes
+
+# Set password
+
+- name: Set password
+  shell: >
+    set -e -o pipefail
+    && (smbclient -U {{ samba_user }}%{{ samba_password }} -L 127.0.0.1 2>&1 > /dev/null)
+    || (echo "{{ samba_password }}"; echo "{{ samba_password }}") | smbpasswd -a {{ samba_user }}
+  args:
+    executable: /bin/bash
+  register: set_password
+  changed_when: '"New SMB password" in set_password.stdout'
+  no_log: true
+
+# Create service
+
+- name: Enable
+  systemd: 
+    name: smbd
+    enabled: true
+
+- name: Restart
+  systemd:
+    name: smbd
+    state: restarted
+  when: >
+    package is changed or
+    create_config is changed or
+    create_section_config is changed
+
+- name: Start 
+  systemd: 
+    name: smbd
+    state: started
