@@ -7,6 +7,11 @@
     policy_rc_d: 101
   register: package
 
+- name: Package
+  apt:
+    name: python3-passlib
+    state: latest
+
 # Create cookie
   
 - name: Check cookie
@@ -24,15 +29,17 @@
   no_log: true
   when: not check_cookie.stat.exists
 
-# Create htpasswd
-  
-- name: Create htpasswd
-  template:
-    src: htpasswd.j2
-    dest: '{{ nginx_htpasswd_path }}'
+# Set passwords
+
+- name: Set passwords
+  htpasswd:
+    path: '{{ nginx_htpasswd_path }}'
+    name: '{{ item[0] }}'
+    password: '{{ item[1] }}'
     owner: root
     group: root
     mode: u=rw,go=r
+  loop: '{{ nginx_htpasswd_users }}'
   no_log: true
 
 # Create config
