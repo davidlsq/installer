@@ -6,11 +6,6 @@
     force_apt_get: yes
     cache_valid_time: 3600
 
-- name: Upgrade
-  apt:
-    upgrade: dist
-    force_apt_get: yes
-
 # Create kernel symlinks
 
 - name: Find initrd
