@@ -10,14 +10,14 @@
     tags: systemctl
   - role: cdrom
     tags: cdrom
-  - role: upgrade
-    tags: upgrade
   - role: keyboard
     tags: keyboard
   - role: network
     tags: network
   - role: apt
     tags: apt
+  - role: grub
+    tags: grub
   - role: ssh-server
     tags: ssh-server
     ssh_server_key: virtual/ssh/server
