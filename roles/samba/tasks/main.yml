@@ -5,6 +5,7 @@
     name:
     - samba
     - smbclient
+    - avahi-daemon
     state: latest
   register: package
 
