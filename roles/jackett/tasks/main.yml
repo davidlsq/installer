@@ -3,8 +3,8 @@
 - name: Package
   apt:
     name:
-      - libicu67
-      - libssl1.1
+      - libicu72
+      - libssl3
       - jq
     state: latest
 

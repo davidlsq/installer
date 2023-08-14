@@ -1,5 +1,0 @@
-- name: Add cron
-  cron:
-    name: playbook
-    special_time: reboot
-    job: '[ -f /SIGNAL_BOOT ] && (/media/cdrom/.config/playbook.sh --skip-tags bootstrap && rm /SIGNAL_BOOT)'

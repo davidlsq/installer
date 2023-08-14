@@ -6,7 +6,7 @@ SCRIPT_IMAGE          = bootstrap/scripts/image.py
 
 DEBIAN_AARCH64 = bootstrap/debian-aarch64.iso
 $(DEBIAN_AARCH64) :
-	@wget -q https://cdimage.debian.org/images/release/11.6.0/arm64/iso-cd/debian-11.6.0-arm64-netinst.iso -O $@
+	@wget -q https://cdimage.debian.org/images/release/12.1.0/arm64/iso-cd/debian-12.1.0-arm64-netinst.iso -O $@
 
 VIRTUAL_PASSWORD = host_vars/virtual/password.yml
 $(VIRTUAL_PASSWORD) :
@@ -34,7 +34,7 @@ $(VIRTUAL_INSTALL) : $(VIRTUAL_SSH)
 
 DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
 $(DEBIAN_X86_64) :
-	@wget -q https://cdimage.debian.org/images/release/11.6.0/amd64/iso-cd/debian-11.6.0-amd64-netinst.iso -O $@
+	@wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
 
 SERVER_PASSWORD = host_vars/server/password.yml
 $(SERVER_PASSWORD) :

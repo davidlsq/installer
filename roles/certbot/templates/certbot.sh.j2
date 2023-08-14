@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source {{ certbot_venv }}/bin/activate
+
 certbot certonly -n \
   --agree-tos --email {{ certbot_email }} --no-eff-email \
   --dns-ovh --dns-ovh-credentials {{ certbot_ovh_credentials }} \

@@ -93,5 +93,11 @@ template(host, 'preseed.cfg.j2', config_path / 'preseed.cfg')
 # Create playbook script
 template(host, 'playbook.sh.j2', config_path / 'playbook.sh', '+x')
 
+# Create install script
+copy(files_path / 'install.sh', config_path / 'install.sh', '+x')
+
+# Fix config permissions
+run_command(['chmod', '-R', 'go-rwx', str(config_path)])
+
 create_iso(content_path, efi_path, output_path)
 shutil.rmtree(tmp_path, ignore_errors=True)

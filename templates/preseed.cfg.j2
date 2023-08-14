@@ -17,7 +17,7 @@ d-i netcfg/hostname string {{ bootstrap.host_name }}
 
 # user
 d-i passwd/make-user boolean false
-d-i passwd/root-password-crypted password {{ bootstrap.root_password }}
+d-i passwd/root-password-crypted password {{ bootstrap.root_password | password_hash("sha512", "root") }}
 
 # partitionning
 d-i partman-auto/method string regular
@@ -38,11 +38,7 @@ d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman-efi/non_efi_system boolean true
 
 # install script
-d-i preseed/late_command string \
-  in-target /bin/bash -c 'ln -sfr $(ls /boot/initrd.img-* | tail -n 1) /boot/initrd.img'; \
-  in-target /bin/bash -c 'ln -sfr $(ls /boot/vmlinuz-* | tail -n 1) /boot/vmlinuz'; \
-  in-target /media/cdrom/.config/playbook.sh --tags bootstrap; \
-  touch /target/SIGNAL_BOOT
+d-i preseed/late_command string in-target /media/cdrom/.config/install.sh /ansible
 
 # keep cdrom
 d-i cdrom-detect/eject boolean false

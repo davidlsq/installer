@@ -2,15 +2,21 @@
 
 - name: Package apt
   apt:
-    name: python3-pip
+    name:
+    - python3-pip
+    - python3-venv
     state: latest
 
-- name: Package pip
+# Create lib
+
+- name: Create venv
   pip:
     name:
     - certbot
     - certbot-dns-ovh
-    state: latest
+    virtualenv: '{{ certbot_venv }}'
+    virtualenv_command: python3 -m venv
+  register: create_venv
 
 # Create var
 

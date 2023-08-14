@@ -3,5 +3,5 @@
     src: /dev/disk/by-label/CDROM
     path: /media/cdrom
     fstype: iso9660
-    opts: ro
+    opts: ro,nofail
     state: mounted

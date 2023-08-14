@@ -1,3 +1,10 @@
+# Package
+
+- name: Package
+  apt:
+    name: systemd-resolved
+    state: latest
+
 # Setup networkd
 
 - name: Create directory

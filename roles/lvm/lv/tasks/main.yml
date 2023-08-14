@@ -19,5 +19,5 @@
     src: '/dev/mapper/{{ vg_name }}-{{ lv_name }}'
     path: '{{ lv_mount }}'
     fstype: ext4
-    opts: rw,relatime
+    opts: rw,relatime,nofail
     state: mounted

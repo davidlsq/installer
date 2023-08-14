@@ -11,7 +11,6 @@
   - role: bootstrap/cdrom
   - role: bootstrap/upgrade
   - role: bootstrap/keyboard
-  - role: bootstrap/playbook
 
 # All playbooks below run automatically during first boot
 
