@@ -1,24 +1,19 @@
-# Bootstrap playbook
-# Run during debian install, before first boot
-
-- name: Bootstrap
-  hosts: virtual
-  gather_facts: no
-  become: true
-  tags: bootstrap # <- debian installer tag
-  roles:
-  - role: bootstrap/systemctl
-  - role: bootstrap/cdrom
-  - role: bootstrap/upgrade
-  - role: bootstrap/keyboard
-
 # All playbooks below run automatically during first boot
 
 - name: Base
   hosts: virtual
   gather_facts: no
   become: true
+  tags: base
   roles:
+  - role: systemctl
+    tags: systemctl
+  - role: cdrom
+    tags: cdrom
+  - role: upgrade
+    tags: upgrade
+  - role: keyboard
+    tags: keyboard
   - role: network
     tags: network
   - role: apt
