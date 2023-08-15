@@ -8,16 +8,20 @@ let
   python = pkgs.python311;
   passlib = pkgs.python311Packages.passlib;
   pipx = pkgs.python311Packages.pipx;
+  libarchive = pkgs.libarchive;
+  xorriso = pkgs.xorriso;
+  gnumake = pkgs.gnumake;
+  pre_commit = pkgs.pre-commit;
 
 in pkgs.mkShell {
   buildInputs = [
     python
     passlib
     pipx
-    pkgs.libarchive
-    pkgs.xorriso
-    pkgs.gnumake
-    pkgs.pre-commit
+    libarchive
+    xorriso
+    gnumake
+    pre_commit
   ];
 
   shellHook = ''
@@ -49,12 +53,19 @@ in pkgs.mkShell {
     pre-commit install --overwrite
 
     # print versions
-    echo -e "\033[1;33m\n>>> VERSIONS\033[0m"
-    echo python==${python.version}
-    echo passlib==${passlib.version}
-    echo pipx==${pipx.version}
-    echo ansible==$ANSIBLE_VERSION
-    echo ansible-lint==$ANSIBLE_LINT_VERSION
+    print_versions () {
+      echo PYTHON_VERSION=${python.version}
+      echo PASSLIB_VERSION=${passlib.version}
+      echo PIPX_VERSION=${pipx.version}
+      echo ANSIBLE_VERSION=$ANSIBLE_VERSION
+      echo ANSIBLE_LINT_VERSION=$ANSIBLE_LINT_VERSION
+      echo LIBARCHIVE_VERSION=${libarchive.version}
+      echo XORRISO_VERSION=${xorriso.version}
+      echo GNUMAKE_VERSION=${gnumake.version}
+      echo PRE_COMMIT_VERSION=${pre_commit.version}
+    }
+    echo -e "\033[1;33m\n>>> PRINT VERSIONS\033[0m"
+    print_versions
 
     set +eo pipefail
   '';
