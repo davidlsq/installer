@@ -17,6 +17,8 @@ let
     src = ./.;
     hooks = {
       nixfmt.enable = true;
+      black.enable = true;
+      isort.enable = true;
       ansiblelint = {
         enable = true;
         name = "ansiblelint";
