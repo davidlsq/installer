@@ -46,7 +46,6 @@
     ohmyzsh_user_name: '{{ user_name }}'
   - role: ohmyzsh
     ohmyzsh_user_name: ansible
-    ohmyzsh_user_name: '{{ user_name }}'
   - role: docker
     tags: docker
 
