@@ -2,3 +2,5 @@ bootstrap/*.iso
 bootstrap/*.iso.tmp/
 files/*/ssh/
 host_vars/*/password.yml
+.pipx
+.ansible

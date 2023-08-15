@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/opt/homebrew/bin/xorriso \
+xorriso \
   -as mkisofs \
   -quiet \
   -V CDROM \
