@@ -1,15 +1,1 @@
-repos:
-  - repo: local
-    hooks:
-      - id: ansible-lint
-        name: ansible-lint
-        entry: ansible-lint -v --force-color
-        language: system
-        pass_filenames: false
-        always_run: true
-      - id: versions
-        name: versions
-        entry: nix-shell --command "print_versions > versions"
-        language: system
-        pass_filenames: false
-        always_run: true
+/nix/store/f92jy0giy5999b3cqz31akc54gphfwnh-pre-commit-config.json
