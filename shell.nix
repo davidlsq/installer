@@ -16,6 +16,7 @@ let
   pre-commit-check = nix-pre-commit-hooks.run {
     src = ./.;
     hooks = {
+      checkmake.enable = true;
       nixfmt.enable = true;
       black.enable = true;
       isort.enable = true;
