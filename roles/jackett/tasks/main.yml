@@ -1,17 +1,17 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name:
       - libicu72
       - libssl3
       - jq
-    state: latest
+    state: present
 
 # Create lib
 
 - name: Create lib directory
-  file:
+  ansible.builtin.file:
     path: '{{ jackett_lib }}'
     state: directory
     owner: root
@@ -19,23 +19,23 @@
     mode: u=rwx,go=rx
 
 - name: Create lib
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ jackett_archive }}'
-    remote_src: yes
+    remote_src: true
     dest: '{{ jackett_lib }}'
     owner: root
     group: root
     mode: u+rw,go-w+r
     creates: '{{ jackett_lib }}/jackett'
     extra_opts:
-    - --transform
-    - s/^Jackett//
+      - --transform
+      - s/^Jackett//
   register: create_lib
 
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ jackett_var }}'
     state: directory
     owner: '{{ jackett_user }}'
@@ -43,12 +43,12 @@
     mode: ug=rwx,o=rx
 
 - name: Check config
-  stat:
+  ansible.builtin.stat:
     path: '{{ jackett_var }}/ServerConfig.json'
   register: check_config
 
 - name: Init config
-  copy:
+  ansible.builtin.copy:
     content: '{}'
     dest: '{{ jackett_var }}/ServerConfig.json'
     owner: '{{ jackett_user }}'
@@ -57,7 +57,7 @@
   when: not check_config.stat.exists
 
 - name: Create ansible config
-  copy:
+  ansible.builtin.copy:
     content: '{{ jackett_config | to_json }}'
     dest: '{{ jackett_var }}/ServerConfig.json.ansible'
     owner: '{{ jackett_user }}'
@@ -65,15 +65,18 @@
     mode: u=rw,go=r
   register: create_config
 
-- name: Update config
-  shell: >
+- name: Update config # noqa no-handler
+  ansible.builtin.shell: >
+    set -e -o pipefail
     cat {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible | jq -s add > {{ jackett_var }}/ServerConfig.json.tmp;
     cat {{ jackett_var }}/ServerConfig.json.tmp > {{ jackett_var }}/ServerConfig.json;
     rm {{ jackett_var }}/ServerConfig.json.tmp
   when: create_config is changed
+  changed_when: true
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ jackett_var }} \
       ! -user root \
       ! -user {{ jackett_user }} \
@@ -87,7 +90,7 @@
 # Create service
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: service.j2
     dest: '/etc/systemd/system/{{ jackett_name }}.service'
     owner: root
@@ -96,12 +99,12 @@
   register: create_service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: '{{ jackett_name }}'
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: '{{ jackett_name }}'
     daemon_reload: true
     state: restarted
@@ -110,7 +113,7 @@
     create_config is changed or
     create_service is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: '{{ jackett_name }}'
     state: started

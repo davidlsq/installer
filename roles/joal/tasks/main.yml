@@ -1,14 +1,14 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: default-jre
-    state: latest
+    state: present
 
 # Create lib
 
 - name: Create lib directory
-  file:
+  ansible.builtin.file:
     path: '{{ joal_lib }}'
     state: directory
     owner: root
@@ -16,9 +16,9 @@
     mode: u=rwx,go=rx
 
 - name: Create lib
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ joal_archive }}'
-    remote_src: yes
+    remote_src: true
     dest: '{{ joal_lib }}'
     owner: root
     group: root
@@ -29,22 +29,22 @@
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     state: directory
     owner: '{{ joal_user }}'
     group: '{{ joal_user }}'
     mode: ug=rwx,o=rx
   with_items:
-  - '{{ joal_var }}'
-  - '{{ joal_var }}/clients'
-  - '{{ joal_var }}/torrents'
-  - '{{ joal_var }}/torrents/archived'
+    - '{{ joal_var }}'
+    - '{{ joal_var }}/clients'
+    - '{{ joal_var }}/torrents'
+    - '{{ joal_var }}/torrents/archived'
 
 - name: Create client config
-  copy:
+  ansible.builtin.copy:
     src: '{{ joal_lib }}/clients/{{ joal_client }}.client'
-    remote_src: yes
+    remote_src: true
     dest: '{{ joal_var }}/clients/{{ joal_client }}.client'
     owner: '{{ joal_user }}'
     group: '{{ joal_user }}'
@@ -52,7 +52,7 @@
   register: create_client_config
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: config.json.j2
     dest: '{{ joal_var }}/config.json'
     owner: '{{ joal_user }}'
@@ -61,7 +61,8 @@
   register: create_config
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ joal_var }} \
       ! -user root \
       ! -user {{ joal_user }} \
@@ -75,7 +76,7 @@
 # Create service
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: service.j2
     dest: '/etc/systemd/system/{{ joal_name }}.service'
     owner: root
@@ -84,12 +85,12 @@
   register: create_service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: '{{ joal_name }}'
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: '{{ joal_name }}'
     state: restarted
     daemon_reload: true
@@ -99,7 +100,7 @@
     create_config is changed or
     create_service is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: '{{ joal_name }}'
     state: started

@@ -1,19 +1,19 @@
 # Install package
 
 - name: Package apt
-  apt:
+  ansible.builtin.apt:
     name:
-    - python3-pip
-    - python3-venv
-    state: latest
+      - python3-pip
+      - python3-venv
+    state: present
 
 # Create lib
 
 - name: Create venv
-  pip:
+  ansible.builtin.pip:
     name:
-    - certbot
-    - certbot-dns-ovh
+      - certbot
+      - certbot-dns-ovh
     virtualenv: '{{ certbot_venv }}'
     virtualenv_command: python3 -m venv
   register: create_venv
@@ -21,19 +21,19 @@
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     state: directory
     owner: root
     group: root
     mode: u=rwx,go=rx
   with_items:
-  - '{{ certbot_var }}'
-  - '{{ certbot_var }}/config'
-  - '{{ certbot_var }}/work'
+    - '{{ certbot_var }}'
+    - '{{ certbot_var }}/config'
+    - '{{ certbot_var }}/work'
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: ovh-credentials.conf.j2
     dest: '{{ certbot_ovh_credentials }}'
     owner: root
@@ -43,7 +43,7 @@
   register: create_config
 
 - name: Create script
-  template:
+  ansible.builtin.template:
     src: certbot.sh.j2
     dest: '{{ certbot_script }}'
     owner: root
@@ -54,16 +54,15 @@
 # Create certificate
 
 - name: Init certificate
-  command: '{{ certbot_script }}'
+  ansible.builtin.command: '{{ certbot_script }}'
   args:
     creates: '{{ certbot_var }}/config/live/{{ certbot_domain }}/fullchain.pem'
 
 - name: Add cron
-  cron:
+  ansible.builtin.cron:
     name: 'certbot-{{ item }}'
     special_time: '{{ item }}'
     job: '{{ certbot_script }}'
   with_items:
-  - 'monthly'
-  - 'reboot'
-
+    - 'monthly'
+    - 'reboot'

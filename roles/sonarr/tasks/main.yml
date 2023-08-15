@@ -1,19 +1,19 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name:
-    - mono-devel
-    - curl
-    - sqlite3
-    - python3-lxml
-    - mediainfo
-    state: latest
+      - mono-devel
+      - curl
+      - sqlite3
+      - python3-lxml
+      - mediainfo
+    state: present
 
 # Create lib
 
 - name: Create lib directory
-  file:
+  ansible.builtin.file:
     path: '{{ sonarr_lib }}'
     state: directory
     owner: root
@@ -21,23 +21,23 @@
     mode: u=rwx,go=rx
 
 - name: Create lib
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ sonarr_archive }}'
-    remote_src: yes
+    remote_src: true
     dest: '{{ sonarr_lib }}'
     owner: root
     group: root
     mode: u+rw,go-w+r
     creates: '{{ sonarr_lib }}/Sonarr.exe'
     extra_opts:
-    - --transform
-    - 's/^Sonarr//'
+      - --transform
+      - 's/^Sonarr//'
   register: create_lib
 
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ sonarr_var }}'
     state: directory
     owner: '{{ sonarr_user }}'
@@ -45,12 +45,12 @@
     mode: ug=rwx,o=rx
 
 - name: Check config
-  stat:
+  ansible.builtin.stat:
     path: '{{ sonarr_var }}/config.xml'
   register: check_config
 
 - name: Init config
-  copy:
+  ansible.builtin.copy:
     content: <Config></Config>
     dest: '{{ sonarr_var }}/config.xml'
     owner: '{{ sonarr_user }}'
@@ -59,7 +59,7 @@
   when: not check_config.stat.exists
 
 - name: Create config
-  xml:
+  community.general.xml:
     path: '{{ sonarr_var }}/config.xml'
     xpath: '/Config/{{ item[0] }}'
     value: '{{ item[1] | string }}'
@@ -67,7 +67,8 @@
   register: create_config
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ sonarr_var }} \
       ! -user root \
       ! -user {{ sonarr_user }} \
@@ -81,7 +82,7 @@
 # Create service
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: service.j2
     dest: '/etc/systemd/system/{{ sonarr_name }}.service'
     owner: root
@@ -90,12 +91,12 @@
   register: create_service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: '{{ sonarr_name }}'
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: '{{ sonarr_name }}'
     daemon_reload: true
     state: restarted
@@ -104,7 +105,7 @@
     create_config is changed or
     create_service is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: '{{ sonarr_name }}'
     state: started

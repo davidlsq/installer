@@ -1,7 +1,7 @@
 # Create VG
 
 - name: Create
-  lvol:
+  community.general.lvol:
     vg: '{{ vg_name }}'
     lv: '{{ lv_name }}'
     size: '{{ lv_size }}'
@@ -9,13 +9,13 @@
     resizefs: true
 
 - name: Format
-  filesystem:
+  community.general.filesystem:
     dev: '/dev/{{ vg_name }}/{{ lv_name }}'
     fstype: ext4
     force: false
 
 - name: Mount
-  mount:
+  ansible.posix.mount:
     src: '/dev/mapper/{{ vg_name }}-{{ lv_name }}'
     path: '{{ lv_mount }}'
     fstype: ext4

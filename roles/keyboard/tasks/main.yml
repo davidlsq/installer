@@ -1,5 +1,5 @@
 - name: Create config
-  copy:
+  ansible.builtin.copy:
     src: keyboard
     dest: /etc/default/keyboard
     owner: root

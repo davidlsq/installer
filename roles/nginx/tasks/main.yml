@@ -1,26 +1,26 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: nginx
-    state: latest
+    state: present
     policy_rc_d: 101
   register: package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: python3-passlib
-    state: latest
+    state: present
 
 # Create cookie
-  
+
 - name: Check cookie
-  stat:
+  ansible.builtin.stat:
     path: '{{ nginx_cookie_path }}'
   register: check_cookie
 
 - name: Create cookie
-  copy:
+  ansible.builtin.copy:
     content: '{{ lookup("password", "/dev/null length=32 chars=ascii_letters,digits") }}'
     dest: '{{ nginx_cookie_path }}'
     owner: root
@@ -32,7 +32,7 @@
 # Set passwords
 
 - name: Set passwords
-  htpasswd:
+  community.general.htpasswd:
     path: '{{ nginx_htpasswd_path }}'
     name: '{{ item[0] }}'
     password: '{{ item[1] }}'
@@ -43,20 +43,21 @@
   no_log: true
 
 # Create config
-  
+
 - name: Get cookie
-  command: 'cat {{ nginx_cookie_path }}'
+  ansible.builtin.command: 'cat {{ nginx_cookie_path }}'
   register: cat_cookie
   changed_when: false
   no_log: true
 
-- set_fact:
+- name: Set fact
+  ansible.builtin.set_fact:
     cookie: '{{ cat_cookie.stdout }}'
     htpasswd: '{{ nginx_htpasswd_path }}'
   no_log: true
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: '{{ nginx_site_conf }}'
     dest: '/etc/nginx/sites-enabled/{{ nginx_site_name }}.conf'
     owner: root
@@ -68,19 +69,19 @@
 # Create service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: nginx
     enabled: true
 
 - name: Reload
-  systemd:
+  ansible.builtin.systemd:
     name: nginx
     state: reloaded
   when: >
     package is changed or
     create_config is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: nginx
     state: started

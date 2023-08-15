@@ -1,8 +1,9 @@
-- name: Get current
-  command: systemctl get-default
-  changed_when: false
-  register: default
-
 - name: Set default
-  command: systemctl set-default multi-user.target
-  when: default.stdout != 'multi-user.target'
+  ansible.builtin.shell: >
+    set -e -o pipefail
+    && [ "$(systemctl get-default)" = multi-user.target ]
+    || (systemctl set-default multi-user.target && echo CHANGED)
+  args:
+    executable: /bin/bash
+  register: set_default
+  changed_when: '"CHANGED" in set_default.stdout'

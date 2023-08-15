@@ -2,52 +2,52 @@
 
 - name: Base
   hosts: server
-  gather_facts: no
+  gather_facts: false
   become: true
   tags: base
   roles:
-  - role: systemctl
-    tags: systemctl
-  - role: cdrom
-    tags: cdrom
-  - role: keyboard
-    tags: keyboard
-  - role: network
-    tags: network
-  - role: apt
-    tags: apt
-  - role: grub
-    tags: grub
-  - role: ssh-server
-    tags: ssh-server
-    ssh_server_key: server/ssh/server
-    ssh_server_key_pub: server/ssh/server.pub
-  - role: user
-    tags: user
-    user_name: root
-    user_password: '{{ password.root }}'
-    user_shell: /bin/zsh
-  - role: user
-    tags: user
-    user_password: '{{ password.user }}'
-    user_key_pub: server/ssh/user.pub
-    user_shell: /bin/zsh
-    user_sudo: true
-  - role: user
-    tags: user
-    user_name: ansible
-    user_password: '{{ password.ansible }}'
-    user_key_pub: server/ssh/ansible.pub
-    user_shell: /bin/zsh
-    user_sudo: yes-no-password
-  - role: ohmyzsh
-    ohmyzsh_user_name: root
-  - role: ohmyzsh
-    ohmyzsh_user_name: '{{ user_name }}'
-  - role: ohmyzsh
-    ohmyzsh_user_name: ansible
-  - role: docker
-    tags: docker
+    - role: systemctl
+      tags: systemctl
+    - role: cdrom
+      tags: cdrom
+    - role: keyboard
+      tags: keyboard
+    - role: network
+      tags: network
+    - role: apt
+      tags: apt
+    - role: grub
+      tags: grub
+    - role: ssh_server
+      tags: ssh_server
+      ssh_server_key: server/ssh/server
+      ssh_server_key_pub: server/ssh/server.pub
+    - role: user
+      tags: user
+      user_name: root
+      user_password: '{{ password.root }}'
+      user_shell: /bin/zsh
+    - role: user
+      tags: user
+      user_password: '{{ password.user }}'
+      user_key_pub: server/ssh/user.pub
+      user_shell: /bin/zsh
+      user_sudo: true
+    - role: user
+      tags: user
+      user_name: ansible
+      user_password: '{{ password.ansible }}'
+      user_key_pub: server/ssh/ansible.pub
+      user_shell: /bin/zsh
+      user_sudo: yes-no-password
+    - role: ohmyzsh
+      ohmyzsh_user_name: root
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ user_name }}'
+    - role: ohmyzsh
+      ohmyzsh_user_name: ansible
+    - role: docker
+      tags: docker
 
 - name: Data Disks
   hosts: server
@@ -55,11 +55,11 @@
   become: true
   tags: data
   roles:
-  - role: lvm/vg
-    vg_name: data
-    vg_pvs:
-    - /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
-    - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
+    - role: lvm_vg
+      vg_name: data
+      vg_pvs:
+        - /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
+        - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
 
 - name: Time Machine
   hosts: server
@@ -67,18 +67,18 @@
   become: true
   tags: timemachine
   roles:
-  - role: lvm/lv
-    tags: data
-    vg_name: data
-    lv_name: timemachine
-    lv_size: 1T
-    lv_opts: --type raid1 --nosync
-  - role: samba
-    samba_var: /mnt/data/timemachine
-    samba_user: '{{ user_name }}'
-    samba_password: '{{ password.user }}'
-    samba_section: TimeMachine
-    samba_section_conf: timemachine.conf.j2
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: timemachine
+      lv_size: 1T
+      lv_opts: --type raid1 --nosync
+    - role: samba
+      samba_var: /mnt/data/timemachine
+      samba_user: '{{ user_name }}'
+      samba_password: '{{ password.user }}'
+      samba_section: TimeMachine
+      samba_section_conf: timemachine.conf.j2
 
 - name: Media Softwares
   hosts: server
@@ -86,86 +86,86 @@
   become: true
   tags: media
   roles:
-  - role: lvm/lv
-    tags: data
-    vg_name: data
-    lv_name: media
-    lv_size: 8T
-    lv_opts: --type raid1 --nosync
-  - role: user-service
-    tags: data
-    user_service_name: media
-  - role: user-service
-    tags: data
-    user_service_name: media
-  - role: library
-    tags: data
-    library_user: media
-    library_var: /mnt/data/media/library
-  - role: plex
-    tags: plex
-    plex_user: media
-    plex_var: /mnt/data/media/plex
-  - role: qbittorrent
-    tags: qbittorrent
-    qbittorrent_name: '{{ qbittorrent_1_name }}'
-    qbittorrent_port: '{{ qbittorrent_1_port }}'
-    qbittorrent_var: '/mnt/data/media/{{ qbittorrent_1_name }}'
-    qbittorrent_user: media
-    qbittorrent_peer_port: 50000
-    qbittorrent_interface: '{{ network_interface }}'
-  - role: joal
-    tags: joal
-    joal_user: media
-    joal_var: /mnt/data/media/joal
-  - role: sabnzbd
-    tags: sabnzbd
-    sabnzbd_name: '{{ sabnzbd_1_name }}'
-    sabnzbd_port: '{{ sabnzbd_1_port }}'
-    sabnzbd_var: '/mnt/data/media/{{ sabnzbd_1_name }}'
-    sabnzbd_user: media
-    sabnzbd_host_whitelist:
-    - '{{ private_domain }}'
-    - '{{ public_domain }}'
-  - role: servarr
-    tags: [servarr, prowlarr]
-    servarr_software: prowlarr
-    servarr_name: '{{ prowlarr_1_name }}'
-    servarr_port: '{{ prowlarr_1_port }}'
-    servarr_var: '/mnt/data/media/{{ prowlarr_1_name }}'
-    servarr_user: media
-  - role: jackett
-    tags: jackett
-    jackett_name: '{{ jackett_1_name }}'
-    jackett_port: '{{ jackett_1_port }}'
-    jackett_var: '/mnt/data/media/{{ jackett_1_name }}'
-    jackett_user: media
-  - role: servarr
-    tags: [servarr, radarr]
-    servarr_software: radarr
-    servarr_name: '{{ radarr_1_name }}'
-    servarr_port: '{{ radarr_1_port }}'
-    servarr_var: '/mnt/data/media/{{ radarr_1_name }}'
-    servarr_user: media
-  - role: servarr
-    tags: [servarr, radarr]
-    servarr_software: radarr
-    servarr_name: '{{ radarr_2_name }}'
-    servarr_port: '{{ radarr_2_port }}'
-    servarr_var: '/mnt/data/media/{{ radarr_2_name }}'
-    servarr_user: media
-  - role: sonarr
-    tags: sonarr
-    sonarr_name: '{{ sonarr_1_name }}'
-    sonarr_port: '{{ sonarr_1_port }}'
-    sonarr_var: '/mnt/data/media/{{ sonarr_1_name }}'
-    sonarr_user: media
-  - role: sonarr
-    tags: sonarr
-    sonarr_name: '{{ sonarr_2_name }}'
-    sonarr_port: '{{ sonarr_2_port }}'
-    sonarr_var: '/mnt/data/media/{{ sonarr_2_name }}'
-    sonarr_user: media
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: media
+      lv_size: 8T
+      lv_opts: --type raid1 --nosync
+    - role: user_service
+      tags: data
+      user_service_name: media
+    - role: user_service
+      tags: data
+      user_service_name: media
+    - role: library
+      tags: data
+      library_user: media
+      library_var: /mnt/data/media/library
+    - role: plex
+      tags: plex
+      plex_user: media
+      plex_var: /mnt/data/media/plex
+    - role: qbittorrent
+      tags: qbittorrent
+      qbittorrent_name: '{{ qbittorrent_1_name }}'
+      qbittorrent_port: '{{ qbittorrent_1_port }}'
+      qbittorrent_var: '/mnt/data/media/{{ qbittorrent_1_name }}'
+      qbittorrent_user: media
+      qbittorrent_peer_port: 50000
+      qbittorrent_interface: '{{ network_interface }}'
+    - role: joal
+      tags: joal
+      joal_user: media
+      joal_var: /mnt/data/media/joal
+    - role: sabnzbd
+      tags: sabnzbd
+      sabnzbd_name: '{{ sabnzbd_1_name }}'
+      sabnzbd_port: '{{ sabnzbd_1_port }}'
+      sabnzbd_var: '/mnt/data/media/{{ sabnzbd_1_name }}'
+      sabnzbd_user: media
+      sabnzbd_host_whitelist:
+        - '{{ private_domain }}'
+        - '{{ public_domain }}'
+    - role: servarr
+      tags: [servarr, prowlarr]
+      servarr_software: prowlarr
+      servarr_name: '{{ prowlarr_1_name }}'
+      servarr_port: '{{ prowlarr_1_port }}'
+      servarr_var: '/mnt/data/media/{{ prowlarr_1_name }}'
+      servarr_user: media
+    - role: jackett
+      tags: jackett
+      jackett_name: '{{ jackett_1_name }}'
+      jackett_port: '{{ jackett_1_port }}'
+      jackett_var: '/mnt/data/media/{{ jackett_1_name }}'
+      jackett_user: media
+    - role: servarr
+      tags: [servarr, radarr]
+      servarr_software: radarr
+      servarr_name: '{{ radarr_1_name }}'
+      servarr_port: '{{ radarr_1_port }}'
+      servarr_var: '/mnt/data/media/{{ radarr_1_name }}'
+      servarr_user: media
+    - role: servarr
+      tags: [servarr, radarr]
+      servarr_software: radarr
+      servarr_name: '{{ radarr_2_name }}'
+      servarr_port: '{{ radarr_2_port }}'
+      servarr_var: '/mnt/data/media/{{ radarr_2_name }}'
+      servarr_user: media
+    - role: sonarr
+      tags: sonarr
+      sonarr_name: '{{ sonarr_1_name }}'
+      sonarr_port: '{{ sonarr_1_port }}'
+      sonarr_var: '/mnt/data/media/{{ sonarr_1_name }}'
+      sonarr_user: media
+    - role: sonarr
+      tags: sonarr
+      sonarr_name: '{{ sonarr_2_name }}'
+      sonarr_port: '{{ sonarr_2_port }}'
+      sonarr_var: '/mnt/data/media/{{ sonarr_2_name }}'
+      sonarr_user: media
 
 - name: NGINX
   hosts: server
@@ -173,26 +173,26 @@
   become: true
   tags: nginx
   roles:
-  - role: lvm/lv
-    tags: [data, certbot]
-    vg_name: data
-    lv_name: certbot
-    lv_size: 64M
-    lv_opts: --type raid1 --nosync
-  - role: certbot
-    tags: certbot
-    certbot_var: /mnt/data/certbot
-    certbot_domain: '{{ public_domain }}'
-    certbot_ovh_application_key: '{{ password.ovh_application_key }}'
-    certbot_ovh_application_secret: '{{ password.ovh_application_secret }}'
-    certbot_ovh_consumer_key: '{{ password.ovh_consumer_key }}'
-  - role: ddclient
-    tags: ddclient
-    ddclient_login: davidlsq.fr-server
-    ddclient_domains:
-    - '{{ public_domain }}'
-    ddclient_password: '{{ password.ddclient }}'
-  - role: nginx
-    nginx_site_conf: server/nginx/site.conf.j2
-    nginx_htpasswd_users:
-    - ['{{ user_name }}', '{{ password.user }}']
+    - role: lvm_lv
+      tags: [data, certbot]
+      vg_name: data
+      lv_name: certbot
+      lv_size: 64M
+      lv_opts: --type raid1 --nosync
+    - role: certbot
+      tags: certbot
+      certbot_var: /mnt/data/certbot
+      certbot_domain: '{{ public_domain }}'
+      certbot_ovh_application_key: '{{ password.ovh_application_key }}'
+      certbot_ovh_application_secret: '{{ password.ovh_application_secret }}'
+      certbot_ovh_consumer_key: '{{ password.ovh_consumer_key }}'
+    - role: ddclient
+      tags: ddclient
+      ddclient_login: davidlsq.fr-server
+      ddclient_domains:
+        - '{{ public_domain }}'
+      ddclient_password: '{{ password.ddclient }}'
+    - role: nginx
+      nginx_site_conf: server/nginx/site.conf.j2
+      nginx_htpasswd_users:
+        - ['{{ user_name }}', '{{ password.user }}']

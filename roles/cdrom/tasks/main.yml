@@ -1,5 +1,5 @@
 - name: Mount
-  mount:
+  ansible.posix.mount:
     src: /dev/disk/by-label/CDROM
     path: /media/cdrom
     fstype: iso9660

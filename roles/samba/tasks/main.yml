@@ -1,18 +1,18 @@
 # Install Package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name:
-    - samba
-    - smbclient
-    - avahi-daemon
-    state: latest
+      - samba
+      - smbclient
+      - avahi-daemon
+    state: present
   register: package
 
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ samba_var }}'
     state: directory
     owner: '{{ samba_user }}'
@@ -20,7 +20,8 @@
     mode: u=rwx,go=rx
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ samba_var }} \
       ! -user root \
       ! -user {{ samba_user }} \
@@ -34,7 +35,7 @@
 # Configure
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: smb.conf.j2
     dest: /etc/samba/smb.conf
     owner: root
@@ -43,7 +44,7 @@
   register: create_config
 
 - name: Create section directory
-  file:
+  ansible.builtin.file:
     path: /etc/samba/section.d
     state: directory
     owner: root
@@ -51,7 +52,7 @@
     mode: ug=rwx,o=rx
 
 - name: Create section config
-  template:
+  ansible.builtin.template:
     src: '{{ samba_section_conf }}'
     dest: '/etc/samba/section.d/{{ samba_section }}.conf'
     owner: root
@@ -60,15 +61,18 @@
   register: create_section_config
 
 - name: Add section config
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/samba/section.conf
     line: 'include = /etc/samba/section.d/{{ samba_section }}.conf'
-    create: yes
+    owner: root
+    group: root
+    mode: u=rw,go=r
+    create: true
 
 # Set password
 
 - name: Set password
-  shell: >
+  ansible.builtin.shell: >
     set -e -o pipefail
     && (smbclient -U {{ samba_user }}%{{ samba_password }} -L 127.0.0.1 2>&1 > /dev/null)
     || (echo "{{ samba_password }}"; echo "{{ samba_password }}") | smbpasswd -a {{ samba_user }}
@@ -81,12 +85,12 @@
 # Create service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: smbd
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: smbd
     state: restarted
   when: >
@@ -94,7 +98,7 @@
     create_config is changed or
     create_section_config is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: smbd
     state: started

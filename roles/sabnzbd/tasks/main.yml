@@ -1,23 +1,24 @@
 # Install unrar
-- include_role:
+- name: Include role
+  ansible.builtin.include_role:
     name: unrar
 
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name:
-    - python3
-    - python3-venv
-    - par2
-    - git
-    - p7zip-full
-    state: latest
+      - python3
+      - python3-venv
+      - par2
+      - git
+      - p7zip-full
+    state: present
 
 # Create lib
 
 - name: Create lib directory
-  file:
+  ansible.builtin.file:
     path: '{{ sabnzbd_lib }}'
     state: directory
     owner: root
@@ -25,21 +26,21 @@
     mode: u=rwx,go=rx
 
 - name: Create lib
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ sabnzbd_archive }}'
-    remote_src: yes
+    remote_src: true
     dest: '{{ sabnzbd_lib }}'
     owner: root
     group: root
     mode: u+rw,go-w+r
     creates: '{{ sabnzbd_lib }}/SABnzbd.py'
     extra_opts:
-    - --transform
-    - 's/^SABnzbd-{{ sabnzbd_version }}//'
+      - --transform
+      - 's/^SABnzbd-{{ sabnzbd_version }}//'
   register: create_lib
 
 - name: Create venv
-  pip:
+  ansible.builtin.pip:
     requirements: '{{ sabnzbd_lib }}/requirements.txt'
     virtualenv: '{{ sabnzbd_venv }}'
     virtualenv_command: python3 -m venv
@@ -48,7 +49,7 @@
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ sabnzbd_var }}'
     state: directory
     owner: '{{ sabnzbd_user }}'
@@ -56,7 +57,7 @@
     mode: ug=rwx,o=rx
 
 - name: Create config
-  ini_file:
+  community.general.ini_file:
     path: '{{ sabnzbd_var }}/sabnzbd.ini'
     owner: '{{ sabnzbd_user }}'
     group: '{{ sabnzbd_user }}'
@@ -68,7 +69,8 @@
   register: create_config
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ sabnzbd_var }} \
       ! -user root \
       ! -user {{ sabnzbd_user }} \
@@ -82,7 +84,7 @@
 # Create service
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: service.j2
     dest: '/etc/systemd/system/{{ sabnzbd_name }}.service'
     owner: root
@@ -91,12 +93,12 @@
   register: create_service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: '{{ sabnzbd_name }}'
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: '{{ sabnzbd_name }}'
     state: restarted
     daemon_reload: true
@@ -106,7 +108,7 @@
     create_config is changed or
     create_service is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: '{{ sabnzbd_name }}'
     state: started

@@ -1,15 +1,15 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: ddclient
-    state: latest
+    state: present
     policy_rc_d: 101
 
 # Create config
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: ddclient.conf.j2
     dest: /etc/ddclient.conf
     owner: root
@@ -21,18 +21,18 @@
 # Create service
 
 - name: Enable
-  systemd:
-    name: ddclient 
+  ansible.builtin.systemd:
+    name: ddclient
     enabled: true
 
-- name: Restart
-  systemd:
+- name: Restart # noqa no-handler
+  ansible.builtin.systemd:
     name: ddclient
     state: restarted
     daemon_reload: true
   when: create_config is changed
 
 - name: Start
-  systemd: 
+  ansible.builtin.systemd:
     name: ddclient
     state: started

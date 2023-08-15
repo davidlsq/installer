@@ -1,10 +1,10 @@
 - name: Remove debian sources
-  file:
+  ansible.builtin.file:
     path: /etc/apt/sources.list
     state: absent
 
 - name: Create directory
-  file:
+  ansible.builtin.file:
     path: /etc/apt/sources.list.d
     state: directory
     owner: root
@@ -12,7 +12,7 @@
     mode: u=rwx,go=rx
 
 - name: Create sources
-  copy:
+  ansible.builtin.copy:
     src: debian.list
     dest: /etc/apt/sources.list.d/debian.list
     owner: root
@@ -20,12 +20,12 @@
     mode: u=rw,go=r
   register: sources
 
-- name: Update cache
-  apt:
+- name: Update cache # noqa no-handler
+  ansible.builtin.apt:
     update_cache: true
   when: sources is changed
 
 - name: Update old cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600

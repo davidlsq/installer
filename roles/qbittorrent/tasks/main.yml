@@ -1,28 +1,28 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: qbittorrent-nox
-    state: latest
+    state: present
     policy_rc_d: 101
   register: package
 
 # Create var
 
 - name: Create var directory
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     state: directory
     owner: '{{ qbittorrent_user }}'
     group: '{{ qbittorrent_user }}'
     mode: ug=rwx,o=rx
   with_items:
-  - '{{ qbittorrent_var }}'
-  - '{{ qbittorrent_var }}/qBittorrent'
-  - '{{ qbittorrent_var }}/qBittorrent/config'
+    - '{{ qbittorrent_var }}'
+    - '{{ qbittorrent_var }}/qBittorrent'
+    - '{{ qbittorrent_var }}/qBittorrent/config'
 
 - name: Create config
-  ini_file:
+  community.general.ini_file:
     path: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf'
     owner: '{{ qbittorrent_user }}'
     group: '{{ qbittorrent_user }}'
@@ -35,7 +35,8 @@
   register: create_config
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ qbittorrent_var }} \
       ! -user root \
       ! -user {{ qbittorrent_user }} \
@@ -49,7 +50,7 @@
 # Create service
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: service.j2
     dest: '/etc/systemd/system/{{ qbittorrent_name }}.service'
     owner: root
@@ -58,12 +59,12 @@
   register: create_service
 
 - name: Enable
-  systemd: 
+  ansible.builtin.systemd:
     name: '{{ qbittorrent_name }}'
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd:
     name: '{{ qbittorrent_name }}'
     daemon_reload: true
     state: restarted
@@ -72,7 +73,7 @@
     create_config is changed or
     create_service is changed
 
-- name: Start 
-  systemd: 
+- name: Start
+  ansible.builtin.systemd:
     name: '{{ qbittorrent_name }}'
     state: started

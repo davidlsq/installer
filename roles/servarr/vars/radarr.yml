@@ -2,8 +2,8 @@ servarr_version: 4.7.5.7809
 servarr_archive: 'https://github.com/Radarr/Radarr/releases/download/v{{ servarr_version }}/Radarr.master.{{ servarr_version }}.linux-core-x64.tar.gz'
 servarr_executable: Radarr
 servarr_config:
-- [BindAddress, '{{ servarr_address }}']
-- [Port, '{{ servarr_port }}']
-- [UrlBase, '/{{ servarr_name }}']
-- [InstanceName, '{{ servarr_name }}']
-- [AnalyticsEnabled, false]
+  - [BindAddress, '{{ servarr_address }}']
+  - [Port, '{{ servarr_port }}']
+  - [UrlBase, '/{{ servarr_name }}']
+  - [InstanceName, '{{ servarr_name }}']
+  - [AnalyticsEnabled, false]

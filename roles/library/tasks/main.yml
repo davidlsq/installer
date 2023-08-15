@@ -1,19 +1,20 @@
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     state: directory
     owner: '{{ library_user }}'
     group: '{{ library_user }}'
     mode: ug=rwx,o=rx
   with_items:
-  - '{{ library_var }}'
-  - '{{ library_var }}/radarr-1'
-  - '{{ library_var }}/radarr-2'
-  - '{{ library_var }}/sonarr-1'
-  - '{{ library_var }}/sonarr-2'
+    - '{{ library_var }}'
+    - '{{ library_var }}/radarr-1'
+    - '{{ library_var }}/radarr-2'
+    - '{{ library_var }}/sonarr-1'
+    - '{{ library_var }}/sonarr-2'
 
 - name: Fix permissions
-  shell: >
+  ansible.builtin.shell: >
+    set -e -o pipefail
     find {{ library_var }} \
       ! -user root \
       ! -user {{ library_user }} \

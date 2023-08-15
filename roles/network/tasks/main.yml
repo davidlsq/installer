@@ -1,14 +1,14 @@
 # Package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: systemd-resolved
-    state: latest
+    state: present
 
 # Setup networkd
 
 - name: Create directory
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/network
     state: directory
     owner: root
@@ -16,7 +16,7 @@
     mode: u=rwx,go=rx
 
 - name: Create service
-  template:
+  ansible.builtin.template:
     src: network.j2
     dest: /etc/systemd/network/interface.network
     owner: root
@@ -25,26 +25,26 @@
   register: create_service
 
 - name: Enable
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-networkd
     enabled: true
 
 - name: Restart
-  systemd:
+  ansible.builtin.systemd: # noqa no-handler
     name: systemd-networkd
     state: restarted
     daemon_reload: true
   when: create_service is changed
 
 - name: Start
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-networkd
     state: started
 
 # Setup resolved
 
 - name: Config hostname
-  copy:
+  ansible.builtin.copy:
     content: '{{ network_host_name }}'
     dest: /etc/hostname
     owner: root
@@ -53,31 +53,31 @@
   register: config_hostname
 
 - name: Set hostname with systemd
-  hostname:
+  ansible.builtin.hostname:
     name: '{{ network_host_name }}'
     use: systemd
   when: not bootstrap
 
 - name: Set config link
-  file:
+  ansible.builtin.file:
     src: /run/systemd/resolve/resolv.conf
     dest: /etc/resolv.conf
     state: link
     force: true
 
 - name: Enable
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-resolved
     enabled: true
 
-- name: Restart
-  systemd:
+- name: Restart # noqa no-handler
+  ansible.builtin.systemd:
     name: systemd-resolved
     state: restarted
     daemon_reload: true
   when: config_hostname is changed
 
 - name: Start
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-resolved
     state: started

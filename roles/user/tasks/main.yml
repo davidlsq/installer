@@ -1,40 +1,40 @@
 # Install package
 
 - name: Package sudo
-  apt:
+  ansible.builtin.apt:
     name: sudo
-    state: latest
+    state: present
   when: user_sudo in [True, "yes", "yes-no-password"]
 
 - name: Package zsh
-  apt:
+  ansible.builtin.apt:
     name: zsh
-    state: latest
+    state: present
   when: user_shell == '/bin/zsh'
 
 # Create user
 
 - name: Create user
-  user:
+  ansible.builtin.user:
     name: '{{ user_name }}'
   when: user_id is not defined
 
 - name: Set password
-  user:
+  ansible.builtin.user:
     name: '{{ user_name }}'
     password: '{{ user_password | password_hash("sha512", user_name) }}'
   when: user_password is defined
   no_log: true
 
 - name: Add to sudo group
-  user:
+  ansible.builtin.user:
     name: '{{ user_name }}'
     groups: sudo
     append: true
   when: user_sudo in [True, "yes", "yes-no-password"]
 
 - name: Set sudo without password
-  copy:
+  ansible.builtin.copy:
     content: '{{ user_name }} ALL=(ALL) NOPASSWD:ALL'
     dest: '/etc/sudoers.d/ansible_nopasswd_{{ user_name }}'
     owner: root
@@ -43,12 +43,12 @@
   when: user_sudo == 'yes-no-password'
 
 - name: Set shell
-  user:
+  ansible.builtin.user:
     name: '{{ user_name }}'
     shell: '{{ user_shell }}'
 
 - name: Add public key
-  authorized_key:
+  ansible.posix.authorized_key:
     user: '{{ user_name }}'
     key: '{{ lookup("file", user_key_pub) }}'
   when: user_key_pub is defined

@@ -6,8 +6,8 @@ sonarr_lib: '/usr/lib/sonarr-{{ sonarr_version }}'
 sonarr_address: 127.0.0.1
 sonarr_port: 8080
 sonarr_config:
-- [BindAddress, '{{ sonarr_address }}']
-- [Port, '{{ sonarr_port }}']
-- [UrlBase, '/{{ sonarr_name }}']
-- [InstanceName, '{{ sonarr_name }}']
-- [AnalyticsEnabled, false]
+  - [BindAddress, '{{ sonarr_address }}']
+  - [Port, '{{ sonarr_port }}']
+  - [UrlBase, '/{{ sonarr_name }}']
+  - [InstanceName, '{{ sonarr_name }}']
+  - [AnalyticsEnabled, false]

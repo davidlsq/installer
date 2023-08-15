@@ -1,23 +1,24 @@
 # Install package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name:
-    - zsh
-    - git
-    state: latest
+      - zsh
+      - git
+    state: present
 
 # Download
-    
+
 - name: Git clone
-  git:
+  ansible.builtin.git:
     repo: '{{ ohmyzsh_git }}'
     dest: '~{{ ohmyzsh_user_name }}/.oh-my-zsh'
+    version: '{{ ohmyzsh_version }}'
 
 # Configure
 
 - name: Create config
-  template:
+  ansible.builtin.template:
     src: zshrc.j2
     dest: '~{{ ohmyzsh_user_name }}/.zshrc'
     owner: '{{ ohmyzsh_user_name }}'
@@ -25,6 +26,6 @@
     mode: u=rw,go=r
 
 - name: Set shell
-  user:
+  ansible.builtin.user:
     name: '{{ ohmyzsh_user_name }}'
     shell: /bin/zsh

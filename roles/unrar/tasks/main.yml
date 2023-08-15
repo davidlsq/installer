@@ -1,14 +1,14 @@
 # Install Package
 
 - name: Package
-  apt:
+  ansible.builtin.apt:
     name: make
-    state: latest
+    state: present
 
 # Create lib
 
 - name: Create lib directory
-  file:
+  ansible.builtin.file:
     path: '{{ unrar_lib }}'
     state: directory
     owner: root
@@ -16,17 +16,17 @@
     mode: ug=rwx,o=rx
 
 - name: Create lib
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ unrar_archive }}'
-    remote_src: yes
+    remote_src: true
     dest: '{{ unrar_lib }}'
     creates: '{{ unrar_lib }}/makefile'
     extra_opts:
-    - --transform
-    - 's/^unrar//'
+      - --transform
+      - 's/^unrar//'
 
 - name: Build lib
-  shell: |
+  ansible.builtin.shell: |
     make -j 8
     make install
   args:
