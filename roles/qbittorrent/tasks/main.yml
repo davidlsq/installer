@@ -26,7 +26,7 @@
     path: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf'
     owner: '{{ qbittorrent_user }}'
     group: '{{ qbittorrent_user }}'
-    mode: ug=rw,o=r
+    mode: u=rw,go=r
     section: '{{ item[0] }}'
     option: '{{ item[1] }}'
     value: '{{ item[2] }}'
