@@ -6,7 +6,6 @@ let
   };
   pkgs = import nixpkgs { };
   python = pkgs.python311;
-  passlib = pkgs.python311Packages.passlib;
   pipx = pkgs.python311Packages.pipx;
   libarchive = pkgs.libarchive;
   xorriso = pkgs.xorriso;
@@ -16,7 +15,6 @@ let
 in pkgs.mkShell {
   buildInputs = [
     python
-    passlib
     pipx
     libarchive
     xorriso
@@ -31,11 +29,12 @@ in pkgs.mkShell {
 
     ANSIBLE_VERSION=2.15.3
     ANSIBLE_LINT_VERSION=6.17.2
+    PASSLIB_VERSION=1.7.4
 
     # print versions
     print_versions () {
       echo PYTHON_VERSION=${python.version}
-      echo PASSLIB_VERSION=${passlib.version}
+      echo PASSLIB_VERSION=$PASSLIB_VERSION
       echo PIPX_VERSION=${pipx.version}
       echo ANSIBLE_VERSION=$ANSIBLE_VERSION
       echo ANSIBLE_LINT_VERSION=$ANSIBLE_LINT_VERSION
@@ -58,6 +57,7 @@ in pkgs.mkShell {
     echo -e "\033[1;33m\n>>> INSTALLING ANSIBLE\033[0m"
     export ANSIBLE_HOME=$ROOT_PATH/.ansible
     pipx install ansible-core==$ANSIBLE_VERSION
+    pipx inject ansible-core passlib==$PASSLIB_VERSION
     ansible-galaxy collection install ansible.posix community.general
 
     # install ansible-lint
