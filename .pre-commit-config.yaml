@@ -1,8 +1,9 @@
 repos:
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v6.17.2
+  - repo: local
     hooks:
       - id: ansible-lint
-        additional_dependencies:
-          - ansible-core==2.15.3
-          - passlib==1.7.4
+        name: ansible-lint
+        entry: ansible-lint -v --force-color
+        language: system
+        pass_filenames: false
+        always_run: true

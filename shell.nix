@@ -29,28 +29,8 @@ in pkgs.mkShell {
 
     ROOT_PATH="${builtins.toPath ./.}"
 
-    # install pipx
-    PIPX_PATH=$ROOT_PATH/.pipx
-    export PIPX_HOME=$PIPX_PATH
-    export PIPX_BIN_DIR=$PIPX_PATH/bin
-    export PATH="$PIPX_BIN_DIR:$PATH"
-
-    # install ansible
-    echo -e "\033[1;33m\n>>> INSTALLING ANSIBLE\033[0m"
     ANSIBLE_VERSION=2.15.3
-    export ANSIBLE_HOME=$ROOT_PATH/.ansible
-    pipx install ansible-core==$ANSIBLE_VERSION
-    ansible-galaxy collection install ansible.posix community.general
-
-    # install ansible-lint
     ANSIBLE_LINT_VERSION=6.17.2
-    echo -e "\033[1;33m\n>>> INSTALLING ANSIBLE-LINT\033[0m"
-    pipx install ansible-lint==$ANSIBLE_LINT_VERSION
-    pipx inject ansible-lint ansible-core==$ANSIBLE_VERSION
-
-    # install commit hooks
-    echo -e "\033[1;33m\n>>> INSTALLING PRE-COMMIT HOOKS\033[0m"
-    pre-commit install --overwrite
 
     # print versions
     print_versions () {
@@ -65,7 +45,30 @@ in pkgs.mkShell {
       echo PRE_COMMIT_VERSION=${pre_commit.version}
     }
     echo -e "\033[1;33m\n>>> PRINT VERSIONS\033[0m"
+    export $(print_versions | xargs)
     print_versions
+
+    # install pipx
+    PIPX_PATH=$ROOT_PATH/.pipx
+    export PIPX_HOME=$PIPX_PATH
+    export PIPX_BIN_DIR=$PIPX_PATH/bin
+    export PATH="$PIPX_BIN_DIR:$PATH"
+
+    # install ansible
+    echo -e "\033[1;33m\n>>> INSTALLING ANSIBLE\033[0m"
+    export ANSIBLE_HOME=$ROOT_PATH/.ansible
+    pipx install ansible-core==$ANSIBLE_VERSION
+    ansible-galaxy collection install ansible.posix community.general
+
+    # install ansible-lint
+    echo -e "\033[1;33m\n>>> INSTALLING ANSIBLE-LINT\033[0m"
+    pipx install ansible-lint==$ANSIBLE_LINT_VERSION
+    pipx inject ansible-lint ansible-core==$ANSIBLE_VERSION
+    pipx inject ansible-lint passlib==$PASSLIB_VERSION
+
+    # install commit hooks
+    echo -e "\033[1;33m\n>>> INSTALLING PRE-COMMIT HOOKS\033[0m"
+    pre-commit install --overwrite
 
     set +eo pipefail
   '';
