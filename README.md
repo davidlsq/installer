@@ -35,7 +35,7 @@ The image can be installed in a [UTM](https://mac.getutm.app) virtual machine :
 
 ![utm](doc/utm.png)
 
-At first boot, select the `[CDROM] Install grub entry` :
+At first boot, select the `[CDROM] Install` grub entry :
 
 ![grub](doc/grub.png)
 
