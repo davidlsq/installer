@@ -26,7 +26,9 @@ let
         entry = "ansible-lint -v --force-color";
         language = "system";
         pass_filenames = false;
-        always_run = true;
+        always_run = false;
+        types = [ "file" ];
+        files = "^(host_vars|inventory|roles|templates|(server|virtual)\\.yml)";
       };
       versions = {
         enable = true;
@@ -34,7 +36,9 @@ let
         entry = ''nix-shell --command "print_versions > versions"'';
         language = "system";
         pass_filenames = false;
-        always_run = true;
+        always_run = false;
+        types = [ "file" ];
+        files = "^(shell\\.nix|versions)$";
       };
     };
   };
