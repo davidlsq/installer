@@ -44,10 +44,16 @@ The installation is fully automatic and Debian starts without other manipulation
 You can log you with :
 
 ```sh
-ssh -i files/virtual/ssh/user david@virtual.local
+ssh -F .ssh/virtual/config david@virtual.local
 ```
 
-`make install` deploys the key files in `~/.ssh`. After to run the Ansible playbook manually :
+You can include it in your main config :
+
+```sh
+echo "Include $(pwd)/.ssh/*/config" >> ~/.ssh/config
+```
+
+To run the Ansible playbook manually :
 
 ```sh
 ansible-playbook -i inventory/virtual.local virtual.yml

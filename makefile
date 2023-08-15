@@ -15,22 +15,24 @@ $(VIRTUAL_PASSWORD):
 	@$(SCRIPT_PASSWORD) virtual user $@
 	@$(SCRIPT_PASSWORD) virtual ansible $@
 
-VIRTUAL_SSH = files/virtual/ssh
-$(VIRTUAL_SSH):
+VIRTUAL_SSH_FILES = files/virtual/ssh
+$(VIRTUAL_SSH_FILES):
 	@mkdir $@
 	@$(SCRIPT_SSH_KEYGEN) $@/server
 	@$(SCRIPT_SSH_KEYGEN) $@/user
 	@$(SCRIPT_SSH_KEYGEN) $@/ansible
 
+VIRTUAL_SSH = .ssh/virtual
+$(VIRTUAL_SSH): $(VIRTUAL_SSH_FILES)
+	@mkdir -p .ssh
+	@mkdir $@
+	@$(SCRIPT_SSH_KNOWN_HOST) $(VIRTUAL_SSH_FILES)/server virtual.local $@/known_hosts
+	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH_FILES)/user $@/known_hosts david virtual.local $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH_FILES)/ansible $@/known_hosts ansible virtual.local $@/config
+
 VIRTUAL_IMAGE = bootstrap/virtual.iso
 $(VIRTUAL_IMAGE): $(DEBIAN_AARCH64) $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH)
 	@$(SCRIPT_IMAGE) --iso $< --host virtual --output $@
-
-VIRTUAL_INSTALL = virtual.install
-$(VIRTUAL_INSTALL): $(VIRTUAL_SSH)
-	@$(SCRIPT_SSH_KNOWN_HOST) $(VIRTUAL_SSH)/server virtual.local
-	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH)/user virtual.local david
-	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH)/ansible virtual.local ansible
 
 DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
 $(DEBIAN_X86_64):
@@ -47,34 +49,35 @@ $(SERVER_PASSWORD):
 	@$(SCRIPT_PASSWORD) server ovh_application_secret $@
 	@$(SCRIPT_PASSWORD) server ovh_consumer_key $@
 
-SERVER_SSH = files/server/ssh
-$(SERVER_SSH):
+SERVER_SSH_FILES = files/server/ssh
+$(SERVER_SSH_FILES):
 	@mkdir $@
 	@$(SCRIPT_SSH_KEYGEN) $@/server
 	@$(SCRIPT_SSH_KEYGEN) $@/user
 	@$(SCRIPT_SSH_KEYGEN) $@/ansible
 
+SERVER_SSH = .ssh/server
+$(SERVER_SSH): $(SERVER_SSH_FILES)
+	@mkdir -p .ssh
+	@mkdir $@
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server server.local $@/known_hosts
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server server.davidlsq.fr $@/known_hosts
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user $@/known_hosts david server.local $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/ansible $@/known_hosts ansible server.local $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user $@/known_hosts david server.davidlsq.fr $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/ansible $@/known_hosts ansible server.davidlsq.fr $@/config
+
 SERVER_IMAGE = bootstrap/server.iso
 $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_PASSWORD) $(SERVER_SSH)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
 
-SERVER_INSTALL = server.install
-$(SERVER_INSTALL): $(SERVER_SSH)
-	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH)/server server.local
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/user server.local david
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/ansible server.local ansible
-	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH)/server server.davidlsq.fr
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/user server.davidlsq.fr david
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH)/ansible server.davidlsq.fr ansible
-
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
-CONFIGURE = $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH) $(SERVER_PASSWORD) $(SERVER_SSH)
+CONFIGURE = $(VIRTUAL_PASSWORD) $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_PASSWORD) $(SERVER_SSH_FILES) $(SERVER_SSH)
 IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
-INSTALL   = $(VIRTUAL_INSTALL) $(SERVER_INSTALL)
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := configure
-.PHONY: clean download configure image all test install $(INSTALL)
+.PHONY: clean download configure image all test
 
 tmpclean:
 	@rm -rf $(addsuffix .tmp,$(IMAGE))
@@ -92,5 +95,3 @@ all: image
 
 test:
 	@pre-commit run -a
-
-install: $(INSTALL)

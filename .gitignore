@@ -5,3 +5,4 @@ host_vars/*/password.yml
 .pipx
 .ansible
 .pre-commit-config.yaml
+.ssh
