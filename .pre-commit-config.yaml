@@ -7,3 +7,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: versions
+        name: versions
+        entry: nix-shell --command "print_versions > versions"
+        language: system
+        pass_filenames: false
+        always_run: true
