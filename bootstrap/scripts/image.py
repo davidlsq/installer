@@ -7,10 +7,23 @@ from pathlib import Path
 from subprocess import DEVNULL, run
 
 
-def copy(src, dest, mode=None):
+def copydir(src, dest, mode=None):
+    shutil.copytree(src, dest)
+    if mode is not None:
+        run_command(["chmod", "-R", mode, str(dest)])
+
+
+def copyfile(src, dest, mode=None):
     shutil.copy(src, dest)
     if mode is not None:
         run_command(["chmod", mode, str(dest)])
+
+
+def copy(src, dest, mode=None):
+    if os.path.isdir(src):
+        copydir(src, dest, mode)
+    else:
+        copyfile(src, dest, mode)
 
 
 def run_command(command, **kwargs):
@@ -80,19 +93,17 @@ extract_iso_content(iso_path, content_path)
 extract_iso_efi(iso_path, efi_path)
 
 config_path.mkdir()
-
-ignore_contents = {
-    "./bootstrap",
-}
-
-
-def ignore(directory, contents):
-    return [
-        content for content in contents if directory + "/" + content in ignore_contents
-    ]
-
-
-shutil.copytree(root_path, config_path / "ansible", ignore=ignore)
+(config_path / "ansible").mkdir()
+for name in [
+    "files",
+    "host_vars",
+    "inventory",
+    "roles",
+    "templates",
+    "server.yml",
+    "virtual.yml",
+]:
+    copy(root_path / name, config_path / "ansible" / name)
 
 # Create symlink to kernel
 (content_path / "install").rmdir()
