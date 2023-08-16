@@ -1,8 +1,5 @@
 bootstrap/*.iso
 bootstrap/*.iso.tmp/
 files/*/ssh/
-host_vars/*/password.yml
-.pipx
-.ansible
-.pre-commit-config.yaml
+host_vars/server/password.yml
 .ssh

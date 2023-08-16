@@ -65,7 +65,7 @@
     mode: u=rw,go=r
   register: create_config
 
-- name: Update config # noqa no-handler
+- name: Update config
   ansible.builtin.shell: >
     set -e -o pipefail
     cat {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible | jq -s add > {{ jackett_var }}/ServerConfig.json.tmp;

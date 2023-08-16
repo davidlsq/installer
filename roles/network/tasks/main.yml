@@ -30,7 +30,7 @@
     enabled: true
 
 - name: Restart
-  ansible.builtin.systemd: # noqa no-handler
+  ansible.builtin.systemd:
     name: systemd-networkd
     state: restarted
     daemon_reload: true
@@ -70,7 +70,7 @@
     name: systemd-resolved
     enabled: true
 
-- name: Restart # noqa no-handler
+- name: Restart
   ansible.builtin.systemd:
     name: systemd-resolved
     state: restarted

@@ -20,7 +20,7 @@
     mode: u=rw,go=r
   register: sources
 
-- name: Update cache # noqa no-handler
+- name: Update cache
   ansible.builtin.apt:
     update_cache: true
   when: sources is changed

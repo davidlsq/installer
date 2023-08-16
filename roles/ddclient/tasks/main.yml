@@ -25,7 +25,7 @@
     name: ddclient
     enabled: true
 
-- name: Restart # noqa no-handler
+- name: Restart
   ansible.builtin.systemd:
     name: ddclient
     state: restarted

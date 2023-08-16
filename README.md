@@ -4,7 +4,7 @@ Build iso images to automatically install Debian 12
 
 ## Dependencies
 
-[Nix OS](https://nixos.org/) is used for the development/build/deployment environment. The dependencies are also listed in the file [versions](versions)
+[Nix OS](https://nixos.org/) is used for the development/build/deployment environment
 
 **Install nix:**
 
