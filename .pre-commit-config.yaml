@@ -41,4 +41,5 @@ repos:
     hooks:
       - id: yamllint
         name: yamllint
-        files: "^(\\.pre-commit-config.yaml|\\.ansible-lint)$"
+        files:
+          "^(\\.pre-commit-config.yaml|\\.ansible-lint)$|\\.github/.*\\.yml$"
