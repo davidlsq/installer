@@ -43,4 +43,4 @@ repos:
         name: yamllint
         args: [-s]
         files:
-          "^(\\.pre-commit-config.yaml|\\.ansible-lint)$|\\.github/.*\\.yml$"
+          "^(\\.pre-commit-config.yaml|\\.ansible-lint|\\.yamllint.yml)$|\\.github/.*\\.yml$"
