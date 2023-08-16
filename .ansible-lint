@@ -3,3 +3,5 @@
 skip_list:
   - var-naming[no-role-prefix]
   - no-handler
+  - yaml[line-length]
+  - yaml[document-start]
