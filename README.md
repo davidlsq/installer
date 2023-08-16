@@ -20,15 +20,12 @@ nix-shell
 
 ## Images
 
-The default `make` goal builds all the images. The first time, it asks for the passwords
+The default `make` goal builds all the images
 
 ### virtual
 
 ```sh
 make bootstrap/virtual.iso
-virtual/root ?
-virtual/user ?
-virtual/ansible ?
 ```
 
 The image can be installed in a [UTM](https://mac.getutm.app) virtual machine :
@@ -41,13 +38,13 @@ At first boot, select the `[CDROM] Install` grub entry :
 
 The installation is fully automatic and Debian starts without other manipulation. At first boot, an [Ansible](https://docs.ansible.com) playbook runs inside the virtual machine, installing everything in about one minute
 
-You can log you with :
+Log you with :
 
 ```sh
 ssh -F .ssh/virtual/config david@virtual.local
 ```
 
-You can include it in your main config :
+You can include the ssh config it in your home config :
 
 ```sh
 echo "Include $(pwd)/.ssh/*/config" >> ~/.ssh/config
