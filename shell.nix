@@ -25,7 +25,7 @@ let
         name = "ansiblelint";
         entry = "ansible-lint -v --force-color";
         language = "system";
-        pass_filenames = false;
+        pass_filenames = true;
         always_run = false;
         types = [ "file" ];
         files = "^(host_vars|inventory|roles|templates|(server|virtual)\\.yml)";
