@@ -1,0 +1,24 @@
+---
+
+name: CI
+
+on:
+  push: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Run pre-commit
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Run install-nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Run checkout
+        uses: actions/checkout@v2
+      - name: Run pre-commit
+        run: nix-shell --command "pre-commit run -a"
