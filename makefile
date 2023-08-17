@@ -66,7 +66,7 @@ IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := configure
-.PHONY: clean download configure image all test server-github
+.PHONY: clean download configure image all test server-archive
 
 tmpclean:
 	@rm -rf $(addsuffix .tmp,$(IMAGE))
@@ -85,5 +85,5 @@ all: image
 test:
 	@pre-commit run -a
 
-server-github:
+server-archive:
 	@cat bootstrap/server-github.tar.gz | base64

@@ -1,6 +1,6 @@
 ---
 
-name: CI
+name: ci
 
 on:
   push:
@@ -11,47 +11,38 @@ concurrency:
 
 jobs:
   pre-commit:
-    name: Run pre-commit
+    name: pre-commit
     runs-on: ubuntu-22.04
     steps:
-      - name: Run install-nix
-        uses: cachix/install-nix-action@v22
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: pre-commit
+        uses: ./.github/actions/nix-shell
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - name: Run checkout
-        uses: actions/checkout@v3.5.3
-      - name: Run pre-commit
-        run: nix-shell --command "pre-commit run -a"
+          command: pre-commit run -a
   make:
-    name: Run make
+    name: make
     runs-on: ubuntu-22.04
     steps:
-      - name: Run install-nix
-        uses: cachix/install-nix-action@v22
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: make
+        uses: ./.github/actions/nix-shell
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - name: Run checkout
-        uses: actions/checkout@v3.5.3
-      - name: Run make
-        run: |
-          nix-shell --command "make bootstrap/virtual.iso"
-          ls -lh bootstrap
-          [ -f bootstrap/virtual.iso ]
+          command: make bootstrap/virtual.iso
+      - name: check
+        run: ls -lh bootstrap; [ -f bootstrap/virtual.iso ]
   server-playbook-check:
-    name: Run server-playbook-check
+    name: server-playbook-check
     runs-on: ubuntu-22.04
     steps:
-      - name: Run install-nix
-        uses: cachix/install-nix-action@v22
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-      - name: Run checkout
-        uses: actions/checkout@v3.5.3
-      - name: Unarchive secrets
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: server-archive
         env:
           SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}
-        run: |
-          echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
-          nix-shell --command "make .ssh/server"
-      - name: Run ansible-playbook-check
-        run: nix-shell --command "ansible-playbook -i inventory/server.davidlsq.fr -D -C server.yml"
+        run: echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
+      - name: server-playbook-check
+        uses: ./.github/actions/nix-shell
+        with:
+          command: make .ssh/server; ansible-playbook -i inventory/server.davidlsq.fr -D -C server.yml
