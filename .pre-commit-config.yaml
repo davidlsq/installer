@@ -3,15 +3,6 @@
 repos:
   - repo: local
     hooks:
-      - id: ansiblelint
-        name: ansiblelint
-        language: system
-        entry: ansible-lint -v --force-color
-        files: "^(host_vars|inventory|roles|templates|(server|virtual)\\.yml)"
-        pass_filenames: true
-        always_run: false
-        stages: [commit]
-        types: [file]
       - id: nixfmt
         name: nixfmt
         language: system
@@ -21,6 +12,13 @@ repos:
         always_run: false
         stages: [commit]
         types: [file]
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v6.17.2
+    hooks:
+      - id: ansible-lint
+        name: ansiblelint
+        files: "^(host_vars|inventory|roles|templates|(server|virtual)\\.yml)"
+        always_run: false
   - repo: https://github.com/ambv/black
     rev: 23.7.0
     hooks:
