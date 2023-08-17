@@ -18,8 +18,10 @@ VIRTUAL_SSH = .ssh/virtual
 $(VIRTUAL_SSH): $(VIRTUAL_SSH_FILES)
 	@mkdir -p .ssh
 	@mkdir $@
+
 	@$(SCRIPT_SSH_KNOWN_HOST) $(VIRTUAL_SSH_FILES)/server virtual.local $@/known_hosts
-	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH_FILES)/user $@/known_hosts david virtual.local $@/config
+
+	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH_FILES)/user    $@/known_hosts david   virtual.local $@/config
 	@$(SCRIPT_SSH_IDENTITY) $(VIRTUAL_SSH_FILES)/ansible $@/known_hosts ansible virtual.local $@/config
 
 VIRTUAL_IMAGE = bootstrap/virtual.iso
@@ -41,11 +43,13 @@ SERVER_SSH = .ssh/server
 $(SERVER_SSH): $(SERVER_SSH_FILES)
 	@mkdir -p .ssh
 	@mkdir $@
-	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server server.local $@/known_hosts
-	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server server.davidlsq.fr $@/known_hosts
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user $@/known_hosts david server.local $@/config
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/ansible $@/known_hosts ansible server.local $@/config
-	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user $@/known_hosts david server.davidlsq.fr $@/config
+	
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server  server.local       $@/known_hosts
+	@$(SCRIPT_SSH_KNOWN_HOST) $(SERVER_SSH_FILES)/server  server.davidlsq.fr $@/known_hosts
+
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user    $@/known_hosts david   server.local       $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/ansible $@/known_hosts ansible server.local       $@/config
+	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/user    $@/known_hosts david   server.davidlsq.fr $@/config
 	@$(SCRIPT_SSH_IDENTITY) $(SERVER_SSH_FILES)/ansible $@/known_hosts ansible server.davidlsq.fr $@/config
 
 SERVER_IMAGE = bootstrap/server.iso
@@ -54,7 +58,7 @@ $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
 
 SERVER_GITHUB_ARCHIVE = bootstrap/server-github.tar.gz
 $(SERVER_GITHUB_ARCHIVE): $(SERVER_SSH_FILES)
-	@tar -czf bootstrap/server-github.tar.gz files/server/ssh host_vars/server/password.yml
+	@tar -czf $@ $< host_vars/server/password.yml
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
 CONFIGURE = $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_SSH_FILES) $(SERVER_SSH)
