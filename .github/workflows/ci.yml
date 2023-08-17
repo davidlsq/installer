@@ -52,6 +52,6 @@ jobs:
           SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}
         run: |
           echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
-          make .ssh/server
+          nix-shell --command "make .ssh/server"
       - name: Run ansible-playbook-check
         run: nix-shell --command "ansible-playbook -i inventory/server.davidlsq.fr -D -C server.yml"
