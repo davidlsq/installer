@@ -52,13 +52,17 @@ SERVER_IMAGE = bootstrap/server.iso
 $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
 
+SERVER_GITHUB_ARCHIVE = bootstrap/server-github.tar.gz
+$(SERVER_GITHUB_ARCHIVE): $(SERVER_SSH_FILES)
+	@tar -czf bootstrap/server-github.tar.gz files/server/ssh host_vars/server/password.yml
+
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
 CONFIGURE = $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_SSH_FILES) $(SERVER_SSH)
 IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := configure
-.PHONY: clean download configure image all test
+.PHONY: clean download configure image all test server-github
 
 tmpclean:
 	@rm -rf $(addsuffix .tmp,$(IMAGE))
@@ -76,3 +80,6 @@ all: image
 
 test:
 	@pre-commit run -a
+
+server-github:
+	@cat bootstrap/server-github.tar.gz | base64

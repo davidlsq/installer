@@ -1,5 +1,6 @@
 bootstrap/*.iso
 bootstrap/*.iso.tmp/
+bootstrap/server-github.tar.gz
 files/*/ssh/
 host_vars/server/password.yml
 .ssh

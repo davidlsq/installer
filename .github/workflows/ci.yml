@@ -19,6 +19,24 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - name: Run checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.5.3
       - name: Run pre-commit
         run: nix-shell --command "pre-commit run -a"
+  server-playbook-check:
+    name: Run server-playbook-check
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Run install-nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Run checkout
+        uses: actions/checkout@v3.5.3
+      - name: Unarchive secrets
+        env:
+          SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}
+        run: |
+          echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
+          make .ssh/server
+      - name: Run ansible-playbook-check
+        run: nix-shell --command "ansible-playbook -i inventory/server.davidlsq.fr -D -C server.yml"

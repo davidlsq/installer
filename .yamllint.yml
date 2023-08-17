@@ -6,3 +6,6 @@ rules:
   truthy:
     ignore:
       - /.github/*
+  line-length:
+    ignore:
+      - /.github/*
