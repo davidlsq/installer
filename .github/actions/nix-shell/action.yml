@@ -1,0 +1,18 @@
+---
+
+name: nix-shell
+
+inputs:
+  command:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: install
+      uses: cachix/install-nix-action@v22
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: run
+      run: nix-shell --command "${{ inputs.command }}"
+      shell: bash
