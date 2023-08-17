@@ -20,7 +20,6 @@ let
     pkgs.pre-commit
     pkgs.nixfmt
     ansible
-    pkgs.ansible-lint
     pkgs.openssh
   ];
 in pkgs.mkShell {
