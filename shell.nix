@@ -21,6 +21,7 @@ let
     pkgs.nixfmt
     ansible
     pkgs.ansible-lint
+    pkgs.openssh
   ];
 in pkgs.mkShell {
   buildInputs = buildInputs;
