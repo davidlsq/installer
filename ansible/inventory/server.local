@@ -1,0 +1,1 @@
+server ansible_connection=ssh ansible_ssh_host=server.local ansible_ssh_extra_args="-F ssh/server/config" ansible_user=ansible

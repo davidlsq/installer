@@ -45,4 +45,4 @@ jobs:
       - name: server-playbook-check
         uses: ./.github/actions/nix-shell
         with:
-          command: make .ssh/server; ansible-playbook -i inventory/server.davidlsq.fr -D -C server.yml
+          command: make ssh/server; ansible-playbook -i ansible/inventory/server.davidlsq.fr -D -C ansible/server.yml

@@ -17,7 +17,7 @@ repos:
     hooks:
       - id: ansible-lint
         name: ansiblelint
-        files: "^(host_vars|inventory|roles|templates|(server|virtual)\\.yml)"
+        files: "^ansible"
         always_run: false
   - repo: https://github.com/ambv/black
     rev: 23.7.0
@@ -40,5 +40,4 @@ repos:
       - id: yamllint
         name: yamllint
         args: [-s]
-        files:
-          "^(\\.pre-commit-config.yaml|\\.ansible-lint|\\.yamllint.yml)$|\\.github/.*\\.yml$"
+        files: "^(?!ansible).*\\.(yml|yaml)$"
