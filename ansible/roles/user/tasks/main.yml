@@ -52,3 +52,4 @@
     user: '{{ user_name }}'
     key: '{{ lookup("file", user_key_pub) }}'
   when: user_key_pub is defined
+  no_log: true
