@@ -7,16 +7,15 @@ DEBIAN_AARCH64 = bootstrap/debian-aarch64.iso
 $(DEBIAN_AARCH64):
 	@wget -q https://cdimage.debian.org/images/release/12.1.0/arm64/iso-cd/debian-12.1.0-arm64-netinst.iso -O $@
 
-VIRTUAL_SSH_FILES = files/virtual/ssh
+VIRTUAL_SSH_FILES = ansible/files/virtual/ssh
 $(VIRTUAL_SSH_FILES):
 	@mkdir $@
 	@$(SCRIPT_SSH_KEYGEN) $@/server
 	@$(SCRIPT_SSH_KEYGEN) $@/user
 	@$(SCRIPT_SSH_KEYGEN) $@/ansible
 
-VIRTUAL_SSH = .ssh/virtual
+VIRTUAL_SSH = ssh/virtual
 $(VIRTUAL_SSH): $(VIRTUAL_SSH_FILES)
-	@mkdir -p .ssh
 	@mkdir $@
 
 	@$(SCRIPT_SSH_KNOWN_HOST) $</server virtual.local $@/known_hosts
@@ -32,16 +31,15 @@ DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
 $(DEBIAN_X86_64):
 	@wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
 
-SERVER_SSH_FILES = files/server/ssh
+SERVER_SSH_FILES = ansible/files/server/ssh
 $(SERVER_SSH_FILES):
 	@mkdir $@
 	@$(SCRIPT_SSH_KEYGEN) $@/server
 	@$(SCRIPT_SSH_KEYGEN) $@/user
 	@$(SCRIPT_SSH_KEYGEN) $@/ansible
 
-SERVER_SSH = .ssh/server
+SERVER_SSH = ssh/server
 $(SERVER_SSH): $(SERVER_SSH_FILES)
-	@mkdir -p .ssh
 	@mkdir $@
 	
 	@$(SCRIPT_SSH_KNOWN_HOST) $</server  server.local       $@/known_hosts
@@ -56,12 +54,12 @@ SERVER_IMAGE = bootstrap/server.iso
 $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
 
-SERVER_GITHUB_ARCHIVE = bootstrap/server-github.tar.gz
-$(SERVER_GITHUB_ARCHIVE): $(SERVER_SSH_FILES)
-	@tar -czf $@ $< host_vars/server/password.yml
+SERVER_ARCHIVE = bootstrap/server-archive.tar.gz
+$(SERVER_ARCHIVE): $(SERVER_SSH_FILES)
+	@tar -czf $@ $< ansible/host_vars/server/password.yml
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
-CONFIGURE = $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_SSH_FILES) $(SERVER_SSH)
+CONFIGURE = $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_SSH_FILES) $(SERVER_SSH) $(SERVER_ARCHIVE)
 IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
 
 .DEFAULT_GOAL := image
@@ -85,5 +83,5 @@ all: image
 test:
 	@pre-commit run -a
 
-server-archive:
-	@cat bootstrap/server-github.tar.gz | base64
+server-archive: $(SERVER_ARCHIVE)
+	@cat $< | base64

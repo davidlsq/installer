@@ -3,6 +3,7 @@
 import argparse
 import os
 import shutil
+from os.path import realpath
 from pathlib import Path
 from subprocess import DEVNULL, run
 
@@ -45,6 +46,27 @@ def create_iso(content_path, efi_path, iso_path):
     )
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--iso", required=True)
+parser.add_argument("--host", required=True)
+parser.add_argument("--output", required=True)
+args = parser.parse_args()
+
+host = args.host
+
+root_path = Path(".")
+iso_path = Path(args.iso)
+output_path = Path(args.output)
+tmp_path = Path(args.output + ".tmp")
+ansible_path = root_path / "ansible"
+bootstrap_path = root_path / "bootstrap"
+templates_path = bootstrap_path / "templates"
+files_path = bootstrap_path / "files"
+content_path = tmp_path / "content"
+efi_path = tmp_path / "efi.img"
+config_path = content_path / ".config"
+
+
 def template(host, src, dest, mode=None):
     run_command(
         [
@@ -57,34 +79,14 @@ def template(host, src, dest, mode=None):
             "-m",
             "template",
             "-a",
-            "src={0} dest={1}".format(src, dest),
+            "src={0} dest={1}".format(realpath(src), realpath(dest)),
         ],
         stderr=DEVNULL,
+        cwd=str(ansible_path),
     )
     if mode is not None:
         run_command(["chmod", mode, str(dest)])
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--iso", required=True)
-parser.add_argument("--host", required=True)
-parser.add_argument("--output", required=True)
-args = parser.parse_args()
-
-host = args.host
-
-root_path = Path(".")
-
-iso_path = Path(args.iso)
-output_path = Path(args.output)
-tmp_path = Path(args.output + ".tmp")
-
-files_path = root_path / "files"
-
-content_path = tmp_path / "content"
-efi_path = tmp_path / "efi.img"
-
-config_path = content_path / ".config"
 
 shutil.rmtree(tmp_path, ignore_errors=True)
 tmp_path.mkdir()
@@ -92,36 +94,25 @@ tmp_path.mkdir()
 extract_iso_content(iso_path, content_path)
 extract_iso_efi(iso_path, efi_path)
 
+# Copy ansible
 config_path.mkdir()
-(config_path / "ansible").mkdir()
-for name in [
-    "files",
-    "host_vars",
-    "inventory",
-    "roles",
-    "templates",
-    "server.yml",
-    "virtual.yml",
-]:
-    copy(root_path / name, config_path / "ansible" / name)
+copy(ansible_path, config_path / "ansible")
 
 # Create symlink to kernel
 (content_path / "install").rmdir()
 os.symlink(next(content_path.glob("install.*")).name, content_path / "install")
 
-# Create symlink to grub config
-grub_path = content_path / "boot" / "grub" / "grub.cfg"
-grub_path.unlink()
-os.symlink("../../.config/ansible/files/grub.cfg", grub_path)
+# Create grub config
+copy(files_path / "grub.cfg", content_path / "boot" / "grub" / "grub.cfg")
 
-# Create symlink to recipe config
-os.symlink("ansible/files/" + host + "/recipe", config_path / "recipe")
+# Copy recipe config
+copy(files_path / host / "recipe", config_path / "recipe")
 
 # Create preseed config
-template(host, "preseed.cfg.j2", config_path / "preseed.cfg")
+template(host, templates_path / "preseed.cfg.j2", config_path / "preseed.cfg")
 
 # Create playbook script
-template(host, "playbook.sh.j2", config_path / "playbook.sh", "+x")
+template(host, templates_path / "playbook.sh.j2", config_path / "playbook.sh", "+x")
 
 # Create install script
 copy(files_path / "install.sh", config_path / "install.sh", "+x")
