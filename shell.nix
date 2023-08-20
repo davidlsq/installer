@@ -11,9 +11,8 @@ let
     src = pkgs.ansible;
     installPhase = "cp -r $src $out";
   };
-  buildInputs = with pkgs; [
+  buildInputs = [
     pkgs.python311
-    pkgs.python311Packages.passlib
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
