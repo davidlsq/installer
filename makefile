@@ -54,9 +54,10 @@ SERVER_IMAGE = bootstrap/server.iso
 $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
 
-SERVER_ARCHIVE = bootstrap/server-archive.tar.gz
-$(SERVER_ARCHIVE): $(SERVER_SSH_FILES)
-	@tar -czf $@ $< ansible/host_vars/server/password.yml
+SERVER_GITHUB = server-github
+$(SERVER_GITHUB): $(SERVER_SSH_FILES)
+	@tar -cz $</server* $</user.pub $</ansible* ansible/host_vars/server/password.yml | base64 | \
+	 gh secret set SERVER_ARCHIVE -R davidlsq/installer
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
 CONFIGURE = $(VIRTUAL_SSH_FILES) $(VIRTUAL_SSH) $(SERVER_SSH_FILES) $(SERVER_SSH) $(SERVER_ARCHIVE)
@@ -64,7 +65,7 @@ IMAGE     = $(VIRTUAL_IMAGE) $(SERVER_IMAGE)
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := configure
-.PHONY: clean download configure image all test server-archive
+.PHONY: clean download configure image all test $(SERVER_GITHUB)
 
 tmpclean:
 	@rm -rf $(addsuffix .tmp,$(IMAGE))
@@ -82,6 +83,3 @@ all: image
 
 test:
 	@pre-commit run -a
-
-server-archive: $(SERVER_ARCHIVE)
-	@cat $< | base64
