@@ -16,15 +16,36 @@ let
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
-    pkgs.pre-commit
-    pkgs.nixfmt
-    ansible
+    pkgs.ansible-lint
     pkgs.openssh
     pkgs.gh
+    ansible
   ];
+  nix-pre-commit-hooks = import (builtins.fetchTarball
+    "https://github.com/cachix/pre-commit-hooks.nix/tarball/master");
+  pre-commit-check = nix-pre-commit-hooks.run {
+    src = ./.;
+    hooks = {
+      checkmake.enable = true;
+      nixfmt.enable = true;
+      black.enable = true;
+      isort.enable = true;
+      yamllint.enable = true;
+      yamllint.files = "^(?!ansible).*\\.(yml|yaml)$";
+      ansiblelint = {
+        enable = true;
+        name = "ansiblelint";
+        entry = "python3 -m ansiblelint -v --force-color";
+        language = "python";
+        pass_filenames = false;
+        files = "^ansible";
+        always_run = false;
+      };
+    };
+  };
 in pkgs.mkShell {
   buildInputs = buildInputs;
   shellHook = ''
-    pre-commit install --overwrite
+    ${pre-commit-check.shellHook}
   '';
 }
