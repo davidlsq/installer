@@ -2,6 +2,8 @@ SCRIPT_SSH_KEYGEN     = bootstrap/scripts/ssh-keygen.sh
 SCRIPT_SSH_KNOWN_HOST = bootstrap/scripts/ssh-known-host.sh
 SCRIPT_SSH_IDENTITY   = bootstrap/scripts/ssh-identity.sh
 SCRIPT_IMAGE          = bootstrap/scripts/image.py
+SCRIPT_VIRTUAL        = bootstrap/virtual.py
+SCRIPT_SERVER         = bootstrap/server.py
 
 DEBIAN_AARCH64 = bootstrap/debian-aarch64.iso
 $(DEBIAN_AARCH64):
@@ -25,7 +27,7 @@ $(VIRTUAL_SSH): $(VIRTUAL_SSH_FILES)
 
 VIRTUAL_IMAGE = bootstrap/virtual.iso
 $(VIRTUAL_IMAGE): $(DEBIAN_AARCH64) $(VIRTUAL_SSH)
-	@$(SCRIPT_IMAGE) --iso $< --host virtual --output $@
+	@$(SCRIPT_VIRTUAL)
 
 DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
 $(DEBIAN_X86_64):
@@ -52,7 +54,7 @@ $(SERVER_SSH): $(SERVER_SSH_FILES)
 
 SERVER_IMAGE = bootstrap/server.iso
 $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
-	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
+	@$(SCRIPT_SERVER)
 
 SERVER_GITHUB = server-github
 $(SERVER_GITHUB): $(SERVER_SSH_FILES)

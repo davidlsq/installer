@@ -5,21 +5,16 @@ let
     sha256 = "1dwa763zp97jymsx2g2xky0yl7gp8nc22yrwf4n3084ahdb149b3";
   };
   pkgs = import nixpkgs { };
-  ansible = pkgs.stdenv.mkDerivation {
-    name = "ansible";
-    propagatedBuildInputs = [ pkgs.python310Packages.passlib ];
-    src = pkgs.ansible;
-    installPhase = "cp -r $src $out";
-  };
-  buildInputs = [
-    pkgs.python311
+  python-packages = p: [ p.ansible p.passlib p.pyyaml ];
+  python = pkgs.python311.withPackages python-packages;
+  packages = [
+    python
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
     pkgs.ansible-lint
     pkgs.openssh
     pkgs.gh
-    ansible
   ];
   nix-pre-commit-hooks = import (builtins.fetchTarball
     "https://github.com/cachix/pre-commit-hooks.nix/tarball/master");
@@ -44,7 +39,7 @@ let
     };
   };
 in pkgs.mkShell {
-  buildInputs = buildInputs;
+  packages = packages;
   shellHook = ''
     ${pre-commit-check.shellHook}
   '';

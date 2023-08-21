@@ -1,0 +1,8 @@
+---
+
+partman_recipe_name: partitionning
+partman_disk: /dev/vda
+playbook: virtual.yml
+network_interface: enp0s1
+host_name: virtual
+inventory_hostname: virtual

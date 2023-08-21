@@ -17,7 +17,7 @@ d-i netcfg/hostname string {{ bootstrap.host_name }}
 
 # user
 d-i passwd/make-user boolean false
-d-i passwd/root-password-crypted password {{ bootstrap.root_password | password_hash("sha512", "root") }}
+d-i passwd/root-password-crypted password {{ password.root | password_hash }}
 
 # partitionning
 d-i partman-auto/method string regular
