@@ -20,8 +20,8 @@
       tags: grub
     - role: ssh_server
       tags: ssh_server
-      ssh_server_key: server/ssh/server
-      ssh_server_key_pub: server/ssh/server.pub
+      ssh_server_key: server/server
+      ssh_server_key_pub: server/server.pub
     - role: user
       tags: user
       user_name: root
@@ -30,14 +30,14 @@
     - role: user
       tags: user
       user_password: '{{ password.user }}'
-      user_key_pub: server/ssh/user.pub
+      user_key_pub: server/user.pub
       user_shell: /bin/zsh
       user_sudo: true
     - role: user
       tags: user
       user_name: ansible
       user_password: '{{ password.ansible }}'
-      user_key_pub: server/ssh/ansible.pub
+      user_key_pub: server/ansible.pub
       user_shell: /bin/zsh
       user_sudo: yes-no-password
     - role: ohmyzsh

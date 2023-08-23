@@ -5,26 +5,42 @@ let
     sha256 = "1dwa763zp97jymsx2g2xky0yl7gp8nc22yrwf4n3084ahdb149b3";
   };
   pkgs = import nixpkgs { };
-  ansible = pkgs.stdenv.mkDerivation {
-    name = "ansible";
-    propagatedBuildInputs = [ pkgs.python310Packages.passlib ];
-    src = pkgs.ansible;
-    installPhase = "cp -r $src $out";
-  };
-  buildInputs = with pkgs; [
-    pkgs.python311
-    pkgs.python311Packages.passlib
+  python-packages = p: [ p.ansible p.passlib p.pyyaml p.jinja2 ];
+  python = pkgs.python311.withPackages python-packages;
+  packages = [
+    python
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
-    pkgs.pre-commit
-    pkgs.nixfmt
-    ansible
+    pkgs.ansible-lint
     pkgs.openssh
+    pkgs.gh
   ];
+  nix-pre-commit-hooks = import (builtins.fetchTarball
+    "https://github.com/cachix/pre-commit-hooks.nix/tarball/master");
+  pre-commit-check = nix-pre-commit-hooks.run {
+    src = ./.;
+    hooks = {
+      checkmake.enable = true;
+      nixfmt.enable = true;
+      black.enable = true;
+      isort.enable = true;
+      yamllint.enable = true;
+      yamllint.files = "^(?!ansible).*\\.(yml|yaml)$";
+      ansiblelint = {
+        enable = true;
+        name = "ansiblelint";
+        entry = "python3 -m ansiblelint -v --force-color";
+        language = "python";
+        pass_filenames = false;
+        files = "^ansible";
+        always_run = false;
+      };
+    };
+  };
 in pkgs.mkShell {
-  buildInputs = buildInputs;
+  packages = packages;
   shellHook = ''
-    pre-commit install --overwrite
+    ${pre-commit-check.shellHook}
   '';
 }

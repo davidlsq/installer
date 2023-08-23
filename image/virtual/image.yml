@@ -1,0 +1,6 @@
+---
+
+image:
+  partman_recipe_name: partitionning
+  partman_disk: /dev/vda
+  network_interface: enp0s1

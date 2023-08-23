@@ -1,7 +1,7 @@
 user_name: david
 network_interface: enp0s31f6
-network_host_name: '{{ inventory_hostname }}'
-private_domain: '{{ network_host_name }}.local'
+network_host_name: server
+private_domain: server.local
 public_domain: server.davidlsq.fr
 
 qbittorrent_1_name: qbittorrent

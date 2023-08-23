@@ -22,7 +22,7 @@
 - name: Set password
   ansible.builtin.user:
     name: '{{ user_name }}'
-    password: '{{ user_password | password_hash("sha512", user_name) }}'
+    password: '{{ user_password }}'
   when: user_password is defined
   no_log: true
 
