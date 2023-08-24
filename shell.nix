@@ -9,10 +9,8 @@ let
     name = "ansible";
     propagatedBuildInputs = [ pkgs.python310Packages.passlib ];
     src = pkgs.ansible;
-    installPhase = "cp -r $src $out";
   };
-  buildInputs = [
-    pkgs.python311
+  packages = [
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
@@ -44,7 +42,7 @@ let
     };
   };
 in pkgs.mkShell {
-  buildInputs = buildInputs;
+  packages = packages;
   shellHook = ''
     ${pre-commit-check.shellHook}
   '';
