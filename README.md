@@ -47,11 +47,11 @@ ssh -F .ssh/virtual/config david@virtual.local
 You can include the ssh config it in your home config :
 
 ```sh
-echo "Include $(pwd)/.ssh/*/config" >> ~/.ssh/config
+echo "Include $(pwd)/configure/*/ssh/config" >> ~/.ssh/config
 ```
 
 To run the Ansible playbook manually :
 
 ```sh
-ansible-playbook -i inventory/virtual.local virtual.yml
+ansible-playbook -i ansible/inventory/virtual.local ansible/virtual.yml
 ```
