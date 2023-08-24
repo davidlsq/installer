@@ -3,7 +3,7 @@
 import argparse
 import os
 import shutil
-from os.path import realpath
+from os.path import exists, realpath
 from pathlib import Path
 from subprocess import DEVNULL, run
 
@@ -25,6 +25,21 @@ def copy(src, dest, mode=None):
         copydir(src, dest, mode)
     else:
         copyfile(src, dest, mode)
+
+
+def copy_ansible(src, name, dest):
+    paths = [
+        f"files/{name}",
+        f"host_vars/{name}",
+        f"roles",
+        f"templates/{name}",
+        f"{name}.yml",
+    ]
+    for path in paths:
+        _src = f"{src}/{path}"
+        _dest = f"{dest}/{path}"
+        if exists(_src):
+            copy(_src, _dest)
 
 
 def run_command(command, **kwargs):
@@ -96,7 +111,7 @@ extract_iso_efi(iso_path, efi_path)
 
 # Copy ansible
 config_path.mkdir()
-copy(ansible_path, config_path / "ansible")
+copy_ansible(ansible_path, host, config_path / "ansible")
 
 # Create symlink to kernel
 (content_path / "install").rmdir()
