@@ -1,1 +1,1 @@
-virtual ansible_connection=ssh ansible_ssh_host=virtual.local ansible_ssh_extra_args="-F ssh/virtual/config" ansible_user=ansible
+virtual ansible_connection=ssh ansible_ssh_host=virtual.local ansible_ssh_extra_args="-F configure/virtual/ssh/config" ansible_user=ansible
