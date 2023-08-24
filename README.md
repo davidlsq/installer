@@ -53,5 +53,5 @@ echo "Include $(pwd)/configure/*/ssh/config" >> ~/.ssh/config
 To run the Ansible playbook manually :
 
 ```sh
-ansible-playbook -i inventory/virtual.local virtual.yml
+ansible-playbook -i ansible/inventory/virtual.local ansible/virtual.yml
 ```
