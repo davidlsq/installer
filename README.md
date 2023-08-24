@@ -41,7 +41,7 @@ The installation is fully automatic and Debian starts without other manipulation
 Log you with :
 
 ```sh
-ssh -F .ssh/virtual/config david@virtual.local
+ssh -F configure/virtual/ssh/config david@virtual.local
 ```
 
 You can include the ssh config it in your home config :
