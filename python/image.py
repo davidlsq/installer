@@ -1,140 +1,173 @@
-#!/usr/bin/python3
-
-import argparse
-import os
-import shutil
-from os.path import exists, realpath
+import platform
+from os import makedirs, symlink
+from os.path import exists
 from pathlib import Path
-from subprocess import DEVNULL, run
+from re import escape, match
+from shutil import rmtree
+from subprocess import DEVNULL, check_output
+
+from common import chmod, copy, read_yaml
+from template import render
 
 
-def copydir(src, dest, mode=None):
-    shutil.copytree(src, dest)
-    if mode is not None:
-        run_command(["chmod", "-R", mode, str(dest)])
+def extract_iso_content(iso, content):
+    content.mkdir()
+    check_output(["bsdtar", "-xf", iso, "-C", content])
+    chmod(content, "+w")
 
 
-def copyfile(src, dest, mode=None):
-    shutil.copy(src, dest)
-    if mode is not None:
-        run_command(["chmod", mode, str(dest)])
-
-
-def copy(src, dest, mode=None):
-    if os.path.isdir(src):
-        copydir(src, dest, mode)
-    else:
-        copyfile(src, dest, mode)
-
-
-def copy_ansible(src, name, dest):
-    paths = [
-        f"files/{name}",
-        f"host_vars/{name}",
-        f"roles",
-        f"templates/{name}",
-        f"{name}.yml",
+def extract_iso_efi_darwin(iso, efi):
+    output = check_output(["fdisk", iso])
+    output = output.decode("utf-8")
+    output = output.split("\n")
+    output = [
+        match(r"\s[0-9]*\:\sEF.*\[\s*([0-9]*)\s*-\s*([0-9]*)\].*$", x) for x in output
     ]
+    output = next(iter([x for x in output if x is not None]))
+    skip = int(output.group(1))
+    count = int(output.group(2))
+    check_output(
+        [
+            "dd",
+            f"if={iso}",
+            f"of={efi}",
+            f"skip={skip}",
+            f"count={count}",
+            "status=none",
+        ]
+    )
+
+
+def extract_iso_efi_linux(iso, efi):
+    output = check_output(["fdisk", "-l", iso])
+    output = output.decode("utf-8")
+    output = output.split("\n")
+    output = [
+        match(rf"^{escape(str(iso))}[0-9]*\s*([0-9]*)\s*[0-9]*\s*([0-9]*).*EFI.*$", x)
+        for x in output
+    ]
+    output = next(iter([x for x in output if x is not None]))
+    skip = int(output.group(1))
+    count = int(output.group(2))
+    check_output(
+        [
+            "dd",
+            f"if={iso}",
+            f"of={efi}",
+            f"skip={skip}",
+            f"count={count}",
+            "status=none",
+        ]
+    )
+
+
+def extract_iso_efi(iso, efi):
+    system = platform.system()
+    if system == "Darwin":
+        extract_iso_efi_darwin(iso, efi)
+    elif system == "Linux":
+        extract_iso_efi_linux(iso, efi)
+    else:
+        raise Exception()
+
+
+def symlink_install(content):
+    (content / "install").rmdir()
+    symlink(next(content.glob("install.*")).name, content / "install")
+
+
+def copy_ansible(src, image_name, dest):
+    paths = [
+        f"files/{image_name}",
+        f"host_vars/{image_name}",
+        f"roles",
+        f"templates/{image_name}",
+        f"{image_name}.yml",
+    ]
+    dest.mkdir()
     for path in paths:
-        _src = f"{src}/{path}"
-        _dest = f"{dest}/{path}"
+        _src = src / path
+        _dest = dest / path
         if exists(_src):
             copy(_src, _dest)
 
 
-def run_command(command, **kwargs):
-    run(command, check=True, stdout=DEVNULL, **kwargs)
-
-
-def extract_iso_content(iso_path, content_path):
-    run_command(["bash/extract-iso-content.sh", iso_path, content_path])
-
-
-def extract_iso_efi(iso_path, efi_path):
-    run_command(["bash/extract-iso-efi.sh", iso_path, efi_path])
-
-
-def create_iso(content_path, efi_path, iso_path):
-    run_command(
-        ["bash/create-iso.sh", content_path, efi_path, iso_path],
-        stderr=DEVNULL,
-    )
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--iso", required=True)
-parser.add_argument("--host", required=True)
-parser.add_argument("--output", required=True)
-args = parser.parse_args()
-
-host = args.host
-
-root_path = Path(".")
-iso_path = Path(args.iso)
-output_path = Path(args.output)
-ansible_path = root_path / "ansible"
-config_path = root_path / "config"
-common_path = config_path / "common"
-image_tmp_path = Path(args.output + ".tmp")
-image_content_path = image_tmp_path / "content"
-image_efi_path = image_tmp_path / "efi.img"
-image_config_path = image_content_path / ".config"
-
-
-def template(host, src, dest, mode=None):
-    run_command(
+def create_iso(content, efi, iso):
+    check_output(
         [
-            "ansible",
-            "-i",
-            host + ",",
-            "-c",
-            "local",
-            host,
-            "-m",
-            "template",
-            "-a",
-            "src={0} dest={1}".format(realpath(src), realpath(dest)),
+            "xorriso",
+            "-as",
+            "mkisofs",
+            "-quiet",
+            "-V",
+            "CDROM",
+            "-R",
+            "-uid",
+            "0",
+            "-gid",
+            "0",
+            "-e",
+            "boot/grub/efi.img",
+            "-no-emul-boot",
+            "-append_partition",
+            "2",
+            "0xef",
+            f"{efi}",
+            "-partition_cyl_align",
+            "all",
+            "-o",
+            f"{iso}",
+            f"{content}",
         ],
         stderr=DEVNULL,
-        cwd=str(ansible_path),
     )
-    if mode is not None:
-        run_command(["chmod", mode, str(dest)])
 
 
-shutil.rmtree(image_tmp_path, ignore_errors=True)
-image_tmp_path.mkdir()
+def image_build(iso, image_name, output):
+    image_tmp = Path(f"{output}.tmp")
+    image_content = image_tmp / "content"
+    image_efi = image_tmp / "efi.img"
+    image_content_config = image_content / ".config"
 
-extract_iso_content(iso_path, image_content_path)
-extract_iso_efi(iso_path, image_efi_path)
+    config = Path("config")
+    config_common = config / "common"
+    config_image = config / image_name
 
-# Copy ansible
-image_config_path.mkdir()
-copy_ansible(ansible_path, host, image_config_path / "ansible")
+    build = Path("build")
+    build_image = build / image_name
 
-# Create symlink to kernel
-(image_content_path / "install").rmdir()
-os.symlink(
-    next(image_content_path.glob("install.*")).name, image_content_path / "install"
-)
+    ansible = Path("ansible")
 
-# Create grub config
-copy(common_path / "grub.cfg", image_content_path / "boot" / "grub" / "grub.cfg")
+    rmtree(image_tmp, ignore_errors=True)
+    image_tmp.mkdir()
 
-# Copy recipe config
-copy(config_path / host / "recipe", image_config_path / "recipe")
+    extract_iso_content(iso, image_content)
+    extract_iso_efi(iso, image_efi)
+    symlink_install(image_content)
+    copy(config_common / "grub.cfg", image_content / "boot" / "grub" / "grub.cfg")
 
-# Create preseed config
-template(host, common_path / "preseed.cfg.j2", image_config_path / "preseed.cfg")
+    image_content_config.mkdir()
+    copy_ansible(ansible, image_name, image_content_config / "ansible")
+    copy(config_image / "recipe", image_content_config / "recipe")
+    copy(config_common / "install.sh", image_content_config / "install.sh", "+x")
 
-# Create playbook script
-template(host, common_path / "playbook.sh.j2", image_config_path / "playbook.sh", "+x")
+    variables = {
+        **read_yaml(config_image / "image.yml"),
+        **read_yaml(build_image / "password.yml"),
+        "image_name": image_name,
+    }
+    render(
+        config_common / "preseed.cfg.j2",
+        image_content_config / "preseed.cfg",
+        variables,
+    )
+    render(
+        config_common / "playbook.sh.j2",
+        image_content_config / "playbook.sh",
+        variables,
+        "+x",
+    )
+    chmod(image_content_config, "go-rwx")
 
-# Create install script
-copy(common_path / "install.sh", image_config_path / "install.sh", "+x")
-
-# Fix config permissions
-run_command(["chmod", "-R", "go-rwx", str(image_config_path)])
-
-create_iso(image_content_path, image_efi_path, output_path)
-shutil.rmtree(image_tmp_path, ignore_errors=True)
+    create_iso(image_content, image_efi, output)
+    rmtree(image_tmp)

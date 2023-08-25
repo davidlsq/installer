@@ -5,7 +5,7 @@ let
     sha256 = "0kv3z80l5cd27n3yhv0f1gn5bky5a04c3ykczlqksxksppr8cihz";
   };
   pkgs = import nixpkgs { };
-  python-packages = p: [ p.passlib p.pyyaml ];
+  python-packages = p: [ p.passlib p.pyyaml p.jinja2 ];
   python = pkgs.python311.withPackages python-packages;
   packages = [
     python

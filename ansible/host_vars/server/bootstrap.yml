@@ -1,7 +1,0 @@
-bootstrap:
-  partman_recipe_name: partitionning
-  partman_disk: /dev/disk/by-id/nvme-KINGSTON_SNV2S500G_50026B7685F960D0
-  playbook: server.yml
-  network_interface: '{{ network_interface }}'
-  host_name: '{{ network_host_name }}'
-  root_password: '{{ password.root }}'

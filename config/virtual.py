@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 
+from image import image_build
 from password import password_hash
 from ssh import ssh_config, ssh_keygen, ssh_known_host
 
@@ -25,3 +26,6 @@ elif command == "ssh":
 elif command == "password":
     password = Path(sys.argv[3])
     password_hash(password, output, ["root", "user", "ansible"])
+elif command == "image":
+    iso = Path(sys.argv[3])
+    image_build(iso, "virtual", output)
