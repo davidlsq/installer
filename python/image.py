@@ -10,13 +10,13 @@ from common import chmod, copy, read_yaml
 from template import render
 
 
-def extract_iso_content(iso, content):
+def _extract_iso_content(iso, content):
     content.mkdir()
     check_output(["bsdtar", "-xf", iso, "-C", content])
     chmod(content, "+w")
 
 
-def extract_iso_efi_darwin(iso, efi):
+def _extract_iso_efi_darwin(iso, efi):
     output = check_output(["fdisk", iso])
     output = output.decode("utf-8")
     output = output.split("\n")
@@ -38,7 +38,7 @@ def extract_iso_efi_darwin(iso, efi):
     )
 
 
-def extract_iso_efi_linux(iso, efi):
+def _extract_iso_efi_linux(iso, efi):
     output = check_output(["fdisk", "-l", iso])
     output = output.decode("utf-8")
     output = output.split("\n")
@@ -61,22 +61,22 @@ def extract_iso_efi_linux(iso, efi):
     )
 
 
-def extract_iso_efi(iso, efi):
+def _extract_iso_efi(iso, efi):
     system = platform.system()
     if system == "Darwin":
-        extract_iso_efi_darwin(iso, efi)
+        _extract_iso_efi_darwin(iso, efi)
     elif system == "Linux":
-        extract_iso_efi_linux(iso, efi)
+        _extract_iso_efi_linux(iso, efi)
     else:
         raise Exception()
 
 
-def symlink_install(content):
+def _symlink_install(content):
     (content / "install").rmdir()
     symlink(next(content.glob("install.*")).name, content / "install")
 
 
-def copy_ansible(src, image_name, dest):
+def _copy_ansible(src, image_name, dest):
     paths = [
         f"files/{image_name}",
         f"host_vars/{image_name}",
@@ -92,7 +92,7 @@ def copy_ansible(src, image_name, dest):
             copy(_src, _dest)
 
 
-def create_iso(content, efi, iso):
+def _create_iso(content, efi, iso):
     check_output(
         [
             "xorriso",
@@ -141,13 +141,13 @@ def image_build(iso, image_name, output):
     rmtree(image_tmp, ignore_errors=True)
     image_tmp.mkdir()
 
-    extract_iso_content(iso, image_content)
-    extract_iso_efi(iso, image_efi)
-    symlink_install(image_content)
+    _extract_iso_content(iso, image_content)
+    _extract_iso_efi(iso, image_efi)
+    _symlink_install(image_content)
     copy(config_common / "grub.cfg", image_content / "boot" / "grub" / "grub.cfg")
 
     image_content_config.mkdir()
-    copy_ansible(ansible, image_name, image_content_config / "ansible")
+    _copy_ansible(ansible, image_name, image_content_config / "ansible")
     copy(config_image / "recipe", image_content_config / "recipe")
     copy(config_common / "install.sh", image_content_config / "install.sh", "+x")
 
@@ -169,5 +169,5 @@ def image_build(iso, image_name, output):
     )
     chmod(image_content_config, "go-rwx")
 
-    create_iso(image_content, image_efi, output)
+    _create_iso(image_content, image_efi, output)
     rmtree(image_tmp)
