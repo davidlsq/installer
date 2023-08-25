@@ -20,8 +20,8 @@ elif command == "configure/ssh":
     known_host = output / "known_host"
     config = output / "config"
     ssh_known_host(known_host, "virtual.local", keys / "server")
-    ssh_config(config, known_host, "david", "server.local", keys / "user")
-    ssh_config(config, known_host, "ansible", "server.local", keys / "ansible")
+    ssh_config(config, known_host, "david", "virtual.local", keys / "user")
+    ssh_config(config, known_host, "ansible", "virtual.local", keys / "ansible")
 elif command == "configure/password_hash":
     password = Path(sys.argv[3])
     password_hash(password, output, ["root", "user", "ansible"])
