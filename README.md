@@ -25,7 +25,7 @@ The default `make` goal builds all the images
 ### virtual
 
 ```sh
-make bootstrap/virtual.iso
+make build/virtual.iso
 ```
 
 The image can be installed in a [UTM](https://mac.getutm.app) virtual machine :
@@ -41,13 +41,13 @@ The installation is fully automatic and Debian starts without other manipulation
 Log you with :
 
 ```sh
-ssh -F configure/virtual/ssh/config david@virtual.local
+ssh -F build/virtual/ssh/config david@virtual.local
 ```
 
 You can include the ssh config it in your home config :
 
 ```sh
-echo "Include $(pwd)/configure/*/ssh/config" >> ~/.ssh/config
+echo "Include $(pwd)/build/*/ssh/config" >> ~/.ssh/config
 ```
 
 To run the Ansible playbook manually :

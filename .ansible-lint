@@ -7,4 +7,4 @@ skip_list:
   - yaml[document-start]
 
 exclude_paths:
-  - configure/*/password_hash.yml
+  - build/*/password.yml

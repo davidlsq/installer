@@ -25,6 +25,6 @@ elif command == "configure/ssh":
     ssh_config(config, known_host, "ansible", "server.local", keys / "ansible")
     ssh_config(config, known_host, "david", "server.davidlsq.fr", keys / "user")
     ssh_config(config, known_host, "ansible", "server.davidlsq.fr", keys / "ansible")
-elif command == "configure/password_hash":
+elif command == "configure/password":
     password = Path(sys.argv[3])
     password_hash(password, output, ["root", "user", "ansible"])
