@@ -9,7 +9,7 @@
   ansible.builtin.get_url:
     url: https://downloads.plex.tv/plex-keys/PlexSign.key
     dest: /etc/apt/trusted.gpg.d/plex.asc
-    force: true
+    force: false
     owner: root
     group: root
     mode: ug=rw,o=r
