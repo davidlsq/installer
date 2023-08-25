@@ -31,7 +31,7 @@ let
       ansiblelint = {
         enable = true;
         name = "ansiblelint";
-        entry = "python3 -m ansiblelint -v --force-color";
+        entry = "ansible-lint -v --force-color";
         language = "python";
         pass_filenames = false;
         files = "^ansible";
