@@ -1,4 +1,4 @@
-SCRIPT_IMAGE = bootstrap/scripts/image.py
+SCRIPT_IMAGE = python/image.py
 
 PYTHONPATH = PYTHONPATH=python:$$PYTHONPATH
 

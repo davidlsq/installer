@@ -47,16 +47,16 @@ def run_command(command, **kwargs):
 
 
 def extract_iso_content(iso_path, content_path):
-    run_command(["bootstrap/scripts/extract-iso-content.sh", iso_path, content_path])
+    run_command(["bash/extract-iso-content.sh", iso_path, content_path])
 
 
 def extract_iso_efi(iso_path, efi_path):
-    run_command(["bootstrap/scripts/extract-iso-efi.sh", iso_path, efi_path])
+    run_command(["bash/extract-iso-efi.sh", iso_path, efi_path])
 
 
 def create_iso(content_path, efi_path, iso_path):
     run_command(
-        ["bootstrap/scripts/create-iso.sh", content_path, efi_path, iso_path],
+        ["bash/create-iso.sh", content_path, efi_path, iso_path],
         stderr=DEVNULL,
     )
 
@@ -72,14 +72,13 @@ host = args.host
 root_path = Path(".")
 iso_path = Path(args.iso)
 output_path = Path(args.output)
-tmp_path = Path(args.output + ".tmp")
 ansible_path = root_path / "ansible"
-bootstrap_path = root_path / "bootstrap"
-templates_path = bootstrap_path / "templates"
-files_path = bootstrap_path / "files"
-content_path = tmp_path / "content"
-efi_path = tmp_path / "efi.img"
-config_path = content_path / ".config"
+config_path = root_path / "config"
+common_path = config_path / "common"
+image_tmp_path = Path(args.output + ".tmp")
+image_content_path = image_tmp_path / "content"
+image_efi_path = image_tmp_path / "efi.img"
+image_config_path = image_content_path / ".config"
 
 
 def template(host, src, dest, mode=None):
@@ -103,37 +102,39 @@ def template(host, src, dest, mode=None):
         run_command(["chmod", mode, str(dest)])
 
 
-shutil.rmtree(tmp_path, ignore_errors=True)
-tmp_path.mkdir()
+shutil.rmtree(image_tmp_path, ignore_errors=True)
+image_tmp_path.mkdir()
 
-extract_iso_content(iso_path, content_path)
-extract_iso_efi(iso_path, efi_path)
+extract_iso_content(iso_path, image_content_path)
+extract_iso_efi(iso_path, image_efi_path)
 
 # Copy ansible
-config_path.mkdir()
-copy_ansible(ansible_path, host, config_path / "ansible")
+image_config_path.mkdir()
+copy_ansible(ansible_path, host, image_config_path / "ansible")
 
 # Create symlink to kernel
-(content_path / "install").rmdir()
-os.symlink(next(content_path.glob("install.*")).name, content_path / "install")
+(image_content_path / "install").rmdir()
+os.symlink(
+    next(image_content_path.glob("install.*")).name, image_content_path / "install"
+)
 
 # Create grub config
-copy(files_path / "grub.cfg", content_path / "boot" / "grub" / "grub.cfg")
+copy(common_path / "grub.cfg", image_content_path / "boot" / "grub" / "grub.cfg")
 
 # Copy recipe config
-copy(files_path / host / "recipe", config_path / "recipe")
+copy(config_path / host / "recipe", image_config_path / "recipe")
 
 # Create preseed config
-template(host, templates_path / "preseed.cfg.j2", config_path / "preseed.cfg")
+template(host, common_path / "preseed.cfg.j2", image_config_path / "preseed.cfg")
 
 # Create playbook script
-template(host, templates_path / "playbook.sh.j2", config_path / "playbook.sh", "+x")
+template(host, common_path / "playbook.sh.j2", image_config_path / "playbook.sh", "+x")
 
 # Create install script
-copy(files_path / "install.sh", config_path / "install.sh", "+x")
+copy(common_path / "install.sh", image_config_path / "install.sh", "+x")
 
 # Fix config permissions
-run_command(["chmod", "-R", "go-rwx", str(config_path)])
+run_command(["chmod", "-R", "go-rwx", str(image_config_path)])
 
-create_iso(content_path, efi_path, output_path)
-shutil.rmtree(tmp_path, ignore_errors=True)
+create_iso(image_content_path, image_efi_path, output_path)
+shutil.rmtree(image_tmp_path, ignore_errors=True)
