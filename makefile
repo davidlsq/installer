@@ -1,11 +1,13 @@
-SCRIPT_VIRTUAL = python/virtual.py
-SCRIPT_SERVER  = python/server.py
-SCRIPT_IMAGE   = bootstrap/scripts/image.py
+SCRIPT_IMAGE = bootstrap/scripts/image.py
+
+PYTHONPATH = PYTHONPATH=python:$$PYTHONPATH
 
 CONFIG                  = config
 CONFIG_VIRTUAL          = $(CONFIG)/virtual
+CONFIG_VIRTUAL_SCRIPT   = $(PYTHONPATH) $(CONFIG)/virtual.py
 CONFIG_VIRTUAL_PASSWORD = $(CONFIG_VIRTUAL)/password.yml
 CONFIG_SERVER           = $(CONFIG)/server
+CONFIG_SERVER_SCRIPT    = $(PYTHONPATH) $(CONFIG)/server.py
 CONFIG_SERVER_PASSWORD  = $(CONFIG_SERVER)/password.yml
 
 BUILD                  = build
@@ -35,13 +37,13 @@ $(BUILD_VIRTUAL): | $(BUILD)
 	@mkdir $@
 
 $(BUILD_VIRTUAL_KEYS): | $(BUILD_VIRTUAL)
-	@$(SCRIPT_VIRTUAL) configure/keys $@
+	@$(CONFIG_VIRTUAL_SCRIPT) configure/keys $@
 
 $(BUILD_VIRTUAL_SSH): $(BUILD_VIRTUAL_KEYS)
-	@$(SCRIPT_VIRTUAL) configure/ssh $@ $<
+	@$(CONFIG_VIRTUAL_SCRIPT) configure/ssh $@ $<
 
 $(BUILD_VIRTUAL_PASSWORD): | $(BUILD_VIRTUAL)
-	@$(SCRIPT_VIRTUAL) configure/password $@ $(CONFIG_VIRTUAL_PASSWORD)
+	@$(CONFIG_VIRTUAL_SCRIPT) configure/password $@ $(CONFIG_VIRTUAL_PASSWORD)
 
 $(BUILD_VIRTUAL_IMAGE): $(BUILD_DEBIAN_AARCH64) $(BUILD_VIRTUAL_KEYS) $(BUILD_VIRTUAL_PASSWORD)
 	@$(SCRIPT_IMAGE) --iso $< --host virtual --output $@
@@ -50,13 +52,13 @@ $(BUILD_SERVER): | $(BUILD)
 	@mkdir $@
 
 $(BUILD_SERVER_KEYS): | $(BUILD_SERVER)
-	@$(SCRIPT_SERVER) configure/keys $@
+	@$(CONFIG_SERVER_SCRIPT) configure/keys $@
 
 $(BUILD_SERVER_SSH): $(BUILD_SERVER_KEYS)
-	@$(SCRIPT_SERVER) configure/ssh $@ $<
+	@$(CONFIG_SERVER_SCRIPT) configure/ssh $@ $<
 
 $(BUILD_SERVER_PASSWORD): | $(BUILD_SERVER)
-	@$(SCRIPT_SERVER) configure/password $@ $(CONFIG_SERVER_PASSWORD)
+	@$(CONFIG_SERVER_SCRIPT) configure/password $@ $(CONFIG_SERVER_PASSWORD)
 
 $(BUILD_SERVER_IMAGE): $(BUILD_DEBIAN_X86_64) $(BUILD_SERVER_KEYS) $(BUILD_SERVER_PASSWORD)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
