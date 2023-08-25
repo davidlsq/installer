@@ -56,7 +56,6 @@
   ansible.builtin.hostname:
     name: '{{ network_host_name }}'
     use: systemd
-  when: not bootstrap
 
 - name: Set config link
   ansible.builtin.file:
