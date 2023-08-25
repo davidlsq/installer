@@ -12,7 +12,7 @@
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/debian/gpg
     dest: /etc/apt/trusted.gpg.d/docker.asc
-    force: true
+    force: false
     owner: root
     group: root
     mode: ug=rw,o=r
