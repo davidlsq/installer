@@ -19,7 +19,9 @@
 
 - name: Add apt source
   ansible.builtin.apt_repository:
-    repo: deb [signed-by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/debian bookworm stable
+    repo: >-
+      deb [signed-by=/etc/apt/trusted.gpg.d/docker.asc]
+      https://download.docker.com/linux/debian bookworm stable
     filename: docker
     update_cache: true
 
