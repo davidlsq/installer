@@ -8,4 +8,4 @@ python3 -m venv /install/ansible-venv
 source /install/ansible-venv/bin/activate
 python3 -m pip install ansible
 
-ansible-playbook -i "{{ inventory_hostname }}," -c local "/install/ansible/{{ bootstrap.playbook }}" "$@"
+ansible-playbook -i "{{ image_name }}," -c local "/install/ansible/{{ image_name }}.yml" "$@"

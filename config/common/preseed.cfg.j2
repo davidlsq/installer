@@ -12,18 +12,18 @@ tasksel tasksel/first multiselect standard
 d-i hw-detect/load_firmware boolean false
 
 # network
-d-i netcfg/choose_interface select {{ bootstrap.network_interface }}
-d-i netcfg/hostname string {{ bootstrap.host_name }}
+d-i netcfg/choose_interface select {{ image.network_interface }}
+d-i netcfg/hostname string {{ image_name }}
 
 # user
 d-i passwd/make-user boolean false
-d-i passwd/root-password-crypted password {{ bootstrap.root_password }}
+d-i passwd/root-password-crypted password {{ password.root }}
 
 # partitionning
 d-i partman-auto/method string regular
 d-i partman-auto/expert_recipe_file string /cdrom/.config/recipe
-d-i partman-auto/choose_recipe select {{ bootstrap.partman_recipe_name }}
-d-i partman/early_command string debconf-set partman-auto/disk $(realpath "{{ bootstrap.partman_disk }}")
+d-i partman-auto/choose_recipe select {{ image.partman_recipe_name }}
+d-i partman/early_command string debconf-set partman-auto/disk $(realpath "{{ image.partman_disk }}")
 
 # force partitionning
 d-i partman/choose_partition select finish

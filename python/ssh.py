@@ -16,7 +16,7 @@ def ssh_known_host(known_host, host, key):
 
 
 def ssh_config(config, known_host, user, host, key):
-    with Path(config).open("a") as config_stream:
+    with config.open("a") as config_stream:
         config_stream.write(f"Match user {user} host {host}\n")
         config_stream.write(f"  IdentitiesOnly yes\n")
         config_stream.write(f"  GlobalKnownHostsFile {known_host.resolve()}\n")
