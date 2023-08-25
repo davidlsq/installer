@@ -44,7 +44,7 @@ $(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
 
 SERVER_GITHUB = server-github
 $(SERVER_GITHUB): $(SERVER_KEYS)
-	@tar -cz $</server* $</user.pub $</ansible* ansible/host_vars/server/password.yml | base64 | \
+	@tar -cz $</server* $</user.pub $</ansible* configure/server/password.yml | base64 | \
 	 gh secret set SERVER_ARCHIVE -R davidlsq/installer
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)
