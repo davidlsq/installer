@@ -18,8 +18,12 @@ VIRTUAL_SSH = $(VIRTUAL_CONFIGURE)/ssh
 $(VIRTUAL_SSH): $(VIRTUAL_KEYS)
 	@$(SCRIPT_VIRTUAL) configure/ssh $@ $<
 
+VIRTUAL_PASSWORD_HASH = $(VIRTUAL_CONFIGURE)/password_hash.yml
+$(VIRTUAL_PASSWORD_HASH): | $(VIRTUAL_CONFIGURE)
+	@$(SCRIPT_VIRTUAL) configure/password_hash $@ $(VIRTUAL_CONFIGURE)/password.yml
+
 VIRTUAL_IMAGE = bootstrap/virtual.iso
-$(VIRTUAL_IMAGE): $(DEBIAN_AARCH64) $(VIRTUAL_SSH)
+$(VIRTUAL_IMAGE): $(DEBIAN_AARCH64) $(VIRTUAL_SSH) $(VIRTUAL_PASSWORD_HASH)
 	@$(SCRIPT_IMAGE) --iso $< --host virtual --output $@
 
 DEBIAN_X86_64 = bootstrap/debian-x86_64.iso
@@ -38,13 +42,17 @@ SERVER_SSH = $(SERVER_CONFIGURE)/ssh
 $(SERVER_SSH): $(SERVER_KEYS)
 	@$(SCRIPT_SERVER) configure/ssh $@ $<
 
+SERVER_PASSWORD_HASH = $(SERVER_CONFIGURE)/password_hash.yml
+$(SERVER_PASSWORD_HASH): | $(SERVER_CONFIGURE)
+	@$(SCRIPT_SERVER) configure/password_hash $@ $(SERVER_CONFIGURE)/password.yml
+
 SERVER_IMAGE = bootstrap/server.iso
-$(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH)
+$(SERVER_IMAGE): $(DEBIAN_X86_64) $(SERVER_SSH) $(SERVER_PASSWORD_HASH)
 	@$(SCRIPT_IMAGE) --iso $< --host server --output $@
 
 SERVER_GITHUB = server-github
-$(SERVER_GITHUB): $(SERVER_KEYS)
-	@tar -cz $</server* $</user.pub $</ansible* ansible/host_vars/server/password.yml | base64 | \
+$(SERVER_GITHUB): $(SERVER_KEYS) $(SERVER_PASSWORD_HASH)
+	@tar -cz $</server* $</user.pub $</ansible* $(word 2,$^) | base64 | \
 	 gh secret set SERVER_ARCHIVE -R davidlsq/installer
 
 DOWNLOAD  = $(DEBIAN_AARCH64) $(DEBIAN_X86_64)

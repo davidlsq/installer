@@ -76,7 +76,7 @@
     - role: samba
       samba_var: /mnt/data/timemachine
       samba_user: '{{ user_name }}'
-      samba_password: '{{ password.user }}'
+      samba_password: '{{ password.samba }}'
       samba_section: TimeMachine
       samba_section_conf: timemachine.conf.j2
 
