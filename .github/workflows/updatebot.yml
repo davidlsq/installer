@@ -20,6 +20,10 @@ jobs:
         uses: actions/checkout@v3
       - name: updatebot
         uses: ./.github/actions/updatebot
+      - name: test
+        run: |
+          sudo chown -R $USER:$USER .
+          sudo chmod -R ugo+w .
       - name: create-pull-request
         uses: peter-evans/create-pull-request@v5
         with:
@@ -28,6 +32,5 @@ jobs:
           commit-message: "[Update Bot] Apply update"
           branch: updatebot
           delete-branch: true
-          base: main
           title: "[Update Bot] Apply update"
           body: ""
