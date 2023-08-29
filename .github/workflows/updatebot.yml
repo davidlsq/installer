@@ -1,0 +1,33 @@
+---
+
+name: updatebot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  updatebot:
+    runs-on: ubuntu-latest
+    name: updatebot
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: updatebot
+        uses: ./.github/actions/updatebot
+      - name: create-pull-request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          add-paths: versions
+          commit-message: "[Update Bot] Apply update"
+          branch: updatebot
+          delete-branch: true
+          base: main
+          title: "[Update Bot] Apply update"
+          body: ""
