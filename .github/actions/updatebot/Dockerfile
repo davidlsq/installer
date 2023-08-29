@@ -12,6 +12,6 @@ RUN apt-get install -y curl gnupg2 && \
 
 RUN apt-get update
 
-COPY run.sh /run.sh
+COPY entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
