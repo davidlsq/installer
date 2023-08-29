@@ -1,0 +1,24 @@
+---
+
+name: update
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    name: update
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: update
+        uses: ./.github/actions/update
+      - name: create-pull-request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_TOKEN }}
