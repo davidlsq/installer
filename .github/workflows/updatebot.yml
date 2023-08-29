@@ -28,6 +28,5 @@ jobs:
           commit-message: "[Update Bot] Apply update"
           branch: updatebot
           delete-branch: true
-          base: main
           title: "[Update Bot] Apply update"
           body: ""
