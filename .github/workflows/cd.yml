@@ -1,0 +1,21 @@
+---
+
+name: cd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  server-playbook:
+    name: server-playbook
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: server-playbook
+        uses: ./.github/actions/ansible
+        with:
+          command: ansible-playbook -i ansible/inventory/server.davidlsq.fr -D ansible/server.yml
+          server-archive: ${{ secrets.SERVER_ARCHIVE }}
