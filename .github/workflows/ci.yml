@@ -7,10 +7,6 @@ on:
     branches-ignore:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   pre-commit:
     name: pre-commit
