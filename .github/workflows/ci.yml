@@ -7,6 +7,10 @@ on:
     branches-ignore:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-commit:
     name: pre-commit
@@ -36,11 +40,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      - name: server-archive
-        env:
-          SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}
-        run: echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
       - name: server-playbook-check
-        uses: ./.github/actions/nix-shell
+        uses: ./.github/actions/ansible
         with:
-          command: make build/server/ssh && ansible-playbook -i ansible/inventory/server.davidlsq.fr -D -C ansible/server.yml
+          command: ansible-playbook -i ansible/inventory/server.davidlsq.fr -D -C ansible/server.yml
+          server-archive: ${{ secrets.SERVER_ARCHIVE }}

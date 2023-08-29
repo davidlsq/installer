@@ -1,0 +1,22 @@
+---
+
+name: ansible
+
+inputs:
+  command:
+    required: true
+  server-archive:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: server-archive
+      env:
+        SERVER_ARCHIVE: ${{ inputs.server-archive }}
+      shell: bash
+      run: echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
+    - name: server-playbook-check
+      uses: ./.github/actions/nix-shell
+      with:
+        command: make build/server/ssh && ${{ inputs.command }}
