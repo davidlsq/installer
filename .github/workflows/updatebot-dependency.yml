@@ -28,7 +28,6 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN }}
-          add-paths: versions
           commit-message: "[Update Bot] Apply ${{ inputs.dependency }} update"
           branch: updatebot-${{ inputs.dependency }}
           delete-branch: true
