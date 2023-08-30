@@ -9,7 +9,7 @@ tarball_nix () {
   name="$1-$revision"
   url="https://github.com/NixOS/nixpkgs/archive/$revision.tar.gz"
   sha256=$(nix-prefetch-url --unpack $url)
-  cat > "$2" << EOF
+  cat > versions/tarball.nix << EOF
 {
   name = "$name";
   url = "$url";
@@ -18,36 +18,33 @@ tarball_nix () {
 EOF
 }
 
+ansible_replace () {
+  sed -i "s/^$1: .*$/$1: $2/g" versions/ansible.yml
+}
+
 ohmyzsh () {
   version=$(curl -s https://api.github.com/repos/ohmyzsh/ohmyzsh/commits | jq -r '.[0].sha')
-  echo "$version"
+  ansible_replace ohmyzsh_version $version
 }
 
 plex () {
   version=$(apt-cache policy plexmediaserver | grep -F "Candidate:" | awk '{ print $2 }')
-  echo "$version"
+  ansible_replace plex_version $version
 }
 
 joal () {
   version=$(curl -s https://api.github.com/repos/anthonyraymond/joal/releases | jq -r '.[0].name')
-  echo "$version"
+  ansible_replace joal_version $version
 }
 
 jackett () {
   version=$(curl -s https://api.github.com/repos/Jackett/Jackett/releases | jq -r '.[0].name' | cut -c 2-)
-  echo "$version"
+  ansible_replace jackett_version $version
 }
 
-rm -rf versions
-mkdir -p versions
+tarball_nix nixos-23.05
 
-tarball_nix nixos-23.05 versions/tarball.nix
-
-cat > versions/ansible.yml << EOF
----
-
-ohmyzsh_version: $(ohmyzsh)
-plex_version: $(plex)
-joal_version: $(joal)
-jackett_version: $(jackett)
-EOF
+ohmyzsh
+plex
+joal
+jackett
