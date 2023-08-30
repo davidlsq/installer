@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v3
       - name: updatebot
         uses: ./.github/actions/updatebot
+        with:
+          dependency: joal
       - name: create-pull-request-permissions
         run: |
           sudo chown -R $USER:$USER .
