@@ -38,8 +38,8 @@ jackett () {
   ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
 }
 
-radarr () {
-  version=$(curl -s https://api.github.com/repos/Radarr/Radarr/releases | jq -r '.[0].name')
+radarr () {'.[] | select(.prerelease == false)'
+  version=$(curl -s https://api.github.com/repos/Radarr/Radarr/releases | jq -r '[.[] | select(.prerelease == false)][0].name')
   ansible_replace servarr_version $version ansible/roles/servarr/vars/radarr.yml
 }
 
