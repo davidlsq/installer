@@ -12,6 +12,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: changes
+    runs-on: ubuntu-latest
+    outputs:
+      dependabot: ${{ steps.changes.outputs.dependabot }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            make:
+              - config
+              - python
+              - makefile
+            dependabot:
+              - .github/dependabot.yml
+            ansible:
+              - ansible
+              - ansible.cfg
   pre-commit:
     name: pre-commit
     runs-on: ubuntu-latest
@@ -25,6 +47,8 @@ jobs:
   make:
     name: make
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.make == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -37,6 +61,8 @@ jobs:
   dependabot:
     name: dependabot
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.dependabot == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -46,6 +72,8 @@ jobs:
     name: server-playbook-check
     runs-on: ubuntu-latest
     concurrency: server
+    needs: changes
+    if: needs.changes.outputs.ansible == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v3
