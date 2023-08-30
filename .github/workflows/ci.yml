@@ -37,6 +37,7 @@ jobs:
   server-playbook-check:
     name: server-playbook-check
     runs-on: ubuntu-22.04
+    concurrency: server
     steps:
       - name: checkout
         uses: actions/checkout@v3
