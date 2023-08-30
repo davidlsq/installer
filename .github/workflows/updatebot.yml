@@ -12,28 +12,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  updatebot-tarball-nix:
-    uses: ./.github/workflows/updatebot-dependency.yml
-    secrets: inherit
-    with:
-      dependency: tarball_nix
-  updatebot-ohmyzsh:
-    uses: ./.github/workflows/updatebot-dependency.yml
-    secrets: inherit
-    with:
-      dependency: ohmyzsh
-  updatebot-plex:
-    uses: ./.github/workflows/updatebot-dependency.yml
-    secrets: inherit
-    with:
-      dependency: plex
-  updatebot-joal:
-    uses: ./.github/workflows/updatebot-dependency.yml
-    secrets: inherit
-    with:
-      dependency: joal
-  updatebot-jackett:
-    uses: ./.github/workflows/updatebot-dependency.yml
-    secrets: inherit
-    with:
-      dependency: jackett
+  updatebot:
+    runs-on: ubuntu-latest
+    name: updatebot
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: updatebot
+        uses: ./.github/actions/updatebot
+      - name: create-pull-request-tarball-nix
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: tarball-nix
+          path: shell.nix
+      - name: create-pull-request-ohmyzsh
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: ohmyzsh
+          path: ansible/roles/ohmyzsh/defaults/main.yml
+      - name: create-pull-request-plex
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: plex
+          path: ansible/roles/plex/defaults/main.yml
+      - name: create-pull-request-joal
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: joal
+          path: ansible/roles/joal/defaults/main.yml
+      - name: create-pull-request-jackett
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: jackett
+          path: ansible/roles/jackett/defaults/main.yml
