@@ -1,0 +1,28 @@
+---
+
+name: ci-server-playbook-check
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - ansible/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server-playbook-check:
+    name: server-playbook-check
+    runs-on: ubuntu-latest
+    concurrency: server
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: server-playbook-check
+        uses: ./.github/actions/ansible
+        with:
+          command: ansible-playbook -i ansible/inventory/server.davidlsq.fr -D -C ansible/server.yml
+          server-archive: ${{ secrets.SERVER_ARCHIVE }}

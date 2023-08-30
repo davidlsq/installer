@@ -1,0 +1,24 @@
+---
+
+name: ci-dependabot
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - .github/dependabot.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependabot:
+    name: dependabot
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: dependabot
+        uses: marocchino/validate-dependabot@v2

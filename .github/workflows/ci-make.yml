@@ -1,0 +1,30 @@
+---
+
+name: ci-make
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - config/**
+      - python/**
+      - makefile
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  make:
+    name: make
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: make
+        uses: ./.github/actions/nix-shell
+        with:
+          command: make build/virtual.iso
+      - name: check
+        run: ls -lh build; [ -f build/virtual.iso ]
