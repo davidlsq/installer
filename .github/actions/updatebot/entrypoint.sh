@@ -23,6 +23,11 @@ plex () {
   echo "$version"
 }
 
+jackett () {
+  version=$(curl -s https://api.github.com/repos/Jackett/Jackett/releases | jq -r '.[0].name' | cut -c 2-)
+  echo "$version"
+}
+
 rm -rf versions
 mkdir -p versions
 
@@ -32,4 +37,5 @@ cat > versions/ansible.yml << EOF
 ---
 
 plex_version: $(plex)
+jackett_version: $(jackett)
 EOF

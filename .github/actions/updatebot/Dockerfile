@@ -10,6 +10,9 @@ RUN apt-get install -y curl gnupg2 && \
     curl -s https://downloads.plex.tv/plex-keys/PlexSign.key > /etc/apt/trusted.gpg.d/plex.asc && \
     echo deb [signed-by=/etc/apt/trusted.gpg.d/plex.asc] https://downloads.plex.tv/repo/deb public main > /etc/apt/sources.list.d/plexmediaserver.list
 
+# jackett
+RUN apt-get install -y jq
+
 RUN apt-get update
 
 COPY entrypoint.sh /entrypoint.sh
