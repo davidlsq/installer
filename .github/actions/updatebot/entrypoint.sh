@@ -18,6 +18,11 @@ tarball_nix () {
 EOF
 }
 
+ohmyzsh () {
+  version=$(curl -s https://api.github.com/repos/ohmyzsh/ohmyzsh/commits | jq -r '.[0].sha')
+  echo "$version"
+}
+
 plex () {
   version=$(apt-cache policy plexmediaserver | grep -F "Candidate:" | awk '{ print $2 }')
   echo "$version"
@@ -36,6 +41,7 @@ tarball_nix nixos-23.05 versions/tarball.nix
 cat > versions/ansible.yml << EOF
 ---
 
+ohmyzsh_version: $(ohmyzsh)
 plex_version: $(plex)
 jackett_version: $(jackett)
 EOF
