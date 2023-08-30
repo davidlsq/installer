@@ -42,9 +42,20 @@ jackett () {
   ansible_replace jackett_version $version
 }
 
-tarball_nix nixos-23.05
-
-ohmyzsh
-plex
-joal
-jackett
+case "$1" in
+  tarball_nix)
+    tarball_nix
+    ;;
+  ohmyzsh)
+    ohmyzsh
+    ;;
+  plex)
+    plex
+    ;;
+  joal)
+    joal
+    ;;
+  jackett)
+    jackett
+    ;;
+esac
