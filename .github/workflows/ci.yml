@@ -14,7 +14,7 @@ concurrency:
 jobs:
   pre-commit:
     name: pre-commit
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
           command: pre-commit run -a
   make:
     name: make
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -36,7 +36,8 @@ jobs:
         run: ls -lh build; [ -f build/virtual.iso ]
   server-playbook-check:
     name: server-playbook-check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    concurrency: server
     steps:
       - name: checkout
         uses: actions/checkout@v3
