@@ -38,20 +38,9 @@ jackett () {
   ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
 }
 
-case "$1" in
-  tarball_nix)
-    tarball_nix nixos-23.05
-    ;;
-  ohmyzsh)
-    ohmyzsh
-    ;;
-  plex)
-    plex
-    ;;
-  joal)
-    joal
-    ;;
-  jackett)
-    jackett
-    ;;
-esac
+tarball_nix nixos-23.05
+ohmyzsh
+plex
+joal
+joal
+jackett

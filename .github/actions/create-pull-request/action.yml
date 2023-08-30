@@ -1,0 +1,30 @@
+---
+
+name: create-pull-request
+
+inputs:
+  token:
+    required: true
+  name:
+    required: true
+  path:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: create-pull-request-permissions
+      shell: bash
+      run: |
+        sudo chown -R $USER:$USER .
+        sudo chmod -R ugo+w .
+    - name: create-pull-request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ inputs.token }}
+        add-paths: ${{ inputs.path }}
+        commit-message: "[Update Bot] Apply ${{ inputs.name }} update"
+        branch: updatebot-${{ inputs.name }}
+        delete-branch: true
+        title: "[Update Bot] Apply ${{ inputs.name }} update"
+        body: ""
