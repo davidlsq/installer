@@ -34,6 +34,14 @@ jobs:
           command: make build/virtual.iso
       - name: check
         run: ls -lh build; [ -f build/virtual.iso ]
+  dependabot:
+    name: dependabot
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: dependabot
+        uses: marocchino/validate-dependabot@v2
   server-playbook-check:
     name: server-playbook-check
     runs-on: ubuntu-latest
