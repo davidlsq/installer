@@ -28,6 +28,11 @@ plex () {
   echo "$version"
 }
 
+joal () {
+  version=$(curl -s https://api.github.com/repos/anthonyraymond/joal/releases | jq -r '.[0].name')
+  echo "$version"
+}
+
 jackett () {
   version=$(curl -s https://api.github.com/repos/Jackett/Jackett/releases | jq -r '.[0].name' | cut -c 2-)
   echo "$version"
@@ -43,5 +48,6 @@ cat > versions/ansible.yml << EOF
 
 ohmyzsh_version: $(ohmyzsh)
 plex_version: $(plex)
+joal_version: $(joal)
 jackett_version: $(jackett)
 EOF

@@ -14,6 +14,7 @@
     owner: root
     group: root
     mode: u=rwx,go=rx
+  register: create_lib_directory
 
 - name: Create lib
   ansible.builtin.unarchive:
@@ -24,6 +25,8 @@
     group: root
     mode: u+rw,go-w+r
     creates: '{{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar'
+  when: >
+    not (ansible_check_mode and create_lib_directory is changed)
   register: create_lib
 
 # Create var
