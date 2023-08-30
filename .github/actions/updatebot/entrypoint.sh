@@ -6,14 +6,11 @@ tarball_nix () {
   revision=$(wget -q -O - https://channels.nixos.org/$1/git-revision | head -c 12)
   name="$1-$revision"
   url="https://github.com/NixOS/nixpkgs/archive/$revision.tar.gz"
+  url_escape="https:\/\/github.com\/NixOS\/nixpkgs\/archive\/$revision.tar.gz"
   sha256=$(nix-prefetch-url --unpack $url)
-  cat > versions/tarball.nix << EOF
-{
-  name = "$name";
-  url = "$url";
-  sha256 = "$sha256";
-}
-EOF
+  sed -i "s/^    name = \"$1-.*/    name = \"$name\";/g" shell.nix
+  sed -i "s/^    url = \".*/    url = \"$url_escape\";/g" shell.nix
+  sed -i "s/^    sha256 = \".*/    sha256 = \"$sha256\";/g" shell.nix
 }
 
 ansible_replace () {
