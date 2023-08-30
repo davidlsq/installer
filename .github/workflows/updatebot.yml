@@ -12,25 +12,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  updatebot:
-    runs-on: ubuntu-latest
-    name: updatebot
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: updatebot
-        uses: ./.github/actions/updatebot
-      - name: create-pull-request-permissions
-        run: |
-          sudo chown -R $USER:$USER .
-          sudo chmod -R ugo+w .
-      - name: create-pull-request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          add-paths: versions
-          commit-message: "[Update Bot] Apply update"
-          branch: updatebot
-          delete-branch: true
-          title: "[Update Bot] Apply update"
-          body: ""
+  updatebot-tarball-nix:
+    uses: ./.github/workflows/updatebot-dependency.yml
+    secrets: inherit
+    with:
+      dependency: tarball_nix
+  updatebot-ohmyzsh:
+    uses: ./.github/workflows/updatebot-dependency.yml
+    secrets: inherit
+    with:
+      dependency: ohmyzsh
+  updatebot-plex:
+    uses: ./.github/workflows/updatebot-dependency.yml
+    secrets: inherit
+    with:
+      dependency: plex
+  updatebot-joal:
+    uses: ./.github/workflows/updatebot-dependency.yml
+    secrets: inherit
+    with:
+      dependency: joal
+  updatebot-jackett:
+    uses: ./.github/workflows/updatebot-dependency.yml
+    secrets: inherit
+    with:
+      dependency: jackett

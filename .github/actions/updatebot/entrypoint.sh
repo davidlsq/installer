@@ -2,8 +2,6 @@
 
 set -e -o pipefail
 
-apt-get update
-
 tarball_nix () {
   revision=$(wget -q -O - https://channels.nixos.org/$1/git-revision | head -c 12)
   name="$1-$revision"
@@ -28,6 +26,7 @@ ohmyzsh () {
 }
 
 plex () {
+  apt-get update
   version=$(apt-cache policy plexmediaserver | grep -F "Candidate:" | awk '{ print $2 }')
   ansible_replace plex_version $version
 }
@@ -42,9 +41,20 @@ jackett () {
   ansible_replace jackett_version $version
 }
 
-tarball_nix nixos-23.05
-
-ohmyzsh
-plex
-joal
-jackett
+case "$1" in
+  tarball_nix)
+    tarball_nix nixos-23.05
+    ;;
+  ohmyzsh)
+    ohmyzsh
+    ;;
+  plex)
+    plex
+    ;;
+  joal)
+    joal
+    ;;
+  jackett)
+    jackett
+    ;;
+esac
