@@ -23,30 +23,30 @@ jobs:
       - name: create-pull-request-tarball-nix
         uses: ./.github/actions/create-pull-request
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           name: tarball-nix
           path: shell.nix
       - name: create-pull-request-ohmyzsh
         uses: ./.github/actions/create-pull-request
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           name: ohmyzsh
           path: ansible/roles/ohmyzsh/defaults/main.yml
       - name: create-pull-request-plex
         uses: ./.github/actions/create-pull-request
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           name: plex
           path: ansible/roles/plex/defaults/main.yml
       - name: create-pull-request-joal
         uses: ./.github/actions/create-pull-request
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           name: joal
           path: ansible/roles/joal/defaults/main.yml
       - name: create-pull-request-jackett
         uses: ./.github/actions/create-pull-request
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           name: jackett
           path: ansible/roles/jackett/defaults/main.yml
