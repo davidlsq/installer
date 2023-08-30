@@ -50,3 +50,9 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           name: jackett
           path: ansible/roles/jackett/defaults/main.yml
+      - name: create-pull-request-radarr
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: radarr
+          path: ansible/roles/servarr/vars/radarr.yml

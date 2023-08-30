@@ -16,7 +16,9 @@ jobs:
     name: changes
     runs-on: ubuntu-latest
     outputs:
+      make: ${{ steps.changes.outputs.make }}
       dependabot: ${{ steps.changes.outputs.dependabot }}
+      ansible: ${{ steps.changes.outputs.ansible }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -26,13 +28,13 @@ jobs:
         with:
           filters: |
             make:
-              - config
-              - python
+              - 'config/**'
+              - 'python/**'
               - makefile
             dependabot:
               - .github/dependabot.yml
             ansible:
-              - ansible
+              - 'ansible/**'
               - ansible.cfg
   pre-commit:
     name: pre-commit
