@@ -71,7 +71,7 @@ $(SERVER_GITHUB): $(BUILD_SERVER_KEYS) $(BUILD_SERVER_PASSWORD)
 UPDATE = update
 $(UPDATE):
 	@cd .github/actions/updatebot && docker build -t updatebot:make .
-	@docker run -v $$(pwd):/installer -w /installer -it updatebot:make
+	@docker run --rm -v $$(pwd):/installer -w /installer -it updatebot:make
 
 DOWNLOAD  = $(BUILD_DEBIAN_AARCH64) $(BUILD_DEBIAN_X86_64)
 CONFIGURE = $(BUILD_VIRTUAL_KEYS) $(BUILD_VIRTUAL_SSH) $(BUILD_VIRTUAL_PASSWORD) $(BUILD_SERVER_KEYS) $(BUILD_SERVER_SSH) $(BUILD_SERVER_PASSWORD)
