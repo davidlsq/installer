@@ -50,9 +50,19 @@ joal () {
   ansible_replace joal_version $version ansible/roles/joal/defaults/main.yml
 }
 
+sabnzbd () {
+  version=$(github_release sabnzbd/sabnzbd | cut -d ' ' -f 2)
+  ansible_replace sabnzbd_version $version ansible/roles/sabnzbd/defaults/main.yml
+}
+
 jackett () {
   version=$(github_release Jackett/Jackett | cut -c 2-)
   ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
+}
+
+prowlarr () {
+  version=$(github_release Prowlarr/Prowlarr)
+  ansible_replace servarr_version $version ansible/roles/servarr/vars/prowlarr.yml
 }
 
 radarr () {
@@ -60,10 +70,18 @@ radarr () {
   ansible_replace servarr_version $version ansible/roles/servarr/vars/radarr.yml
 }
 
+sonarr () {
+  version=$(curl -s https://services.sonarr.tv/v1/download/main | jq -r '.version')
+  ansible_replace servarr_version $version ansible/roles/sonarr/defaults/main.yml
+}
+
 tarball_nix nixos-23.05
 ohmyzsh
 plex
 qbittorrent
 joal
+sabnzbd
 jackett
+prowlarr
 radarr
+sonarr
