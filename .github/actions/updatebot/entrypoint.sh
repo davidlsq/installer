@@ -46,7 +46,7 @@ joal () {
 }
 
 jackett () {
-  version=$(github_release Jackett/Jackett)
+  version=$(github_release Jackett/Jackett | cut -c 2-)
   ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
 }
 
