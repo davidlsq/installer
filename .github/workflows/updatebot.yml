@@ -38,6 +38,12 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           name: plex
           path: ansible/roles/plex/defaults/main.yml
+      - name: create-pull-request-qbittorrent
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: qbittorrent
+          path: ansible/roles/qbittorrent/defaults/main.yml
       - name: create-pull-request-joal
         uses: ./.github/actions/create-pull-request
         with:

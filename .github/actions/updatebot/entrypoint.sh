@@ -40,6 +40,11 @@ plex () {
   ansible_replace plex_version $version ansible/roles/plex/defaults/main.yml
 }
 
+qbittorrent () {
+  version=$(apt_release qbittorrent-nox)
+  ansible_replace qbittorrent_version $version ansible/roles/qbittorrent/defaults/main.yml
+}
+
 joal () {
   version=$(github_release anthonyraymond/joal)
   ansible_replace joal_version $version ansible/roles/joal/defaults/main.yml
@@ -58,7 +63,7 @@ radarr () {
 tarball_nix nixos-23.05
 ohmyzsh
 plex
-joal
+qbittorrent
 joal
 jackett
 radarr
