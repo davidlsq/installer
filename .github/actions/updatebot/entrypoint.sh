@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e -o pipefail
+set -x -e -o pipefail
 
 tarball_nix () {
   revision=$(wget -q -O - https://channels.nixos.org/$1/git-revision | head -c 12)
