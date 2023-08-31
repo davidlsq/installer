@@ -13,33 +13,45 @@ tarball_nix () {
   sed -i "s/^    sha256 = \".*/    sha256 = \"$sha256\";/g" shell.nix
 }
 
+apt_release () {
+  apt-get update -qq
+  apt-cache policy $1 | grep -F "Candidate:" | awk '{ print $2 }'
+}
+
 ansible_replace () {
   sed -i "s/^$1: .*$/$1: $2/g" "$3"
 }
 
+github_commit () {
+  curl -s "https://api.github.com/repos/$1/commits" | jq -r '.[0].sha'
+}
+
+github_release () {
+  curl -s "https://api.github.com/repos/$1/releases" | jq -r '[.[] | select(.prerelease == false)][0].name'
+}
+
 ohmyzsh () {
-  version=$(curl -s https://api.github.com/repos/ohmyzsh/ohmyzsh/commits | jq -r '.[0].sha')
+  version=$(github_commit ohmyzsh/ohmyzsh)
   ansible_replace ohmyzsh_version $version ansible/roles/ohmyzsh/defaults/main.yml
 }
 
 plex () {
-  apt-get update
-  version=$(apt-cache policy plexmediaserver | grep -F "Candidate:" | awk '{ print $2 }')
+  version=$(apt_release plexmediaserver)
   ansible_replace plex_version $version ansible/roles/plex/defaults/main.yml
 }
 
 joal () {
-  version=$(curl -s https://api.github.com/repos/anthonyraymond/joal/releases | jq -r '.[0].name')
+  version=$(github_release anthonyraymond/joal)
   ansible_replace joal_version $version ansible/roles/joal/defaults/main.yml
 }
 
 jackett () {
-  version=$(curl -s https://api.github.com/repos/Jackett/Jackett/releases | jq -r '.[0].name' | cut -c 2-)
+  version=$(github_release Jackett/Jackett)
   ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
 }
 
 radarr () {
-  version=$(curl -s https://api.github.com/repos/Radarr/Radarr/releases | jq -r '[.[] | select(.prerelease == false)][0].name')
+  version=$(github_release Radarr/Radarr)
   ansible_replace servarr_version $version ansible/roles/servarr/vars/radarr.yml
 }
 
