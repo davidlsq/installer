@@ -24,22 +24,13 @@
     mode: u=rwx,go=rx
 
 - name: Check lib
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    n=$(wget -q -O - "{{ servarr_archive }}" |
-        tar -tzf - |
-        grep -F -e "{{ servarr_executable }}/{{ servarr_executable }}" |
-        wc -l
-       );
-    [ "$n" == 1 ]
-  args:
-    executable: /bin/bash
-    creates: '{{ servarr_lib }}/{{ servarr_executable }}'
-  check_mode: false
-  changed_when: false
-  register: check_lib
-  tags:
-    - skip_ansible_lint
+  ansible.builtin.include_role:
+    name: check_archive
+  vars:
+    check_archive_url: '{{ servarr_archive }}'
+    check_archive_files:
+      - '{{ servarr_executable }}/{{ servarr_executable }}'
+    check_archive_creates: '{{ servarr_lib }}/{{ servarr_executable }}'
 
 - name: Create lib
   ansible.builtin.unarchive:
