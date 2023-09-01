@@ -15,6 +15,21 @@
     group: root
     mode: u=rwx,go=rx
 
+- name: Check lib
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    wget -q -O - "{{ joal_archive }}" | tar -tzf -
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: check_lib
+  changed_when: false
+  failed_when:
+    - '"jack-of-all-trades-" + joal_version + ".jar" not in check_lib.stdout_lines'
+    - '"clients/" + joal_client + ".client" not in check_lib.stdout_lines'
+  tags:
+    - skip_ansible_lint
+
 - name: Create lib
   ansible.builtin.unarchive:
     src: '{{ joal_archive }}'
@@ -24,7 +39,7 @@
     group: root
     mode: u+rw,go-w+r
     creates: '{{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar'
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: not ansible_check_mode
   register: create_lib
 
 # Create var
@@ -50,8 +65,8 @@
     owner: '{{ joal_user }}'
     group: '{{ joal_user }}'
     mode: ug=rw,o=r
+  when: not ansible_check_mode
   register: create_client_config
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Create config
   ansible.builtin.template:
