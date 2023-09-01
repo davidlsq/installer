@@ -90,13 +90,15 @@
 
 - name: Fix permissions
   ansible.builtin.shell: >
-    set -e -o pipefail
+    set -e -o pipefail;
     find {{ jackett_var }} \
       ! -user root \
       ! -user {{ jackett_user }} \
       -print \
       -exec chown {{ jackett_user }}. {} \; \
       | wc -l
+  args:
+    executable: /bin/bash
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
   tags: fix_permissions

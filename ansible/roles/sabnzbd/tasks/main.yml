@@ -84,13 +84,15 @@
 
 - name: Fix permissions
   ansible.builtin.shell: >
-    set -e -o pipefail
+    set -e -o pipefail;
     find {{ sabnzbd_var }} \
       ! -user root \
       ! -user {{ sabnzbd_user }} \
       -print \
       -exec chown {{ sabnzbd_user }}. {} \; \
       | wc -l
+  args:
+    executable: /bin/bash
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
   tags: fix_permissions
