@@ -1,3 +1,8 @@
+- name: Package
+  ansible.builtin.apt:
+    name: wget
+    state: present
+
 - name: Check lib
   ansible.builtin.shell: >
     set -e -o pipefail;
