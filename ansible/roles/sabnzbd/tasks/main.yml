@@ -25,6 +25,19 @@
     group: root
     mode: u=rwx,go=rx
 
+- name: Check lib
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    wget -q -O - "{{ sabnzbd_archive }}" | tar -tzf -
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: check_lib
+  changed_when: false
+  failed_when: '"SABnzbd-" + sabnzbd_version + "/SABnzbd.py" not in check_lib.stdout_lines'
+  tags:
+    - skip_ansible_lint
+
 - name: Create lib
   ansible.builtin.unarchive:
     src: '{{ sabnzbd_archive }}'
@@ -37,7 +50,7 @@
     extra_opts:
       - --transform
       - 's/^SABnzbd-{{ sabnzbd_version }}//'
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: not ansible_check_mode
   register: create_lib
 
 - name: Create venv
@@ -71,13 +84,15 @@
 
 - name: Fix permissions
   ansible.builtin.shell: >
-    set -e -o pipefail
+    set -e -o pipefail;
     find {{ sabnzbd_var }} \
       ! -user root \
       ! -user {{ sabnzbd_user }} \
       -print \
       -exec chown {{ sabnzbd_user }}. {} \; \
       | wc -l
+  args:
+    executable: /bin/bash
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
   tags: fix_permissions

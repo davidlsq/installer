@@ -20,6 +20,19 @@
     group: root
     mode: u=rwx,go=rx
 
+- name: Check lib
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    wget -q -O - "{{ sonarr_archive }}" | tar -tzf -
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: check_lib
+  changed_when: false
+  failed_when: '"Sonarr/Sonarr.exe" not in check_lib.stdout_lines'
+  tags:
+    - skip_ansible_lint
+
 - name: Create lib
   ansible.builtin.unarchive:
     src: '{{ sonarr_archive }}'
@@ -32,7 +45,7 @@
     extra_opts:
       - --transform
       - 's/^Sonarr//'
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: not ansible_check_mode
   register: create_lib
 
 # Create var
@@ -69,13 +82,15 @@
 
 - name: Fix permissions
   ansible.builtin.shell: >
-    set -e -o pipefail
+    set -e -o pipefail;
     find {{ sonarr_var }} \
       ! -user root \
       ! -user {{ sonarr_user }} \
       -print \
       -exec chown {{ sonarr_user }}. {} \; \
       | wc -l
+  args:
+    executable: /bin/bash
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
   tags: fix_permissions

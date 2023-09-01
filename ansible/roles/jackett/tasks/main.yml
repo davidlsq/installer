@@ -18,6 +18,19 @@
     group: root
     mode: u=rwx,go=rx
 
+- name: Check lib
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    wget -q -O - "{{ jackett_archive }}" | tar -tzf -
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: check_lib
+  changed_when: false
+  failed_when: '"Jackett/jackett_launcher.sh" not in check_lib.stdout_lines'
+  tags:
+    - skip_ansible_lint
+
 - name: Create lib
   ansible.builtin.unarchive:
     src: '{{ jackett_archive }}'
@@ -26,11 +39,11 @@
     owner: root
     group: root
     mode: u+rw,go-w+r
-    creates: '{{ jackett_lib }}/jackett'
+    creates: '{{ jackett_lib }}/jackett_launcher.sh'
     extra_opts:
       - --transform
       - s/^Jackett//
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: not ansible_check_mode
   register: create_lib
 
 # Create var
@@ -77,13 +90,15 @@
 
 - name: Fix permissions
   ansible.builtin.shell: >
-    set -e -o pipefail
+    set -e -o pipefail;
     find {{ jackett_var }} \
       ! -user root \
       ! -user {{ jackett_user }} \
       -print \
       -exec chown {{ jackett_user }}. {} \; \
       | wc -l
+  args:
+    executable: /bin/bash
   register: fix_permissions
   changed_when: fix_permissions.stdout != '0'
   tags: fix_permissions
