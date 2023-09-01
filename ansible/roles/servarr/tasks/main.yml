@@ -22,7 +22,6 @@
     owner: root
     group: root
     mode: u=rwx,go=rx
-  register: create_lib_directory
 
 - name: Create lib
   ansible.builtin.unarchive:
@@ -36,8 +35,7 @@
     extra_opts:
       - --transform
       - 's/^{{ servarr_executable }}//'
-  when: >
-    not (ansible_check_mode and create_lib_directory is changed)
+  ignore_errors: "{{ ansible_check_mode }}"
   register: create_lib
 
 # Create var
