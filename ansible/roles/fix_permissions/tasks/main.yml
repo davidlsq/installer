@@ -1,0 +1,19 @@
+- name: Package
+  ansible.builtin.apt:
+    name: wget
+    state: present
+
+- name: Fix permissions
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    find {{ fix_permissions_dir }} \
+      ! -user root \
+      ! -user {{ fix_permissions_user }} \
+      -print \
+      -exec chown {{ fix_permissions_user }}. {} \; \
+      | wc -l
+  args:
+    executable: /bin/bash
+  register: fix_permissions
+  changed_when: fix_permissions.stdout != '0'
+  tags: fix_permissions

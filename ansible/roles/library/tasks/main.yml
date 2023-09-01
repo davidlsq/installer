@@ -13,16 +13,8 @@
     - '{{ library_var }}/sonarr-2'
 
 - name: Fix permissions
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    find {{ library_var }} \
-      ! -user root \
-      ! -user {{ library_user }} \
-      -print \
-      -exec chown {{ library_user }}. {} \; \
-      | wc -l
-  args:
-    executable: /bin/bash
-  register: fix_permissions
-  changed_when: fix_permissions.stdout != '0'
-  tags: fix_permissions
+  ansible.builtin.include_role:
+    name: fix_permissions
+  vars:
+    fix_permissions_dir: '{{ library_var }}'
+    fix_permissions_user: '{{ library_user }}'

@@ -86,19 +86,11 @@
   register: create_config
 
 - name: Fix permissions
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    find {{ sonarr_var }} \
-      ! -user root \
-      ! -user {{ sonarr_user }} \
-      -print \
-      -exec chown {{ sonarr_user }}. {} \; \
-      | wc -l
-  args:
-    executable: /bin/bash
-  register: fix_permissions
-  changed_when: fix_permissions.stdout != '0'
-  tags: fix_permissions
+  ansible.builtin.include_role:
+    name: fix_permissions
+  vars:
+    fix_permissions_dir: '{{ sonarr_var }}'
+    fix_permissions_user: '{{ sonarr_user }}'
 
 # Create service
 
