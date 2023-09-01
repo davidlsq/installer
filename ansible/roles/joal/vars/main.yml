@@ -1,0 +1,2 @@
+joal_lib_jar: 'jack-of-all-trades-{{ joal_version }}.jar'
+joal_lib_client: 'clients/{{ joal_client }}.client'

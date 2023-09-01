@@ -23,13 +23,18 @@
 - name: Check lib
   ansible.builtin.shell: >
     set -e -o pipefail;
-    wget -q -O - "{{ sonarr_archive }}" | tar -tzf -
+    n=$(wget -q -O - "{{ sonarr_archive }}" |
+        tar -tzf - |
+        grep -F -e "Sonarr/Sonarr.exe" |
+        wc -l
+       );
+    [ "$n" == 1 ]
   args:
     executable: /bin/bash
+    creates: '{{ sonarr_lib }}/Sonarr.exe'
   check_mode: false
-  register: check_lib
   changed_when: false
-  failed_when: '"Sonarr/Sonarr.exe" not in check_lib.stdout_lines'
+  register: check_lib
   tags:
     - skip_ansible_lint
 
