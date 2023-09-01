@@ -88,19 +88,11 @@
   register: create_config
 
 - name: Fix permissions
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    find {{ sabnzbd_var }} \
-      ! -user root \
-      ! -user {{ sabnzbd_user }} \
-      -print \
-      -exec chown {{ sabnzbd_user }}. {} \; \
-      | wc -l
-  args:
-    executable: /bin/bash
-  register: fix_permissions
-  changed_when: fix_permissions.stdout != '0'
-  tags: fix_permissions
+  ansible.builtin.include_role:
+    name: fix_permissions
+  vars:
+    fix_permissions_dir: '{{ sabnzbd_var }}'
+    fix_permissions_user: '{{ sabnzbd_user }}'
 
 # Create service
 
