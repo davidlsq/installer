@@ -21,13 +21,18 @@
 - name: Check lib
   ansible.builtin.shell: >
     set -e -o pipefail;
-    wget -q -O - "{{ jackett_archive }}" | tar -tzf -
+    n=$(wget -q -O - "{{ jackett_archive }}" |
+        tar -tzf - |
+        grep -F -e "Jackett/jackett_launcher.sh" |
+        wc -l
+       );
+    [ "$n" == 1 ]
   args:
     executable: /bin/bash
+    creates: '{{ joal_lib }}/jackett_launcher.sh'
   check_mode: false
-  register: check_lib
   changed_when: false
-  failed_when: '"Jackett/jackett_launcher.sh" not in check_lib.stdout_lines'
+  register: check_lib
   tags:
     - skip_ansible_lint
 

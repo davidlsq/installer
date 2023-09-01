@@ -28,13 +28,18 @@
 - name: Check lib
   ansible.builtin.shell: >
     set -e -o pipefail;
-    wget -q -O - "{{ sabnzbd_archive }}" | tar -tzf -
+    n=$(wget -q -O - "{{ sabnzbd_archive }}" |
+        tar -tzf - |
+        grep -F -e "SABnzbd-{{ sabnzbd_version }}/SABnzbd.py" |
+        wc -l
+       );
+    [ "$n" == 1 ]
   args:
     executable: /bin/bash
+    creates: '{{ sabnzbd_lib }}/SABnzbd.py'
   check_mode: false
-  register: check_lib
   changed_when: false
-  failed_when: '"SABnzbd-" + sabnzbd_version + "/SABnzbd.py" not in check_lib.stdout_lines'
+  register: check_lib
   tags:
     - skip_ansible_lint
 

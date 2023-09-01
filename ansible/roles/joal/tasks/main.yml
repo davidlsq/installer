@@ -18,15 +18,19 @@
 - name: Check lib
   ansible.builtin.shell: >
     set -e -o pipefail;
-    wget -q -O - "{{ joal_archive }}" | tar -tzf -
+    n=$(wget -q -O - "{{ joal_archive }}" |
+        tar -tzf - |
+        grep -F -e "jack-of-all-trades-{{ joal_version }}.jar"
+                -e "clients/{{ joal_client }}.client" |
+        wc -l
+       );
+    [ "$n" == 2 ]
   args:
     executable: /bin/bash
+    creates: '{{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar'
   check_mode: false
-  register: check_lib
   changed_when: false
-  failed_when:
-    - '"jack-of-all-trades-" + joal_version + ".jar" not in check_lib.stdout_lines'
-    - '"clients/" + joal_client + ".client" not in check_lib.stdout_lines'
+  register: check_lib
   tags:
     - skip_ansible_lint
 
