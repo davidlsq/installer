@@ -16,23 +16,14 @@
     mode: u=rwx,go=rx
 
 - name: Check lib
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    n=$(wget -q -O - "{{ joal_archive }}" |
-        tar -tzf - |
-        grep -F -e "jack-of-all-trades-{{ joal_version }}.jar"
-                -e "clients/{{ joal_client }}.client" |
-        wc -l
-       );
-    [ "$n" == 2 ]
-  args:
-    executable: /bin/bash
-    creates: '{{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar'
-  check_mode: false
-  changed_when: false
-  register: check_lib
-  tags:
-    - skip_ansible_lint
+  ansible.builtin.include_role:
+    name: check_archive
+  vars:
+    check_archive_url: '{{ joal_archive }}'
+    check_archive_files:
+      - 'jack-of-all-trades-{{ joal_version }}.jar'
+      - 'clients/{{ joal_client }}.client'
+    check_archive_creates: '{{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar'
 
 - name: Create lib
   ansible.builtin.unarchive:

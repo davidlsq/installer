@@ -19,22 +19,13 @@
     mode: u=rwx,go=rx
 
 - name: Check lib
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    n=$(wget -q -O - "{{ jackett_archive }}" |
-        tar -tzf - |
-        grep -F -e "Jackett/jackett_launcher.sh" |
-        wc -l
-       );
-    [ "$n" == 1 ]
-  args:
-    executable: /bin/bash
-    creates: '{{ joal_lib }}/jackett_launcher.sh'
-  check_mode: false
-  changed_when: false
-  register: check_lib
-  tags:
-    - skip_ansible_lint
+  ansible.builtin.include_role:
+    name: check_archive
+  vars:
+    check_archive_url: '{{ jackett_archive }}'
+    check_archive_files:
+      - Jackett/jackett_launcher.sh
+    check_archive_creates: '{{ joal_lib }}/jackett_launcher.sh'
 
 - name: Create lib
   ansible.builtin.unarchive:
