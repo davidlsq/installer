@@ -26,22 +26,13 @@
     mode: u=rwx,go=rx
 
 - name: Check lib
-  ansible.builtin.shell: >
-    set -e -o pipefail;
-    n=$(wget -q -O - "{{ sabnzbd_archive }}" |
-        tar -tzf - |
-        grep -F -e "SABnzbd-{{ sabnzbd_version }}/SABnzbd.py" |
-        wc -l
-       );
-    [ "$n" == 1 ]
-  args:
-    executable: /bin/bash
-    creates: '{{ sabnzbd_lib }}/SABnzbd.py'
-  check_mode: false
-  changed_when: false
-  register: check_lib
-  tags:
-    - skip_ansible_lint
+  ansible.builtin.include_role:
+    name: check_archive
+  vars:
+    check_archive_url: '{{ sabnzbd_archive }}'
+    check_archive_files:
+      - 'SABnzbd-{{ sabnzbd_version }}/SABnzbd.py'
+    check_archive_creates: '{{ sabnzbd_lib }}/SABnzbd.py'
 
 - name: Create lib
   ansible.builtin.unarchive:

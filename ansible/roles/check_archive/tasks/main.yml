@@ -1,0 +1,16 @@
+- name: Check lib
+  ansible.builtin.shell: >
+    set -e -o pipefail;
+    n=$(wget -q -O - "{{ check_archive_url }}" | tar -tzf - |
+        grep -F {% for file in check_archive_files %} -e "{{ file }}"{% endfor %} |
+        wc -l
+       );
+    [ "$n" == {{ check_archive_files | length }} ]
+  args:
+    executable: /bin/bash
+    creates: '{{ check_archive_creates }}'
+  check_mode: false
+  changed_when: false
+  register: check_lib
+  tags:
+    - skip_ansible_lint
