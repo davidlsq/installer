@@ -1,0 +1,35 @@
+---
+
+name: playbook
+
+on:
+  workflow_call:
+    inputs:
+      tags:
+        type: string
+      check:
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      tags:
+        default: all
+        type: string
+      check:
+        default: true
+        type: boolean
+
+
+jobs:
+  playbook:
+    name: playbook
+    runs-on: ubuntu-latest
+    concurrency: server
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: server-archive
+        run: echo "$SERVER_ARCHIVE" | base64 -d | tar zxf -
+        env:
+          SERVER_ARCHIVE: ${{ inputs.server-archive }}
+      - name: test
+        run: echo ${{ inputs.check }}
