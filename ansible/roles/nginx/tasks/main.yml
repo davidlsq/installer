@@ -47,6 +47,7 @@
 - name: Get cookie
   ansible.builtin.command: 'cat {{ nginx_cookie_path }}'
   register: cat_cookie
+  check_mode: false
   changed_when: false
   no_log: true
 

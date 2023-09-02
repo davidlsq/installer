@@ -24,8 +24,3 @@
   ansible.builtin.apt:
     update_cache: true
   when: sources is changed
-
-- name: Update old cache
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 3600
