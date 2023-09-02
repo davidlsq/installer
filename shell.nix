@@ -1,8 +1,8 @@
 let
   nixpkgs = builtins.fetchTarball {
-    name = "nixos-23.05-841889913dfd";
-    url = "https://github.com/NixOS/nixpkgs/archive/841889913dfd.tar.gz";
-    sha256 = "1v6b5v7vpprbj9i7vy7hnx1q660dq1a6xx2094r6341a2sb18r8m";
+    name = "nixos-23.05-9075cba53e86";
+    url = "https://github.com/NixOS/nixpkgs/archive/9075cba53e86.tar.gz";
+    sha256 = "0kymzp32d31c0hny2b2f7zfn49nzrxlm963xbm4v0axka6abym36";
   };
   pkgs = import nixpkgs { };
   python-packages = p: [ p.passlib p.pyyaml p.jinja2 ];
