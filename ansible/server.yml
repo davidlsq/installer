@@ -60,6 +60,7 @@
       vg_pvs:
         - /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
         - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
+        - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
 
 - name: Time Machine
   hosts: server
@@ -91,7 +92,7 @@
       vg_name: data
       lv_name: media
       lv_size: 8T
-      lv_opts: --type raid1 --nosync
+      lv_opts: --type raid5 --nosync
     - role: user_service
       tags: data
       user_service_name: media
