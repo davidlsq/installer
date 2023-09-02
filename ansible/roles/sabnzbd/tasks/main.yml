@@ -32,6 +32,7 @@
     check_archive_url: '{{ sabnzbd_archive }}'
     check_archive_files:
       - 'SABnzbd-{{ sabnzbd_version }}/SABnzbd.py'
+      - 'SABnzbd-{{ sabnzbd_version }}/requirements.txt'
     check_archive_creates: '{{ sabnzbd_lib }}/SABnzbd.py'
 
 - name: Create lib
@@ -54,6 +55,7 @@
     requirements: '{{ sabnzbd_lib }}/requirements.txt'
     virtualenv: '{{ sabnzbd_venv }}'
     virtualenv_command: python3 -m venv
+  when: not ansible_check_mode
   register: create_venv
 
 # Create var
