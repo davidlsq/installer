@@ -21,7 +21,7 @@ jobs:
       ansible: ${{ steps.changes.outputs.ansible }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: changes
         uses: dorny/paths-filter@v2
         id: changes
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: pre-commit
         uses: ./.github/actions/nix-shell
         with:
@@ -53,7 +53,7 @@ jobs:
     if: needs.changes.outputs.make == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: make
         uses: ./.github/actions/nix-shell
         with:
@@ -67,7 +67,7 @@ jobs:
     if: needs.changes.outputs.dependabot == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: dependabot
         uses: marocchino/validate-dependabot@v2
   server-playbook-check:
@@ -78,7 +78,7 @@ jobs:
     if: needs.changes.outputs.ansible == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: server-playbook-check
         uses: ./.github/actions/ansible
         with:
