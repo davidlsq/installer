@@ -7,7 +7,7 @@
   ansible.builtin.shell: >
     set -e -o pipefail;
     n=$(wget -q -O - "{{ check_archive_url }}" | tar -tzf - |
-        grep -F {% for file in check_archive_files %} -e "{{ file }}"{% endfor %} |
+        grep {% for file in check_archive_files %} -e "^{{ file }}$"{% endfor %} |
         wc -l
        );
     [ "$n" == {{ check_archive_files | length }} ]
