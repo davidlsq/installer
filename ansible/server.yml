@@ -59,8 +59,6 @@
       vg_name: data
       vg_pvs:
         - /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
-        - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
-        - /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
 
 - name: Time Machine
   hosts: server
