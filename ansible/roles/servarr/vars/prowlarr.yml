@@ -1,4 +1,4 @@
-servarr_version: 1.7.4.3769
+servarr_version: 1.8.6.3946
 servarr_archive: 'https://github.com/Prowlarr/Prowlarr/releases/download/v{{ servarr_version }}/Prowlarr.master.{{ servarr_version }}.linux-core-x64.tar.gz'
 servarr_executable: Prowlarr
 servarr_config:
