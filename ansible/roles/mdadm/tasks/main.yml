@@ -1,0 +1,41 @@
+# Install package
+
+- name: Package
+  ansible.builtin.apt:
+    name: mdadm
+    state: present
+
+# Install array
+
+- name: Stat
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    cat /proc/mdstat | grep "^{{ mdadm_name }} :"
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: stat
+
+- name: Create
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    echo yes | \
+    mdadm --create /dev/{{ mdadm_name }} \
+      --level={{ mdadm_level }} \
+      --raid-device={{ mdadm_disks | count }} \
+      {{ mdadm_disks | join (' ') }}
+  when: stat.rc != 0
+  changed_when: true
+  register: create
+
+- name: Config
+  ansible.builtin.shell: >
+    /usr/share/mdadm/mkconf > /etc/mdadm/mdadm.conf
+  changed_when: true
+  when: create.changed
+
+- name: Initramfs
+  ansible.builtin.command: >
+    update-initramfs -u
+  changed_when: true
+  when: create.changed
