@@ -7,12 +7,20 @@
     size: '{{ lv_size }}'
     opts: '{{ lv_opts }}'
     resizefs: true
+  register: create
 
 - name: Format
   community.general.filesystem:
     dev: '/dev/{{ vg_name }}/{{ lv_name }}'
     fstype: ext4
     force: false
+
+- name: Reserved
+  ansible.builtin.command: >
+    tune2fs -m 0 /dev/{{ vg_name }}/{{ lv_name }}
+  changed_when: true
+  check_mode: false
+  when: create.changed
 
 - name: Mount
   ansible.posix.mount:
