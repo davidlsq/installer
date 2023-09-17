@@ -96,7 +96,7 @@
       tags: data
       vg_name: data
       lv_name: media
-      lv_size: 8T
+      lv_size: 8.5T
       lv_opts: --type linear
     - role: user_service
       tags: data
