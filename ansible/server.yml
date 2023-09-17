@@ -77,7 +77,7 @@
       tags: data
       vg_name: data
       lv_name: timemachine
-      lv_size: 1T
+      lv_size: 500G
       lv_opts: --type linear
     - role: samba
       samba_var: /mnt/data/timemachine
