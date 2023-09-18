@@ -62,6 +62,7 @@
   ansible.builtin.apt:
     name: "plexmediaserver={{ plex_version }}"
     update_cache: true
+    allow_downgrade: true
   register: package
 
 - name: Remove default plex user
