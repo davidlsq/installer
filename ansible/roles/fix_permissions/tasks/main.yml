@@ -5,7 +5,7 @@
       ! -user root \
       ! -user {{ fix_permissions_user }} \
       -print \
-      -exec chown {{ fix_permissions_user }}. {} \; \
+      -exec chown {{ fix_permissions_user }}: {} \; \
       | wc -l
   args:
     executable: /bin/bash
