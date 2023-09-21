@@ -3,9 +3,8 @@
 name: ci
 
 on:
-  push:
-    branches-ignore:
-      - main
+  pull_request:
+  merge_group:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
