@@ -8,13 +8,19 @@ User={{ joal_user }}
 Group={{ joal_user }}
 
 SuccessExitStatus=143
-Type=simple
 WorkingDirectory={{ joal_var }}
 
+Type=simple
 ExecStart=java -jar {{ joal_lib }}/jack-of-all-trades-{{ joal_version }}.jar --joal-conf={{ joal_var }}
 ExecStop=/bin/kill -15 $MAINPID
 
 Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ joal_name }}
 
 [Install]
 WantedBy=multi-user.target

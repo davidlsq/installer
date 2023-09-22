@@ -9,7 +9,7 @@ Group={{ sonarr_user }}
 Type=simple
 ExecStart=mono --debug {{ sonarr_lib }}/Sonarr.exe -nobrowser -data={{ sonarr_var }}/
 
-TimeoutStopSec=20
+TimeoutStopSec=30
 KillMode=process
 Restart=on-failure
 

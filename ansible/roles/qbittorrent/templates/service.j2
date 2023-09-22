@@ -8,7 +8,10 @@ Group={{ qbittorrent_user }}
 
 Type=forking
 ExecStart=/usr/bin/qbittorrent-nox -d --webui-port={{ qbittorrent_port }} --profile={{ qbittorrent_var }}
+
 Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
 
 StandardOutput=journal
 StandardError=journal

@@ -9,9 +9,10 @@ Group={{ servarr_user }}
 Type=simple
 ExecStart={{ servarr_lib }}/{{ servarr_executable }} -nobrowser -data={{ servarr_var }}/
 
-TimeoutStopSec=20
 KillMode=process
 Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
 
 StandardOutput=journal
 StandardError=journal
