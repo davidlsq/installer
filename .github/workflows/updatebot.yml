@@ -20,6 +20,11 @@ jobs:
         uses: actions/checkout@v4
       - name: updatebot
         uses: ./.github/actions/updatebot
+      - name: create-pull-request-all
+        uses: ./.github/actions/create-pull-request
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          name: all
       - name: create-pull-request-tarball-nix
         uses: ./.github/actions/create-pull-request
         with:
