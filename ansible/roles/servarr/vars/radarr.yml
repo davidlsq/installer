@@ -4,6 +4,5 @@ servarr_executable: Radarr
 servarr_config:
   - [BindAddress, '{{ servarr_address }}']
   - [Port, '{{ servarr_port }}']
-  - [UrlBase, '/{{ servarr_name }}']
   - [InstanceName, '{{ servarr_name }}']
   - [AnalyticsEnabled, false]
