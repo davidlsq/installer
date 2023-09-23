@@ -3,8 +3,9 @@
 import sys
 from pathlib import Path
 
+from common import read_yaml, write_yaml
 from image import image_build
-from password import password_hash
+from password import hash
 from ssh import ssh_config, ssh_keygen, ssh_known_host
 
 command = sys.argv[1]
@@ -27,8 +28,14 @@ elif command == "ssh":
     ssh_config(config, known_host, "david", "server.davidlsq.fr", keys / "user")
     ssh_config(config, known_host, "ansible", "server.davidlsq.fr", keys / "ansible")
 elif command == "password":
-    password = Path(sys.argv[3])
-    password_hash(password, output, ["root", "user", "ansible"])
+    passwords = read_yaml(Path(sys.argv[3]))["password"]
+    passwords_hash = {
+        **passwords,
+        "root": hash(passwords["root"]),
+        "user": hash(passwords["user"]),
+        "ansible": hash(passwords["ansible"]),
+    }
+    write_yaml({"password": passwords_hash}, output)
 elif command == "image":
     iso = Path(sys.argv[3])
     image_build(iso, "server", output)
