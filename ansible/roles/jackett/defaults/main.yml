@@ -5,8 +5,9 @@ jackett_lib: '/usr/lib/jackett-{{ jackett_version }}'
 jackett_var: '/var/lib/{{ jackett_name }}'
 jackett_user: '{{ jackett_name }}'
 jackett_port: 8080
+jackett_address: 127.0.0.1
 jackett_external: false
 jackett_config:
+  LocalBindAddress: '{{ jackett_address }}'
   AllowExternal: '{{ jackett_external }}'
   Port: '{{ jackett_port }}'
-  BasePathOverride: '/{{ jackett_name }}'
