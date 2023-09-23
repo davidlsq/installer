@@ -68,7 +68,7 @@
   no_log: true
 
 - name: Update lib
-  ansible.builtin.command: pihole -up
+  ansible.builtin.command: /usr/local/bin/pihole -up
   when: git_clone is changed
   changed_when: false
 
