@@ -1,0 +1,5 @@
+pihole_git_url: https://github.com/pi-hole/pi-hole.git
+pihole_git: /usr/lib/pihole
+pihole_version: fef2861eae23442ad823d51c9b4bfdd5b38ab200
+pihole_var: /etc/pihole
+pihole_port: 8080

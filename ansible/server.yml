@@ -173,6 +173,23 @@
       sonarr_var: '/mnt/data/media/{{ sonarr_2_name }}'
       sonarr_user: media
 
+- name: Pi Hole
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: pihole
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: pihole
+      lv_size: 1G
+      lv_opts: --type linear
+    - role: pihole
+      pihole_interface: '{{ network_interface }}'
+      pihole_password: '{{ password.pihole }}'
+      pihole_var: /mnt/data/pihole
+
 - name: NGINX
   hosts: server
   gather_facts: false

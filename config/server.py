@@ -5,7 +5,7 @@ from pathlib import Path
 
 from common import read_yaml, write_yaml
 from image import image_build
-from password import hash
+from password import hash, sha256
 from ssh import ssh_config, ssh_keygen, ssh_known_host
 
 command = sys.argv[1]
@@ -34,6 +34,7 @@ elif command == "password":
         "root": hash(passwords["root"]),
         "user": hash(passwords["user"]),
         "ansible": hash(passwords["ansible"]),
+        "pihole": sha256(sha256(passwords["pihole"])),
     }
     write_yaml({"password": passwords_hash}, output)
 elif command == "image":
