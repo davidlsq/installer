@@ -1,0 +1,26 @@
+PLAT=Debian
+OSCN=bookworm
+USING_UFW=0
+IPv4dev={{ pivpn_interface }}
+install_user={{ pivpn_user }}
+VPN=openvpn
+pivpnPROTO=tcp
+pivpnPORT={{ pivpn_port }}
+{% if pivpn_dns_1 is defined %}
+pivpnDNS1={{ pivpn_dns_1 }}
+{% endif %}
+{% if pivpn_dns_2 is defined %}
+pivpnDNS2={{ pivpn_dns_2 }}
+{% endif %}
+{% if pivpn_public_domain is defined %}
+pivpnHOST={{ pivpn_public_domain }}
+{% endif %}
+TWO_POINT_FOUR=1
+pivpnENCRYPT=256
+USE_PREDEFINED_DH_PARAM=1
+INPUT_CHAIN_EDITED=0
+FORWARD_CHAIN_EDITED=0
+pivpnDEV=tun0
+pivpnNET=10.206.52.0
+subnetClass=24
+UNATTUPG=1

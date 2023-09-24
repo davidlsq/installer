@@ -1,0 +1,92 @@
+# Install package
+
+- name: Package
+  ansible.builtin.apt:
+    name: git
+    state: present
+
+# Download
+
+- name: Git clone
+  ansible.builtin.git:
+    repo: '{{ pivpn_git_url }}'
+    dest: '{{ pivpn_git }}'
+    version: '{{ pivpn_version }}'
+  register: git_clone
+
+# Create var
+
+- name: Create var
+  when: 'pivpn_var != "/etc/pivpn"'
+  block:
+    - name: Create var directory
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: root
+        group: root
+        mode: ug=rwx,o=rx
+      with_items:
+        - '{{ pivpn_var }}'
+        - '{{ pivpn_var }}/etc'
+    - name: Create var link
+      ansible.builtin.file:
+        src: '{{ pivpn_var }}/etc'
+        dest: /etc/pivpn
+        state: link
+        force: true
+
+# Create user
+
+- name: Create user
+  ansible.builtin.include_role:
+    name: user_service
+  vars:
+    user_service_name: '{{ pivpn_user }}'
+    user_service_home: '{{ pivpn_var }}/home'
+
+- name: Fix permissions
+  ansible.builtin.include_role:
+    name: fix_permissions
+  vars:
+    fix_permissions_dir: '{{ pivpn_var }}/home'
+    fix_permissions_user: '{{ pivpn_user }}'
+
+# Configure
+
+- name: Create config
+  ansible.builtin.template:
+    src: options.conf.j2
+    dest: '{{ pivpn_var }}/options.conf'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  register: create_config
+
+# Install
+
+- name: Install
+  ansible.builtin.command: >
+    bash install.sh --unattended {{ pivpn_var }}/options.conf
+  args:
+    chdir: '{{ pivpn_git }}/auto_install'
+  when: git_clone is changed
+  changed_when: true
+
+- name: Update
+  ansible.builtin.command: >
+    bash install.sh --reconfigure --unattended {{ pivpn_var }}/options.conf
+  args:
+    chdir: '{{ pivpn_git }}/auto_install'
+  when: create_config is changed
+  changed_when: true
+
+# Clients
+
+- name: Clients
+  ansible.builtin.command: >
+    /usr/local/bin/pivpn add --name {{ item[0] }} --password {{ item[1] }} --days 3650
+  args:
+    creates: '{{ pivpn_var }}/home/ovpns/{{ item[0] }}.ovpn'
+  no_log: true
+  loop: '{{ pivpn_clients }}'

@@ -1,0 +1,7 @@
+pivpn_git_url: https://github.com/pivpn/pivpn.git
+pivpn_git: /usr/lib/pivpn
+pivpn_version: 16189edc7b03d3ed930dbb3cc908d8e2275a7563
+pivpn_var: /etc/pivpn
+pivpn_user: pivpn
+pivpn_port: 1194
+pivpn_clients: []

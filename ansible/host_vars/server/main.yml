@@ -33,3 +33,4 @@ sonarr_2_name: sonarr-2
 sonarr_2_port: 8062
 
 pihole_port: 8070
+pivpn_port: 1194

@@ -11,3 +11,14 @@
     home: /nonexistent
     create_home: false
     system: true
+  when: user_service_home is not defined
+
+- name: Create user
+  ansible.builtin.user:
+    name: '{{ user_service_name }}'
+    group: '{{ user_service_name }}'
+    shell: /usr/sbin/nologin
+    home: '{{ user_service_home }}'
+    create_home: true
+    system: true
+  when: user_service_home is defined

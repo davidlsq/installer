@@ -100,6 +100,28 @@
       dns_version: 1
       dns_list: ['127.0.0.1']
 
+- name: Pi VPN
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: pivpn
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: pivpn
+      lv_size: 1G
+      lv_opts: --type linear
+    - role: pivpn
+      pivpn_user: pivpn
+      pivpn_var: /mnt/data/pivpn
+      pivpn_interface: '{{ network_interface }}'
+      pivpn_public_domain: '{{ public_domain }}'
+      pivpn_dns_1: '{{ private_address }}'
+      pivpn_clients:
+        - ['{{ user_name }}-iphone', '{{ password.pivpn }}']
+        - ['{{ user_name }}-macbook', '{{ password.pivpn }}']
+
 - name: Time Machine
   hosts: server
   gather_facts: false
