@@ -26,6 +26,8 @@
       tags: ssh_server
       ssh_server_key: server/ssh/server
       ssh_server_key_pub: server/ssh/server.pub
+    - role: docker
+      tags: docker
 
 - name: Users
   hosts: server
@@ -57,8 +59,6 @@
       ohmyzsh_user_name: '{{ user_name }}'
     - role: ohmyzsh
       ohmyzsh_user_name: ansible
-    - role: docker
-      tags: docker
 
 - name: Data Disks
   hosts: server
