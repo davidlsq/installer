@@ -21,18 +21,35 @@
     - '{{ qbittorrent_var }}/qBittorrent'
     - '{{ qbittorrent_var }}/qBittorrent/config'
 
-- name: Create config
-  community.general.ini_file:
-    path: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf'
-    owner: '{{ qbittorrent_user }}'
-    group: '{{ qbittorrent_user }}'
+- name: Create config cache
+  ansible.builtin.copy:
+    dest: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf.cache'
+    content: '{{ qbittorrent_config | to_json(indent=2) }}'
+    owner: root
+    group: root
     mode: u=rw,go=r
-    section: '{{ item[0] }}'
-    option: '{{ item[1] }}'
-    value: '{{ item[2] }}'
-    no_extra_spaces: true
-  loop: '{{ qbittorrent_config }}'
-  register: create_config
+  register: config_cache
+
+- name: Create config
+  when: config_cache is changed
+  block:
+    - name: Stop
+      ansible.builtin.systemd:
+        name: '{{ qbittorrent_name }}'
+        state: stopped
+      failed_when: false
+    - name: Create config
+      community.general.ini_file:
+        path: '{{ qbittorrent_var }}/qBittorrent/config/qBittorrent.conf'
+        owner: '{{ qbittorrent_user }}'
+        group: '{{ qbittorrent_user }}'
+        mode: u=rw,go=r
+        section: '{{ item[0] }}'
+        option: '{{ item[1] }}'
+        value: '{{ item[2] }}'
+        no_extra_spaces: true
+      loop: '{{ qbittorrent_config }}'
+      register: create_config
 
 - name: Fix permissions
   ansible.builtin.include_role:
