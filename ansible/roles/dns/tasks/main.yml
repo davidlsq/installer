@@ -1,0 +1,18 @@
+# Config
+
+- name: Current version
+  ansible.builtin.command: >
+    grep -Po '(?<=# version )[0-9]+' /etc/resolv.conf
+  register: current_version
+  check_mode: false
+  changed_when: false
+  failed_when: current_version.rc > 1
+
+- name: Resolv
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  when: (current_version.stdout | length > 0) | ternary(current_version.stdout | int, -1) <= dns_version
