@@ -98,7 +98,7 @@
       pihole_dns_2: '{{ dns_2 }}'
     - role: dns
       dns_version: 1
-      dns_list: ['127.0.0.1']
+      dns_list: [127.0.0.1]
 
 - name: Pi VPN
   hosts: server
