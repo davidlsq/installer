@@ -13,6 +13,12 @@ d-i hw-detect/load_firmware boolean false
 
 # network
 d-i netcfg/choose_interface select {{ image.network_interface }}
+d-i netcfg/disable_autoconfig boolean true
+d-i netcfg/get_ipaddress string 192.168.0.2
+d-i netcfg/get_netmask string 255.255.255.0
+d-i netcfg/get_gateway string 192.168.0.1
+d-i netcfg/get_nameservers string 9.9.9.9 149.112.112.112
+d-i netcfg/confirm_static boolean true
 d-i netcfg/hostname string {{ image_name }}
 
 # user
