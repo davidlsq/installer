@@ -14,6 +14,10 @@
       tags: keyboard
     - role: network
       tags: network
+    - role: dns
+      tags: dns
+      dns_version: 0
+      dns_list: ['{{ dns_1 }}', '{{ dns_2 }}']
     - role: apt
       tags: apt
     - role: grub
@@ -90,6 +94,11 @@
       pihole_interface: '{{ network_interface }}'
       pihole_password: '{{ password.pihole }}'
       pihole_var: /mnt/data/pihole
+      pihole_dns_1: '{{ dns_1 }}'
+      pihole_dns_2: '{{ dns_2 }}'
+    - role: dns
+      dns_version: 1
+      dns_list: ['127.0.0.1']
 
 - name: Time Machine
   hosts: server

@@ -4,14 +4,3 @@
   ansible.builtin.apt:
     name: libnss-mdns
     state: present
-
-# Config
-
-- name: Config resolv
-  ansible.builtin.template:
-    src: resolv.conf.j2
-    dest: /etc/resolv.conf
-    owner: root
-    group: root
-    mode: u=rw,go=r
-  when: dns_1 is defined and dns_2 is defined

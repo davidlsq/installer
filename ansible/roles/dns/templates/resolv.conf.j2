@@ -1,0 +1,4 @@
+# version {{ dns_version }}
+{% for dns in dns_list %}
+nameserver {{ dns }}
+{% endfor %}
