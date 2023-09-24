@@ -52,37 +52,72 @@
     group: '{{ jackett_user }}'
     mode: ug=rwx,o=rx
 
-- name: Check config
-  ansible.builtin.stat:
-    path: '{{ jackett_var }}/ServerConfig.json'
-  register: check_config
+## Create api_key
 
-- name: Init config
+- name: Check api_key
+  ansible.builtin.stat:
+    path: '{{ jackett_var }}/api_key'
+  register: check_api_key
+
+- name: Create api_key
   ansible.builtin.copy:
-    content: '{}'
+    dest: '{{ jackett_var }}/api_key'
+    content: '{{ lookup("community.general.random_string", length=32, special=false, upper=false) }}'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  when: not check_api_key.stat.exists
+  no_log: true
+
+- name: Get api_key
+  ansible.builtin.command: >
+    cat {{ jackett_var }}/api_key
+  register: cat_api_key
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+## Create instance_id
+
+- name: Check instance_id
+  ansible.builtin.stat:
+    path: '{{ jackett_var }}/instance_id'
+  register: check_instance_id
+
+- name: Create instance_id
+  ansible.builtin.copy:
+    dest: '{{ jackett_var }}/instance_id'
+    content: '{{ lookup("community.general.random_string", length=64, special=false, upper=false) }}'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  when: not check_instance_id.stat.exists
+  no_log: true
+
+- name: Get instance_id
+  ansible.builtin.command: >
+    cat {{ jackett_var }}/instance_id
+  register: cat_instance_id
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+## Create config
+
+- name: Create config
+  ansible.builtin.template:
+    src: ServerConfig.json.j2
     dest: '{{ jackett_var }}/ServerConfig.json'
     owner: '{{ jackett_user }}'
     group: '{{ jackett_user }}'
-    mode: u=rw,go=r
-  when: not check_config.stat.exists
-
-- name: Create ansible config
-  ansible.builtin.copy:
-    content: '{{ jackett_config | to_json }}'
-    dest: '{{ jackett_var }}/ServerConfig.json.ansible'
-    owner: '{{ jackett_user }}'
-    group: '{{ jackett_user }}'
-    mode: u=rw,go=r
+    mode: ugo=r
+  vars:
+    api_key: '{{ cat_api_key.stdout }}'
+    instance_id: '{{ cat_instance_id.stdout }}'
   register: create_config
+  no_log: true
 
-- name: Update config
-  ansible.builtin.shell: >
-    set -e -o pipefail
-    cat {{ jackett_var }}/ServerConfig.json {{ jackett_var }}/ServerConfig.json.ansible | jq -s add > {{ jackett_var }}/ServerConfig.json.tmp;
-    cat {{ jackett_var }}/ServerConfig.json.tmp > {{ jackett_var }}/ServerConfig.json;
-    rm {{ jackett_var }}/ServerConfig.json.tmp
-  when: create_config is changed
-  changed_when: true
+## Fix permissions
 
 - name: Fix permissions
   ansible.builtin.include_role:
