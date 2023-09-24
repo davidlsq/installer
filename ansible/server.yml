@@ -156,9 +156,6 @@
     - role: user_service
       tags: data
       user_service_name: media
-    - role: user_service
-      tags: data
-      user_service_name: media
     - role: library
       tags: data
       library_user: media
