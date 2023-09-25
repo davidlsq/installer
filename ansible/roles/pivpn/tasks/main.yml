@@ -43,14 +43,8 @@
     name: user_service
   vars:
     user_service_name: '{{ pivpn_user }}'
+    user_service_id: '{{ pivpn_user_id }}'
     user_service_home: '{{ pivpn_var }}/home'
-
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ pivpn_var }}/home'
-    fix_permissions_user: '{{ pivpn_user }}'
 
 # Configure
 

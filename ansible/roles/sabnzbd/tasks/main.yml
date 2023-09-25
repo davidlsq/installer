@@ -80,13 +80,6 @@
   loop: '{{ sabnzbd_config }}'
   register: create_config
 
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ sabnzbd_var }}'
-    fix_permissions_user: '{{ sabnzbd_user }}'
-
 # Create service
 
 - name: Create service
