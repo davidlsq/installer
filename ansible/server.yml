@@ -103,6 +103,22 @@
       dns_version: 1
       dns_list: [127.0.0.1]
 
+- name: Wireguard Server
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: wg_server
+  roles:
+    - role: wg_server
+      wg_name: wg0
+      wg_port: 51820
+      wg_key: server/wg/server
+      wg_ipv4: 192.168.1
+      wg_interface: '{{ network_interface }}'
+      wg_peers:
+        - server/wg/peer-1.pub
+        - server/wg/peer-2.pub
+
 - name: Time Machine
   hosts: server
   gather_facts: false

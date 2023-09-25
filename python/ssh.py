@@ -3,7 +3,7 @@ from subprocess import check_output
 
 
 def ssh_keygen(key):
-    output = check_output(
+    check_output(
         ["ssh-keygen", "-C", "", "-N", "", "-t", "ed25519", "-f", key],
     )
 
