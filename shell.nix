@@ -15,6 +15,7 @@ let
     pkgs.ansible
     pkgs.ansible-lint
     pkgs.openssh
+    pkgs.wireguard-tools
     pkgs.gh
   ];
   nix-pre-commit-hooks = import (builtins.fetchTarball
