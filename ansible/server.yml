@@ -42,12 +42,14 @@
       user_shell: /bin/zsh
     - role: user
       tags: user
+      user_id: 1000
       user_password: '{{ password.user }}'
       user_key_pub: server/ssh/user.pub
       user_shell: /bin/zsh
       user_sudo: true
     - role: user
       tags: user
+      user_id: 1001
       user_name: ansible
       user_password: '{{ password.ansible }}'
       user_key_pub: server/ssh/ansible.pub
@@ -91,6 +93,7 @@
       lv_size: 1G
       lv_opts: --type linear
     - role: pihole
+      pihole_user_id: 1010
       pihole_interface: '{{ network_interface }}'
       pihole_password: '{{ password.pihole }}'
       pihole_var: /mnt/data/pihole
@@ -114,6 +117,7 @@
       lv_opts: --type linear
     - role: pivpn
       pivpn_user: pivpn
+      pivpn_user_id: 1011
       pivpn_var: /mnt/data/pivpn
       pivpn_interface: '{{ network_interface }}'
       pivpn_public_domain: '{{ public_domain }}'
@@ -155,6 +159,7 @@
       lv_opts: --type linear
     - role: user_service
       tags: data
+      user_service_id: 1012
       user_service_name: media
     - role: library
       tags: data

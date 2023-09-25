@@ -72,13 +72,6 @@
     mode: ug=rw,o=r
   register: create_config
 
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ joal_var }}'
-    fix_permissions_user: '{{ joal_user }}'
-
 # Create service
 
 - name: Create service

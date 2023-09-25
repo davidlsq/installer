@@ -14,7 +14,20 @@
 
 # Create user
 
-- name: Create user
+- name: Create user with id
+  when: user_id is defined
+  block:
+    - name: Create group with id
+      ansible.builtin.group:
+        name: '{{ user_name }}'
+        gid: '{{ user_id }}'
+    - name: Create user with id
+      ansible.builtin.user:
+        name: '{{ user_name }}'
+        uid: '{{ user_id }}'
+        group: '{{ user_name }}'
+
+- name: Create user without id
   ansible.builtin.user:
     name: '{{ user_name }}'
   when: user_id is not defined

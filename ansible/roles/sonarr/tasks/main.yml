@@ -76,13 +76,6 @@
   loop: '{{ sonarr_config }}'
   register: create_config
 
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ sonarr_var }}'
-    fix_permissions_user: '{{ sonarr_user }}'
-
 # Create service
 
 - name: Create service

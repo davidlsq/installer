@@ -117,15 +117,6 @@
   register: create_config
   no_log: true
 
-## Fix permissions
-
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ jackett_var }}'
-    fix_permissions_user: '{{ jackett_user }}'
-
 # Create service
 
 - name: Create service

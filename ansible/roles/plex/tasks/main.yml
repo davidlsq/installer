@@ -30,13 +30,6 @@
     group: '{{ plex_user }}'
     mode: ug=rwx,o=rx
 
-- name: Fix permissions
-  ansible.builtin.include_role:
-    name: fix_permissions
-  vars:
-    fix_permissions_dir: '{{ plex_var }}'
-    fix_permissions_user: '{{ plex_user }}'
-
 # Create service override
 
 - name: Create service directory
