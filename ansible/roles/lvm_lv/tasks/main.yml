@@ -17,7 +17,7 @@
 
 - name: Reserved
   ansible.builtin.command: >
-    tune2fs -m 0 /dev/{{ vg_name }}/{{ lv_name }}
+    /usr/sbin/tune2fs -m 0 /dev/{{ vg_name }}/{{ lv_name }}
   changed_when: true
   check_mode: false
   when: create.changed
