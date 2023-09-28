@@ -22,8 +22,8 @@ jobs:
         with:
           filters: |
             server:
-              - roles
-              - server
+              - 'roles/**'
+              - 'server/**'
               - ansible.cfg
   server-playbook:
     name: server-playbook

@@ -29,14 +29,14 @@ jobs:
           filters: |
             make:
               - build.sh
-              - roles/config
+              - 'roles/config/**'
               - virtual/config.yml
               - makefile
             dependabot:
               - .github/dependabot.yml
             server:
-              - roles
-              - server
+              - 'roles/**'
+              - 'server/**'
               - ansible.cfg
   pre-commit:
     name: pre-commit
