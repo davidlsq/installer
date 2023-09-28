@@ -33,7 +33,6 @@ let
         entry = "ansible-lint -v --force-color";
         language = "python";
         pass_filenames = false;
-        files = "^ansible";
         always_run = false;
       };
     };
