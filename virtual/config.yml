@@ -1,0 +1,27 @@
+- name: Config
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - role: config
+      config_hash:
+        - var: user_root_password
+          method: crypt
+        - var: user_regular_password
+          method: crypt
+        - var: user_ansible_password
+          method: crypt
+      config_ssh:
+        users:
+          - '{{ user_regular_name }}'
+          - '{{ user_ansible_name }}'
+        domains:
+          - '{{ network_domain_local }}'
+      config_inventory:
+        user: '{{ user_ansible_name }}'
+        domains:
+          - '{{ network_domain_local }}'
+      config_image:
+        root_password: '{{ hash_user_root_password }}'
+        disk_system: '{{ disk_system }}'
+        network_interface: '{{ network_interface }}'
+        network_hostname: '{{ network_hostname }}'

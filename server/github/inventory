@@ -1,0 +1,1 @@
+host ansible_connection=ssh ansible_ssh_host="server.davidlsq.fr" ansible_ssh_extra_args="-i server/github/ansible -o GlobalKnownHostsFile=server/github/known_host" ansible_user=ansible

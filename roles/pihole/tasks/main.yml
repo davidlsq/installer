@@ -1,0 +1,82 @@
+# Install package
+
+- name: Package
+  ansible.builtin.apt:
+    name: git
+    state: present
+
+# Download
+
+- name: Git clone
+  ansible.builtin.git:
+    repo: '{{ pihole_git_url }}'
+    dest: '{{ pihole_git }}'
+    version: '{{ pihole_version }}'
+  register: git_clone
+
+# Create var
+
+- name: Create user
+  ansible.builtin.include_role:
+    name: user_service
+  vars:
+    user_service_name: pihole
+    user_service_id: '{{ pihole_user_id }}'
+
+- name: Create var
+  when: 'pihole_var != "/etc/pihole"'
+  block:
+    - name: Create var directory
+      ansible.builtin.file:
+        path: '{{ pihole_var }}'
+        state: directory
+        owner: pihole
+        group: pihole
+        mode: ug=rwx,o=rx
+    - name: Create var link
+      ansible.builtin.file:
+        src: '{{ pihole_var }}'
+        dest: /etc/pihole
+        state: link
+        force: true
+
+# Configure
+
+- name: Create config
+  ansible.builtin.template:
+    src: setupVars.conf.j2
+    dest: '{{ pihole_var }}/setupVars.conf'
+    owner: pihole
+    group: pihole
+    mode: u=rw,go=r
+  no_log: true
+  register: create_config
+
+# Install
+
+- name: Install
+  ansible.builtin.command: bash basic-install.sh --unattended
+  args:
+    chdir: '{{ pihole_git }}/automated install'
+    creates: /usr/local/bin/pihole
+  no_log: true
+
+- name: Update
+  ansible.builtin.command: /usr/local/bin/pihole -up
+  when: git_clone is changed or create_config is changed
+  changed_when: true
+
+# Change port
+
+- name: Change lighttpd port
+  ansible.builtin.replace:
+    path: /etc/lighttpd/lighttpd.conf
+    regexp: '^(\s*)server.port(\s*)=(\s*)[0-9]{1,}(\s*)$'
+    replace: '\1server.port\2=\g<3>{{ pihole_port }}\4'
+  register: change_lighttpd_port
+
+- name: Restart lighttpd
+  ansible.builtin.systemd:
+    name: lighttpd
+    state: restarted
+  when: change_lighttpd_port is changed

@@ -1,103 +1,70 @@
-SCRIPT_IMAGE = python/image.py
+common:
+	mkdir -p $@
 
-PYTHONPATH = PYTHONPATH=python:$$PYTHONPATH
+common/debian-arm64.iso: | common
+	wget -q https://cdimage.debian.org/images/release/12.1.0/arm64/iso-cd/debian-12.1.0-arm64-netinst.iso -O $@
 
-CONFIG                  = config
-CONFIG_VIRTUAL          = $(CONFIG)/virtual
-CONFIG_VIRTUAL_SCRIPT   = $(PYTHONPATH) $(CONFIG)/virtual.py
-CONFIG_VIRTUAL_PASSWORD = $(CONFIG_VIRTUAL)/password.yml
-CONFIG_SERVER           = $(CONFIG)/server
-CONFIG_SERVER_SCRIPT    = $(PYTHONPATH) $(CONFIG)/server.py
-CONFIG_SERVER_PASSWORD  = $(CONFIG_SERVER)/password.yml
+common/debian-amd64.iso: | common
+	wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
 
-BUILD                  = build
-BUILD_DEBIAN_AARCH64   = $(BUILD)/debian-x86_64.iso
-BUILD_DEBIAN_X86_64    = $(BUILD)/debian-aarch64.iso
-BUILD_VIRTUAL          = $(BUILD)/virtual
-BUILD_VIRTUAL_KEYS     = $(BUILD_VIRTUAL)/keys
-BUILD_VIRTUAL_SSH      = $(BUILD_VIRTUAL)/ssh
-BUILD_VIRTUAL_PASSWORD = $(BUILD_VIRTUAL)/password.yml
-BUILD_VIRTUAL_IMAGE    = $(BUILD)/virtual.iso
-BUILD_SERVER           = $(BUILD)/server
-BUILD_SERVER_KEYS      = $(BUILD_SERVER)/keys
-BUILD_SERVER_SSH       = $(BUILD_SERVER)/ssh
-BUILD_SERVER_WG        = $(BUILD_SERVER)/wg
-BUILD_SERVER_PASSWORD  = $(BUILD_SERVER)/password.yml
-BUILD_SERVER_IMAGE     = $(BUILD)/server.iso
+virtual/config:
+	mkdir -p $@
+	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
-$(BUILD):
-	@mkdir $@
+virtual/image.iso: common/debian-arm64.iso virtual/config
+	./image.sh --iso $< --image virtual --output $@
 
-$(BUILD_DEBIAN_AARCH64): | $(BUILD)
-	@wget -q https://cdimage.debian.org/images/release/12.1.0/arm64/iso-cd/debian-12.1.0-arm64-netinst.iso -O $@
+server/config:
+	mkdir -p $@
+	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
-$(BUILD_DEBIAN_X86_64): | $(BUILD)
-	@wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
+server/image.iso: common/debian-amd64.iso server/config
+	./image.sh --iso $< --image server --output $@
 
-$(BUILD_VIRTUAL): | $(BUILD)
-	@mkdir $@
-
-$(BUILD_VIRTUAL_KEYS): | $(BUILD_VIRTUAL)
-	@$(CONFIG_VIRTUAL_SCRIPT) keys $@
-
-$(BUILD_VIRTUAL_SSH): $(BUILD_VIRTUAL_KEYS)
-	@$(CONFIG_VIRTUAL_SCRIPT) ssh $@ $<
-
-$(BUILD_VIRTUAL_PASSWORD): | $(BUILD_VIRTUAL)
-	@$(CONFIG_VIRTUAL_SCRIPT) password $@ $(CONFIG_VIRTUAL_PASSWORD)
-
-$(BUILD_VIRTUAL_IMAGE): $(BUILD_DEBIAN_AARCH64) $(BUILD_VIRTUAL_KEYS) $(BUILD_VIRTUAL_SSH) $(BUILD_VIRTUAL_PASSWORD)
-	@$(CONFIG_VIRTUAL_SCRIPT) image $@ $<
-
-$(BUILD_SERVER): | $(BUILD)
-	@mkdir $@
-
-$(BUILD_SERVER_KEYS): | $(BUILD_SERVER)
-	@$(CONFIG_SERVER_SCRIPT) keys $@
-
-$(BUILD_SERVER_SSH): $(BUILD_SERVER_KEYS)
-	@$(CONFIG_SERVER_SCRIPT) ssh $@ $<
-
-$(BUILD_SERVER_WG): | $(BUILD_SERVER)
-	@$(CONFIG_SERVER_SCRIPT) wg $@
-
-$(BUILD_SERVER_PASSWORD): | $(BUILD_SERVER)
-	@$(CONFIG_SERVER_SCRIPT) password $@ $(CONFIG_SERVER_PASSWORD)
-
-$(BUILD_SERVER_IMAGE): $(BUILD_DEBIAN_X86_64) $(BUILD_SERVER_KEYS) $(BUILD_SERVER_SSH) $(BUILD_SERVER_WG) $(BUILD_SERVER_PASSWORD)
-	@$(CONFIG_SERVER_SCRIPT) image $@ $<
-
-SERVER_GITHUB = server-github
-$(SERVER_GITHUB): $(BUILD_SERVER_KEYS) $(BUILD_SERVER_WG) $(BUILD_SERVER_PASSWORD)
-	@tar -cz $</server* $</user.pub $</ansible* $(word 2,$^)/server $(word 2,$^)/peer-1.pub $(word 2,$^)/peer-2.pub $(word 3,$^) | base64 | \
-	 gh secret set SERVER_ARCHIVE -R davidlsq/installer
-
-UPDATE = update
-$(UPDATE):
-	@cd .github/actions/updatebot && docker build -t updatebot:make .
-	@docker run --rm -v $$(pwd):/installer -w /installer -it updatebot:make
-
-DOWNLOAD  = $(BUILD_DEBIAN_AARCH64) $(BUILD_DEBIAN_X86_64)
-CONFIGURE = $(BUILD_VIRTUAL_KEYS) $(BUILD_VIRTUAL_SSH) $(BUILD_VIRTUAL_PASSWORD) $(BUILD_SERVER_KEYS) $(BUILD_SERVER_SSH) $(BUILD_SERVER_WG) $(BUILD_SERVER_PASSWORD)
-IMAGE     = $(BUILD_VIRTUAL_IMAGE) $(BUILD_SERVER_IMAGE)
+DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso
+CONFIG   = virtual/config server/config
+IMAGE    = virtual/image.iso server/image.iso
 
 .DEFAULT_GOAL := image
-.NOT_PARALLEL := configure
-.PHONY: clean download configure image all test $(SERVER_GITHUB)
+.NOT_PARALLEL := config
+
+.PHONY: clean download config image all test
 
 tmpclean:
-	@rm -rf $(addsuffix .tmp,$(IMAGE))
+	rm -rf $(addsuffix .tmp,$(IMAGE))
 
 clean:
-	@rm -rf $(BUILD)
+	rm -rf common $(CONFIG) $(IMAGE)
 
 download: $(DOWNLOAD)
 
-configure: $(CONFIGURE)
+config: $(CONFIG)
 
 image: $(IMAGE)
 
 all: image
 
 test:
-	@pre-commit run -a
+
+.PHONY: playbook-check playbook
+
+playbook-check: server/config
+	ansible-playbook -i server/config/inventory/server.local -C server/install.yml
+
+playbook: server/config
+	ansible-playbook -i server/config/inventory/server.local server/install.yml
+
+.PHONY: github-push github-pull github-playbook-check github-playbook
+
+github-push: server/config
+	(find server/files server/group_vars -type l; find server/github; echo server/group_vars/all/secrets.yml) | \
+	  tar -T - -hcz | base64 -w 0 | gh secret set SERVER_ARCHIVE -R davidlsq/installer
+
+github-pull:
+	@echo "${SERVER_ARCHIVE}" | base64 -d | tar zxf -
+
+github-playbook-check: github-pull
+	ansible-playbook -i server/github/inventory -C server/install.yml
+
+github-playbook: github-pull
+	ansible-playbook -i server/github/inventory server/install.yml

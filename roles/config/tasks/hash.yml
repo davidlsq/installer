@@ -1,0 +1,34 @@
+- name: Create hash dir
+  ansible.builtin.file:
+    path: '{{ config_dir }}/hash'
+    state: directory
+
+- name: Create crypt hash
+  when: item.method == "crypt"
+  block:
+    - name: Include hash
+      ansible.builtin.include_vars: '{{ config_dir }}/hash/hash_{{ item.var }}.yml'
+      failed_when: false
+    - name: Create hash file
+      ansible.builtin.copy:
+        content: |
+          salt_{{ item.var }}: {{ salt }}
+          hash_{{ item.var }}: {{ lookup("vars", item.var) | password_hash(salt=salt) }}
+        dest: '{{ config_dir }}/hash/hash_{{ item.var }}.yml'
+      vars:
+        salt: '{{ lookup("vars", "salt_" + item.var, default=lookup("community.general.random_string", length=16, special=false)) }}'
+      no_log: true
+
+- name: Create sha256 hash
+  when: item.method == "sha256"
+  block:
+    - name: Create hash file
+      ansible.builtin.copy:
+        content: >
+          hash_{{ item.var }}: {{ lookup("vars", item.var) | hash("sha256") | hash("sha256") }}
+        dest: '{{ config_dir }}/hash/hash_{{ item.var }}.yml'
+      no_log: true
+
+- name: Include hash
+  ansible.builtin.include_vars: '{{ config_dir }}/hash/hash_{{ item.var }}.yml'
+  no_log: true
