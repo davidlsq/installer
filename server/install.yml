@@ -1,0 +1,228 @@
+- name: Base
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: base
+  roles:
+    - role: systemctl
+      tags: systemctl
+    - role: cdrom
+      tags: cdrom
+    - role: keyboard
+      tags: keyboard
+    - role: network
+      tags: network
+    - role: dns
+      tags: dns
+      dns_version: 0
+      dns_list: ['{{ dns_1 }}', '{{ dns_2 }}']
+    - role: apt
+      tags: apt
+    - role: grub
+      tags: grub
+    - role: ssh_server
+      tags: ssh_server
+      ssh_server_key: host
+      ssh_server_key_pub: host.pub
+    - role: user
+      tags: user
+      user_name: root
+      user_password: '{{ hash_user_root_password }}'
+      user_shell: /bin/zsh
+    - role: user
+      tags: user
+      user_id: '{{ user_regular_id }}'
+      user_name: '{{ user_regular_name }}'
+      user_password: '{{ hash_user_regular_password }}'
+      user_key_pub: '{{ user_regular_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: true
+    - role: user
+      tags: user
+      user_id: '{{ user_ansible_id }}'
+      user_name: '{{ user_ansible_name }}'
+      user_password: '{{ hash_user_ansible_password }}'
+      user_key_pub: '{{ user_ansible_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: yes-no-password
+    - role: ohmyzsh
+      ohmyzsh_user_name: root
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ user_regular_name }}'
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ user_ansible_name }}'
+    - role: docker
+      tags: docker
+
+- name: Data Disks
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: data
+  roles:
+    - role: mdadm
+      mdadm_name: md0
+      mdadm_level: 5
+      mdadm_disks: ['{{ disk_1 }}', '{{ disk_2 }}', '{{ disk_3 }}']
+    - role: lvm_vg
+      vg_name: data
+      vg_disks:
+        - /dev/md0
+
+- name: Pi Hole
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: pihole
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: pihole
+      lv_size: 1G
+      lv_opts: --type linear
+    - role: pihole
+      pihole_user_id: 1010
+      pihole_password: '{{ hash_pihole_password }}'
+      pihole_interface: '{{ network_interface }}'
+      pihole_var: /mnt/data/pihole
+      pihole_dns_1: '{{ dns_1 }}'
+      pihole_dns_2: '{{ dns_2 }}'
+    - role: dns
+      dns_version: 1
+      dns_list: [127.0.0.1]
+
+- name: Time Machine
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: timemachine
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: timemachine
+      lv_size: 500G
+      lv_opts: --type linear
+    - role: samba
+      samba_var: /mnt/data/timemachine
+      samba_user: '{{ user_regular_name }}'
+      samba_section: TimeMachine
+      samba_section_conf: timemachine.conf.j2
+
+- name: Media Softwares
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: media
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: media
+      lv_size: 15T
+      lv_opts: --type linear
+    - role: user_service
+      tags: data
+      user_service_id: 1012
+      user_service_name: media
+    - role: library
+      tags: data
+      library_user: media
+      library_var: /mnt/data/media/library
+    - role: plex
+      tags: plex
+      plex_user: media
+      plex_var: /mnt/data/media/plex
+    - role: qbittorrent
+      tags: qbittorrent
+      qbittorrent_name: '{{ qbittorrent_1_name }}'
+      qbittorrent_port: '{{ qbittorrent_1_port }}'
+      qbittorrent_var: '/mnt/data/media/{{ qbittorrent_1_name }}'
+      qbittorrent_user: media
+      qbittorrent_peer_port: 50000
+      qbittorrent_interface: '{{ network_interface }}'
+      qbittorrent_address: '{{ network_ip_address }}'
+    - role: joal
+      tags: joal
+      joal_user: media
+      joal_var: /mnt/data/media/joal
+    - role: sabnzbd
+      tags: sabnzbd
+      sabnzbd_name: '{{ sabnzbd_1_name }}'
+      sabnzbd_port: '{{ sabnzbd_1_port }}'
+      sabnzbd_var: '/mnt/data/media/{{ sabnzbd_1_name }}'
+      sabnzbd_user: media
+      sabnzbd_address: '{{ network_ip_address }}'
+      sabnzbd_host_whitelist:
+        - '{{ network_domain_local }}'
+        - '{{ network_ip_address }}'
+    - role: servarr
+      tags: [servarr, prowlarr]
+      servarr_software: prowlarr
+      servarr_name: '{{ prowlarr_1_name }}'
+      servarr_port: '{{ prowlarr_1_port }}'
+      servarr_var: '/mnt/data/media/{{ prowlarr_1_name }}'
+      servarr_user: media
+      servarr_address: '{{ network_ip_address }}'
+    - role: jackett
+      tags: jackett
+      jackett_name: '{{ jackett_1_name }}'
+      jackett_port: '{{ jackett_1_port }}'
+      jackett_var: '/mnt/data/media/{{ jackett_1_name }}'
+      jackett_user: media
+      jackett_external: true
+      jackett_address: '{{ network_ip_address }}'
+    - role: servarr
+      tags: [servarr, radarr]
+      servarr_software: radarr
+      servarr_name: '{{ radarr_1_name }}'
+      servarr_port: '{{ radarr_1_port }}'
+      servarr_var: '/mnt/data/media/{{ radarr_1_name }}'
+      servarr_user: media
+      servarr_address: '{{ network_ip_address }}'
+    - role: servarr
+      tags: [servarr, radarr]
+      servarr_software: radarr
+      servarr_name: '{{ radarr_2_name }}'
+      servarr_port: '{{ radarr_2_port }}'
+      servarr_var: '/mnt/data/media/{{ radarr_2_name }}'
+      servarr_user: media
+      servarr_address: '{{ network_ip_address }}'
+    - role: sonarr
+      tags: sonarr
+      sonarr_name: '{{ sonarr_1_name }}'
+      sonarr_port: '{{ sonarr_1_port }}'
+      sonarr_var: '/mnt/data/media/{{ sonarr_1_name }}'
+      sonarr_user: media
+      sonarr_address: '{{ network_ip_address }}'
+    - role: sonarr
+      tags: sonarr
+      sonarr_name: '{{ sonarr_2_name }}'
+      sonarr_port: '{{ sonarr_2_port }}'
+      sonarr_var: '/mnt/data/media/{{ sonarr_2_name }}'
+      sonarr_user: media
+      sonarr_address: '{{ network_ip_address }}'
+
+- name: Public Network
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: nginx
+  roles:
+    - role: lvm_lv
+      tags: [data, certbot]
+      vg_name: data
+      lv_name: certbot
+      lv_size: 64M
+      lv_opts: --type linear
+    - role: certbot
+      tags: certbot
+      certbot_var: /mnt/data/certbot
+      certbot_domain: '{{ network_domain_public }}'
+      certbot_ovh_application_key: '{{ ovh_application_key }}'
+      certbot_ovh_application_secret: '{{ ovh_application_secret }}'
+      certbot_ovh_consumer_key: '{{ ovh_consumer_key }}'
+    - role: ddclient
+      tags: ddclient
+      ddclient_domains: ['{{ network_domain_public }}']

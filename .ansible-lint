@@ -7,4 +7,9 @@ skip_list:
   - yaml[document-start]
 
 exclude_paths:
-  - build/*/password.yml
+  - roles/config
+  - virtual/config
+  - virtual/group_vars/all/hash
+  - server/config
+  - server/group_vars/all/password
+  - server/group_vars/all/hash

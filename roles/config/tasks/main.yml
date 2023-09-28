@@ -1,0 +1,21 @@
+- name: Password
+  when: config_password is defined
+  with_items: '{{ config_password }}'
+  ansible.builtin.include_tasks: password.yml
+
+- name: Hash
+  when: config_hash is defined
+  with_items: '{{ config_hash }}'
+  ansible.builtin.include_tasks: hash.yml
+
+- name: SSH
+  when: config_ssh is defined
+  ansible.builtin.include_tasks: ssh.yml
+
+- name: Inventory
+  when: config_inventory is defined and config_ssh is defined
+  ansible.builtin.include_tasks: inventory.yml
+
+- name: Image
+  when: config_image is defined
+  ansible.builtin.include_tasks: image.yml

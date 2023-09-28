@@ -18,7 +18,7 @@ jobs:
     outputs:
       make: ${{ steps.changes.outputs.make }}
       dependabot: ${{ steps.changes.outputs.dependabot }}
-      ansible: ${{ steps.changes.outputs.ansible }}
+      server: ${{ steps.changes.outputs.server }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -28,13 +28,15 @@ jobs:
         with:
           filters: |
             make:
-              - 'config/**'
-              - 'python/**'
+              - build.sh
+              - roles/config
+              - virtual/config.yml
               - makefile
             dependabot:
               - .github/dependabot.yml
-            ansible:
-              - 'ansible/**'
+            server:
+              - roles
+              - server
               - ansible.cfg
   pre-commit:
     name: pre-commit
@@ -57,9 +59,9 @@ jobs:
       - name: make
         uses: ./.github/actions/nix-shell
         with:
-          command: make build/virtual.iso
+          command: make virtual/image.iso
       - name: check
-        run: ls -lh build; [ -f build/virtual.iso ]
+        run: ls -lh virtual; [ -f virtual/image.iso ]
   dependabot:
     name: dependabot
     runs-on: ubuntu-latest
@@ -75,12 +77,13 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: server
     needs: changes
-    if: needs.changes.outputs.ansible == 'true'
+    if: needs.changes.outputs.server == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: server-playbook-check
-        uses: ./.github/actions/ansible
+        uses: ./.github/actions/nix-shell
         with:
-          command: ansible-playbook -i ansible/inventory/server.davidlsq.fr -D -C ansible/server.yml
-          server-archive: ${{ secrets.SERVER_ARCHIVE }}
+          command: make github-playbook-check
+        env:
+          SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}

@@ -32,47 +32,47 @@ github_release () {
 
 ohmyzsh () {
   version=$(github_commit ohmyzsh/ohmyzsh)
-  ansible_replace ohmyzsh_version $version ansible/roles/ohmyzsh/defaults/main.yml
+  ansible_replace ohmyzsh_version $version roles/ohmyzsh/defaults/main.yml
 }
 
 plex () {
   version=$(apt_release plexmediaserver)
-  ansible_replace plex_version $version ansible/roles/plex/defaults/main.yml
+  ansible_replace plex_version $version roles/plex/defaults/main.yml
 }
 
 qbittorrent () {
   version=$(apt_release qbittorrent-nox)
-  ansible_replace qbittorrent_version $version ansible/roles/qbittorrent/defaults/main.yml
+  ansible_replace qbittorrent_version $version roles/qbittorrent/defaults/main.yml
 }
 
 joal () {
   version=$(github_release anthonyraymond/joal)
-  ansible_replace joal_version $version ansible/roles/joal/defaults/main.yml
+  ansible_replace joal_version $version roles/joal/defaults/main.yml
 }
 
 sabnzbd () {
   version=$(github_release sabnzbd/sabnzbd | cut -d ' ' -f 2)
-  ansible_replace sabnzbd_version $version ansible/roles/sabnzbd/defaults/main.yml
+  ansible_replace sabnzbd_version $version roles/sabnzbd/defaults/main.yml
 }
 
 jackett () {
   version=$(github_release Jackett/Jackett | cut -c 2-)
-  ansible_replace jackett_version $version ansible/roles/jackett/defaults/main.yml
+  ansible_replace jackett_version $version roles/jackett/defaults/main.yml
 }
 
 prowlarr () {
   version=$(github_release Prowlarr/Prowlarr)
-  ansible_replace servarr_version $version ansible/roles/servarr/vars/prowlarr.yml
+  ansible_replace servarr_version $version roles/servarr/vars/prowlarr.yml
 }
 
 radarr () {
   version=$(github_release Radarr/Radarr)
-  ansible_replace servarr_version $version ansible/roles/servarr/vars/radarr.yml
+  ansible_replace servarr_version $version roles/servarr/vars/radarr.yml
 }
 
 sonarr () {
   version=$(curl -s https://services.sonarr.tv/v1/download/main | jq -r '.version')
-  ansible_replace servarr_version $version ansible/roles/sonarr/defaults/main.yml
+  ansible_replace servarr_version $version roles/sonarr/defaults/main.yml
 }
 
 tarball_nix nixos-23.05
