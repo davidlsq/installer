@@ -5,17 +5,17 @@ let
     sha256 = "1fkbsn8k6xy3p9v74abii8s2prs9gp5hwp7c0zfjhmsgs8wkdv72";
   };
   pkgs = import nixpkgs { };
-  python-packages = p: [ p.passlib p.pyyaml p.jinja2 ];
+  python-packages = p: [ p.ansible-core p.passlib ];
   python = pkgs.python311.withPackages python-packages;
   packages = [
     python
     pkgs.libarchive
     pkgs.xorriso
     pkgs.gnumake
-    pkgs.ansible
     pkgs.ansible-lint
     pkgs.openssh
     pkgs.wireguard-tools
+    pkgs.bitwarden-cli
     pkgs.gh
   ];
   nix-pre-commit-hooks = import (builtins.fetchTarball
@@ -25,10 +25,8 @@ let
     hooks = {
       checkmake.enable = true;
       nixfmt.enable = true;
-      black.enable = true;
-      isort.enable = true;
       yamllint.enable = true;
-      yamllint.files = "^(?!ansible).*\\.(yml|yaml)$";
+      yamllint.files = "^(?!roles).*\\.(yml|yaml)$";
       ansiblelint = {
         enable = true;
         name = "ansiblelint";

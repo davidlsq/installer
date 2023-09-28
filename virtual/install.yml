@@ -1,0 +1,49 @@
+- name: Base
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: base
+  roles:
+    - role: systemctl
+      tags: systemctl
+    - role: cdrom
+      tags: cdrom
+    - role: keyboard
+      tags: keyboard
+    - role: network
+      tags: network
+    - role: apt
+      tags: apt
+    - role: grub
+      tags: grub
+    - role: ssh_server
+      tags: ssh_server
+      ssh_server_key: host
+      ssh_server_key_pub: host.pub
+    - role: user
+      tags: user
+      user_name: root
+      user_password: '{{ hash_user_root_password }}'
+      user_shell: /bin/zsh
+    - role: user
+      tags: user
+      user_id: '{{ user_regular_id }}'
+      user_name: '{{ user_regular_name }}'
+      user_password: '{{ hash_user_regular_password }}'
+      user_key_pub: '{{ user_regular_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: true
+    - role: user
+      tags: user
+      user_id: '{{ user_ansible_id }}'
+      user_name: '{{ user_ansible_name }}'
+      user_password: '{{ hash_user_ansible_password }}'
+      user_key_pub: '{{ user_ansible_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: yes-no-password
+    - role: ohmyzsh
+      ohmyzsh_user_name: root
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ user_regular_name }}'
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ user_ansible_name }}'

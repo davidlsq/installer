@@ -12,7 +12,7 @@ jobs:
     name: changes
     runs-on: ubuntu-latest
     outputs:
-      ansible: ${{ steps.changes.outputs.ansible }}
+      server: ${{ steps.changes.outputs.server }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -21,20 +21,22 @@ jobs:
         id: changes
         with:
           filters: |
-            ansible:
-              - 'ansible/**'
+            server:
+              - roles
+              - server
               - ansible.cfg
   server-playbook:
     name: server-playbook
     runs-on: ubuntu-latest
     concurrency: server
     needs: changes
-    if: needs.changes.outputs.ansible == 'true'
+    if: needs.changes.outputs.server == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: server-playbook
-        uses: ./.github/actions/ansible
+      - name: server-playbook-check
+        uses: ./.github/actions/nix-shell
         with:
-          command: ansible-playbook -i ansible/inventory/server.davidlsq.fr -D ansible/server.yml
-          server-archive: ${{ secrets.SERVER_ARCHIVE }}
+          command: make github-playbook
+        env:
+          SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}

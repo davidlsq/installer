@@ -1,3 +1,0 @@
-user_name: david
-network_interface: enp0s1
-network_host_name: '{{ inventory_hostname }}'

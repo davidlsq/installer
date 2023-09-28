@@ -31,52 +31,52 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: ohmyzsh
-          path: ansible/roles/ohmyzsh/defaults/main.yml
+          path: roles/ohmyzsh/defaults/main.yml
       - name: create-pull-request-plex
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: plex
-          path: ansible/roles/plex/defaults/main.yml
+          path: roles/plex/defaults/main.yml
       - name: create-pull-request-qbittorrent
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: qbittorrent
-          path: ansible/roles/qbittorrent/defaults/main.yml
+          path: roles/qbittorrent/defaults/main.yml
       - name: create-pull-request-joal
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: joal
-          path: ansible/roles/joal/defaults/main.yml
+          path: roles/joal/defaults/main.yml
       - name: create-pull-request-sabnzbd
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: sabnzbd
-          path: ansible/roles/sabnzbd/defaults/main.yml
+          path: roles/sabnzbd/defaults/main.yml
       - name: create-pull-request-jackett
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: jackett
-          path: ansible/roles/jackett/defaults/main.yml
+          path: roles/jackett/defaults/main.yml
       - name: create-pull-request-prowlarr
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: prowlarr
-          path: ansible/roles/servarr/vars/prowlarr.yml
+          path: roles/servarr/vars/prowlarr.yml
       - name: create-pull-request-radarr
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: radarr
-          path: ansible/roles/servarr/vars/radarr.yml
+          path: roles/servarr/vars/radarr.yml
       - name: create-pull-request-sonarr
         uses: ./.github/actions/create-pull-request
         with:
           token: ${{ secrets.GH_TOKEN }}
           name: sonarr
-          path: ansible/roles/sonarr/defaults/main.yml
+          path: roles/sonarr/defaults/main.yml
