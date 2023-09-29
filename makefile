@@ -46,7 +46,7 @@ all: image
 
 test:
 
-.PHONY: bitwarden
+.PHONY: bitwarden-push
 
 bitwarden-push: server/config
 	./scripts/bitwarden.sh --password $</password --folder Server
