@@ -12,14 +12,14 @@ virtual/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
 virtual/image.iso: common/debian-arm64.iso virtual/config
-	./image.sh --iso $< --image virtual --output $@
+	./scripts/image.sh --iso $< --image virtual --output $@
 
 server/config:
 	mkdir -p $@
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
 server/image.iso: common/debian-amd64.iso server/config
-	./image.sh --iso $< --image server --output $@
+	./scripts/image.sh --iso $< --image server --output $@
 
 DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso
 CONFIG   = virtual/config server/config
@@ -45,6 +45,11 @@ image: $(IMAGE)
 all: image
 
 test:
+
+.PHONY: bitwarden
+
+bitwarden-push: server/config
+	./scripts/bitwarden.sh --password $</password --folder Server
 
 .PHONY: playbook-check playbook
 

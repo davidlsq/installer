@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -o pipefail
 
 extract-iso-efi () {
   if [[ "$OSTYPE" == "linux"* ]]; then
@@ -52,6 +52,9 @@ while [[ $# -gt 0 ]]; do
     --output)
       OUTPUT="$2"
       shift 2
+      ;;
+    *)
+      exit 1
       ;;
   esac
 done
