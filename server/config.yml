@@ -30,6 +30,12 @@
         domains:
           - '{{ network_domain_local }}'
           - '{{ network_domain_public }}'
+      config_wireguard:
+        peers: '{{ wireguard_server_peers | map(attribute="name") }}'
+        ip_adress: '{{ wireguard_server_ip_adress }}'
+        domain: '{{ network_domain_public }}'
+        port: '{{ wireguard_server_port }}'
+        dns: '{{ network_ip_address }}'
       config_image:
         root_password: '{{ hash_user_root_password }}'
         disk_system: '{{ disk_system }}'

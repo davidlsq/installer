@@ -22,8 +22,8 @@
       tags: grub
     - role: ssh_server
       tags: ssh_server
-      ssh_server_key: host
-      ssh_server_key_pub: host.pub
+      ssh_server_key: ssh/host
+      ssh_server_key_pub: ssh/host.pub
     - role: user
       tags: user
       user_name: root
@@ -34,7 +34,7 @@
       user_id: '{{ user_regular_id }}'
       user_name: '{{ user_regular_name }}'
       user_password: '{{ hash_user_regular_password }}'
-      user_key_pub: '{{ user_regular_name }}.pub'
+      user_key_pub: 'ssh/{{ user_regular_name }}.pub'
       user_shell: /bin/zsh
       user_sudo: true
     - role: user
@@ -42,7 +42,7 @@
       user_id: '{{ user_ansible_id }}'
       user_name: '{{ user_ansible_name }}'
       user_password: '{{ hash_user_ansible_password }}'
-      user_key_pub: '{{ user_ansible_name }}.pub'
+      user_key_pub: 'ssh/{{ user_ansible_name }}.pub'
       user_shell: /bin/zsh
       user_sudo: yes-no-password
     - role: ohmyzsh
@@ -91,6 +91,14 @@
     - role: dns
       dns_version: 1
       dns_list: [127.0.0.1]
+
+- name: Wireguard
+  hosts: host
+  gather_facts: false
+  become: true
+  tags: wireguard_server
+  roles:
+    - role: wireguard_server
 
 - name: Time Machine
   hosts: host

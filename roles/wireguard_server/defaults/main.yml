@@ -1,0 +1,4 @@
+wireguard_server_name: wg0
+wireguard_server_ip_adress: 192.168.1
+wireguard_server_port: 51820
+wireguard_server_peers: []

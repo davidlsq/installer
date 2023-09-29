@@ -12,6 +12,10 @@
   when: config_ssh is defined
   ansible.builtin.include_tasks: ssh.yml
 
+- name: Wireguard
+  when: config_wireguard is defined
+  ansible.builtin.include_tasks: wireguard.yml
+
 - name: Inventory
   when: config_inventory is defined and config_ssh is defined
   ansible.builtin.include_tasks: inventory.yml

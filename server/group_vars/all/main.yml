@@ -13,6 +13,17 @@ network_gateway: 192.168.0.1
 network_domain_local: '{{ network_hostname }}.local'
 network_domain_public: '{{ network_hostname }}.davidlsq.fr'
 
+wireguard_server_name: wg0
+wireguard_server_interface: '{{ network_interface }}'
+wireguard_server_ip_adress: 192.168.1
+wireguard_server_port: 51820
+wireguard_server_key: wireguard/host
+wireguard_server_peers:
+  - name: iphone
+    key_pub: wireguard/iphone.pub
+  - name: macbook
+    key_pub: wireguard/macbook.pub
+
 dns_1: 9.9.9.9
 dns_2: 149.112.112.112
 
