@@ -1,0 +1,10 @@
+[Interface]
+Address = {{ config_wireguard.ip_adress }}.{{ index + 2 }}/24
+ListenPort = {{ config_wireguard.port }}
+PrivateKey = {{ lookup("file", config_dir + "/wireguard/keys/" + item) }}
+DNS = {{ config_wireguard.dns }}
+
+[Peer]
+PublicKey = {{ lookup("file", config_dir + "/wireguard/keys/host.pub") }}
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = {{ config_wireguard.domain }}:{{ config_wireguard.port }}

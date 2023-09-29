@@ -1,0 +1,22 @@
+- name: Create keys dir
+  ansible.builtin.file:
+    path: '{{ config_dir }}/wireguard/keys'
+    state: directory
+
+- name: Create keys
+  ansible.builtin.shell: |
+    wg genkey > {{ config_dir }}/wireguard/keys/{{ item }}
+    wg pubkey < {{ config_dir }}/wireguard/keys/{{ item }} > {{ config_dir }}/wireguard/keys/{{ item }}.pub
+  args:
+    creates: '{{ config_dir }}/wireguard/keys/{{ item }}*'
+  with_items: '{{ config_wireguard.peers + ["host"] }}'
+  no_log: true
+
+- name: Create client config
+  ansible.builtin.template:
+    src: wireguard/client.cfg.j2
+    dest: '{{ config_dir }}/wireguard/{{ item }}.cfg'
+  loop: '{{ config_wireguard.peers }}'
+  loop_control:
+    index_var: index
+  no_log: true
