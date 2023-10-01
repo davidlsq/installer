@@ -1,5 +1,5 @@
 jackett_name: jackett
-jackett_version: 0.21.938
+jackett_version: 0.21.946
 jackett_archive: 'https://github.com/Jackett/Jackett/releases/download/v{{ jackett_version }}/Jackett.Binaries.LinuxAMDx64.tar.gz'
 jackett_lib: '/usr/lib/jackett-{{ jackett_version }}'
 jackett_var: '/var/lib/{{ jackett_name }}'
