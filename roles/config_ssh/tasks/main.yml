@@ -1,0 +1,23 @@
+- name: Create keys dir
+  ansible.builtin.file:
+    path: '{{ config_dir }}/ssh/keys'
+    state: directory
+
+- name: Create keys
+  ansible.builtin.command: >
+    ssh-keygen -C "" -N "" -t ed25519 -f {{ config_dir }}/ssh/keys/{{ item }}
+  args:
+    creates: '{{ config_dir }}/ssh/keys/{{ item }}*'
+  with_items: '{{ config_ssh_users + ["host"] }}'
+  no_log: true
+
+- name: Create known_host
+  ansible.builtin.template:
+    src: known_host.j2
+    dest: '{{ config_dir }}/ssh/known_host'
+  no_log: true
+
+- name: Create config
+  ansible.builtin.template:
+    src: config.j2
+    dest: '{{ config_dir }}/ssh/config'

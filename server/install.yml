@@ -69,29 +69,6 @@
       vg_disks:
         - /dev/md0
 
-- name: Pi Hole
-  hosts: host
-  gather_facts: false
-  become: true
-  tags: pihole
-  roles:
-    - role: lvm_lv
-      tags: data
-      vg_name: data
-      lv_name: pihole
-      lv_size: 1G
-      lv_opts: --type linear
-    - role: pihole
-      pihole_user_id: 1010
-      pihole_password: '{{ hash_pihole_password }}'
-      pihole_interface: '{{ network_interface }}'
-      pihole_var: /mnt/data/pihole
-      pihole_dns_1: '{{ dns_1 }}'
-      pihole_dns_2: '{{ dns_2 }}'
-    - role: dns
-      dns_version: 1
-      dns_list: [127.0.0.1]
-
 - name: Wireguard
   hosts: host
   gather_facts: false

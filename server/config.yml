@@ -2,13 +2,13 @@
   hosts: localhost
   gather_facts: false
   roles:
-    - role: config
+    - role: config_password
       config_password:
         - var: user_root_password
         - var: user_regular_password
         - var: user_ansible_password
         - var: samba_password
-        - var: pihole_password
+    - role: config_hash
       config_hash:
         - var: user_root_password
           method: crypt
@@ -16,36 +16,29 @@
           method: crypt
         - var: user_ansible_password
           method: crypt
-        - var: pihole_password
-          method: sha256
-      config_ssh:
-        users:
-          - '{{ user_regular_name }}'
-          - '{{ user_ansible_name }}'
-        domains:
-          - '{{ network_domain_local }}'
-          - '{{ network_domain_public }}'
-      config_inventory:
-        user: '{{ user_ansible_name }}'
-        domains:
-          - '{{ network_domain_local }}'
-          - '{{ network_domain_public }}'
-      config_wireguard:
-        peers: '{{ wireguard_server_peers | map(attribute="name") }}'
-        ip_adress: '{{ wireguard_server_ip_adress }}'
-        domain: '{{ network_domain_public }}'
-        port: '{{ wireguard_server_port }}'
-        dns: '{{ network_ip_address }}'
-      config_image:
-        root_password: '{{ hash_user_root_password }}'
-        disk_system: '{{ disk_system }}'
-        network_interface: '{{ network_interface }}'
-        network_hostname: '{{ network_hostname }}'
-        network_manual:
-          address: '{{ network_ip_address }}'
-          netmask: '{{ network_netmask }}'
-          gateway: '{{ network_gateway }}'
-          dns: ['{{ dns_1 }}', '{{ dns_2 }}']
-        recipe_home: 16384
-        recipe_tmp: 16384
-        recipe_swap: 32768
+    - role: config_ssh
+      config_ssh_users:
+        - '{{ user_regular_name }}'
+        - '{{ user_ansible_name }}'
+      config_ssh_domains:
+        - '{{ network_domain_local }}'
+        - '{{ network_domain_public }}'
+    - role: config_inventory
+      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_domains:
+        - '{{ network_domain_local }}'
+        - '{{ network_domain_public }}'
+    - role: config_wireguard
+      config_wireguard_peers: '{{ wireguard_server_peers | map(attribute="name") }}'
+      config_wireguard_ip_adress: '{{ wireguard_server_ip_adress }}'
+      config_wireguard_domain: '{{ network_domain_public }}'
+      config_wireguard_port: '{{ wireguard_server_port }}'
+      config_wireguard_dns: 192.168.100.2
+    - role: config_debian
+      config_debian_root_password: '{{ hash_user_root_password }}'
+      config_debian_disk_system: '{{ disk_system }}'
+      config_debian_network_interface: '{{ network_interface }}'
+      config_debian_network_hostname: '{{ network_hostname }}'
+      config_debian_recipe_home: 16384
+      config_debian_recipe_tmp: 16384
+      config_debian_recipe_swap: 32768

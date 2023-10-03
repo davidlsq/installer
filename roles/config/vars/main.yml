@@ -1,3 +1,0 @@
-config_image_recipe_efi: 128
-config_image_recipe_boot: 256
-config_image_recipe_swap: 4096

@@ -1,0 +1,6 @@
+auto lo
+iface lo inet loopback
+
+auto {{ network_interface }}
+allow-hotplug {{ network_interface }}
+iface {{ network_interface }} inet dhcp

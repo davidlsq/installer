@@ -2,6 +2,12 @@
   hosts: localhost
   gather_facts: false
   roles:
+    - role: config_password
+      config_password:
+        - var: user_root_password
+        - var: user_regular_password
+        - var: user_ansible_password
+        - var: pihole_password
     - role: config_hash
       config_hash:
         - var: user_root_password
@@ -10,6 +16,8 @@
           method: crypt
         - var: user_ansible_password
           method: crypt
+        - var: pihole_password
+          method: sha256
     - role: config_ssh
       config_ssh_users:
         - '{{ user_regular_name }}'
@@ -20,8 +28,5 @@
       config_inventory_user: '{{ user_ansible_name }}'
       config_inventory_domains:
         - '{{ network_domain_local }}'
-    - role: config_debian
-      config_debian_root_password: '{{ hash_user_root_password }}'
-      config_debian_disk_system: '{{ disk_system }}'
-      config_debian_network_interface: '{{ network_interface }}'
-      config_debian_network_hostname: '{{ network_hostname }}'
+    - role: config_raspi
+      config_raspi_network_hostname: '{{ network_hostname }}'
