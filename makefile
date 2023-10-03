@@ -12,18 +12,25 @@ virtual/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
 virtual/image.iso: common/debian-arm64.iso virtual/config
-	./scripts/image.sh --iso $< --image virtual --output $@
+	./scripts/debian.sh --iso $< --image virtual --output $@
+
+raspi/config:
+	mkdir -p $@
+	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
+
+raspi/image.img: raspi/config
+	./scripts/raspi.sh --image raspi --output $@
 
 server/config:
 	mkdir -p $@
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
 server/image.iso: common/debian-amd64.iso server/config
-	./scripts/image.sh --iso $< --image server --output $@
+	./scripts/debian.sh --iso $< --image server --output $@
 
 DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso
-CONFIG   = virtual/config server/config
-IMAGE    = virtual/image.iso server/image.iso
+CONFIG   = virtual/config server/config raspi/config
+IMAGE    = virtual/image.iso server/image.iso raspi/image.img
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := config

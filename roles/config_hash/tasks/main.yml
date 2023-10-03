@@ -1,0 +1,3 @@
+- name: Hash
+  with_items: '{{ config_hash }}'
+  ansible.builtin.include_tasks: hash.yml

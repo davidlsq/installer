@@ -1,3 +1,0 @@
-{% for domain in config_ssh.domains %}
-{{ domain }} {{ lookup("file", config_dir + "/ssh/keys/host.pub") }}
-{% endfor %}

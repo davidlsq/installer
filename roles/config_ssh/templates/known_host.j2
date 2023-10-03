@@ -1,0 +1,3 @@
+{% for domain in config_ssh_domains %}
+{{ domain }} {{ lookup("file", config_dir + "/ssh/keys/host.pub") }}
+{% endfor %}

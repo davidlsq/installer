@@ -1,0 +1,15 @@
+---
+
+user_regular_id: 1000
+user_regular_name: david
+user_ansible_id: 1001
+user_ansible_name: ansible
+
+network_interface: eth0
+network_hostname: raspi
+network_domain_local: '{{ network_hostname }}.local'
+
+dns_1: 9.9.9.9
+dns_2: 149.112.112.112
+
+pihole_port: 80

@@ -1,0 +1,30 @@
+- name: Create dir
+  ansible.builtin.file:
+    path: '{{ config_dir }}/debian'
+    state: directory
+
+- name: Create preseed config
+  ansible.builtin.template:
+    src: preseed.cfg.j2
+    dest: '{{ config_dir }}/debian/preseed.cfg'
+  no_log: true
+
+- name: Create recipe
+  ansible.builtin.template:
+    src: recipe.j2
+    dest: '{{ config_dir }}/debian/recipe'
+
+- name: Create grub config
+  ansible.builtin.copy:
+    src: grub.cfg
+    dest: '{{ config_dir }}/debian/grub.cfg'
+
+- name: Create playbook script
+  ansible.builtin.copy:
+    src: playbook.sh
+    dest: '{{ config_dir }}/debian/playbook.sh'
+
+- name: Create install script
+  ansible.builtin.copy:
+    src: install.sh
+    dest: '{{ config_dir }}/debian/install.sh'

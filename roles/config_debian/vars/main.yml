@@ -1,0 +1,3 @@
+config_debian_recipe_efi: 128
+config_debian_recipe_boot: 256
+config_debian_recipe_swap: 4096

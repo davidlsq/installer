@@ -26,7 +26,7 @@ let
       checkmake.enable = true;
       nixfmt.enable = true;
       yamllint.enable = true;
-      yamllint.files = "^(?!roles).*\\.(yml|yaml)$";
+      yamllint.files = "^\\.github.*\\.(yml|yaml)$";
       ansiblelint = {
         enable = true;
         name = "ansiblelint";
