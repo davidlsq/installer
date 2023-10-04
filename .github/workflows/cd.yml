@@ -23,7 +23,7 @@ jobs:
           filters: |
             server:
               - 'roles/**'
-              - 'server/**'
+              - 'infra/**'
               - ansible.cfg
   playbook:
     name: playbook
