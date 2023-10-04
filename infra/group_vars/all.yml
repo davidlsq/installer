@@ -5,7 +5,7 @@ user_regular_name: david
 user_ansible_id: 1001
 user_ansible_name: ansible
 
-network_public_domain: server.davidlsq.fr
+network_public_domain: home.davidlsq.fr
 network_dns_1: 9.9.9.9
 network_dns_2: 149.112.112.112
 
