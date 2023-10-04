@@ -1,0 +1,8 @@
+- name: Create keys
+  with_items: '{{ config_wireguard_keys }}'
+  ansible.builtin.shell: |
+    wg genkey > {{ item }}
+    wg pubkey < {{ item }} > {{ item }}.pub
+  args:
+    creates: '{{ item }}*'
+  no_log: true

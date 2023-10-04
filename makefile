@@ -8,29 +8,23 @@ common/debian-amd64.iso: | common
 	wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
 
 virtual/config:
-	mkdir -p $@
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
-virtual/image.iso: common/debian-arm64.iso virtual/config
-	./scripts/debian.sh --iso $< --image virtual --output $@
+virtual/virtual.iso: common/debian-arm64.iso virtual/config
+	./scripts/debian.sh --iso $< --playbook virtual/virtual.yml --output $@
 
-raspi/config:
-	mkdir -p $@
+infra/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
 
-raspi/image.img: raspi/config
-	./scripts/raspi.sh --image raspi --output $@
+infra/raspi.img: infra/config
+	./scripts/raspi.sh  --playbook infra/raspi.yml --output $@
 
-server/config:
-	mkdir -p $@
-	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
-
-server/image.iso: common/debian-amd64.iso server/config
-	./scripts/debian.sh --iso $< --image server --output $@
+infra/server.iso: common/debian-amd64.iso infra/config
+	./scripts/debian.sh --iso $< --playbook infra/server.yml --output $@
 
 DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso
-CONFIG   = virtual/config server/config raspi/config
-IMAGE    = virtual/image.iso server/image.iso raspi/image.img
+CONFIG   = virtual/config infra/config
+IMAGE    = virtual/virtual.iso infra/raspi.img infra/server.iso
 
 .DEFAULT_GOAL := image
 .NOT_PARALLEL := config
@@ -40,7 +34,7 @@ IMAGE    = virtual/image.iso server/image.iso raspi/image.img
 tmpclean:
 	rm -rf $(addsuffix .tmp,$(IMAGE))
 
-clean:
+clean: tmpclean
 	rm -rf common $(CONFIG) $(IMAGE)
 
 download: $(DOWNLOAD)
@@ -55,28 +49,28 @@ test:
 
 .PHONY: bitwarden-push
 
-bitwarden-push: server/config
-	./scripts/bitwarden.sh --password $</password --folder Server
+bitwarden-push: infra/config
+	./scripts/bitwarden.sh --passwords $</raspi_password.yml,$</server_password.yml,$</server_password_samba.yml --folder Infra
 
 .PHONY: playbook-check playbook
 
-playbook-check: server/config
-	ansible-playbook -i server/config/inventory/server.local -C server/install.yml
+playbook-check: infra/config
+	ansible-playbook -i infra/config/inventory_local_ip_address -C infra/raspi.yml infra/server.yml
 
-playbook: server/config
-	ansible-playbook -i server/config/inventory/server.local server/install.yml
+playbook: infra/config
+	ansible-playbook -i infra/config/inventory_local_ip_address infra/raspi.yml infra/server.yml
 
 .PHONY: github-push github-pull github-playbook-check github-playbook
 
-github-push: server/config
-	(find server/files server/group_vars -type l; find server/github; echo server/group_vars/all/secrets.yml) | \
+github-push: infra/config
+	(find infra/files infra/group_vars infra/host_vars infra/github -type l; echo infra/host_vars/server/secrets.yml) | \
 	  tar -T - -hcz | base64 -w 0 | gh secret set SERVER_ARCHIVE -R davidlsq/installer
 
 github-pull:
 	@echo "${SERVER_ARCHIVE}" | base64 -d | tar zxf -
 
 github-playbook-check: github-pull
-	ansible-playbook -i server/github/inventory -C server/install.yml
+	ansible-playbook -i infra/github/inventory -C infra/raspi.yml infra/server.yml
 
 github-playbook: github-pull
-	ansible-playbook -i server/github/inventory server/install.yml
+	ansible-playbook -i infra/github/inventory infra/raspi.yml infra/server.yml

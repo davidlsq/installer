@@ -1,0 +1,14 @@
+- name: Create dir
+  ansible.builtin.file:
+    path: '{{ config_image_raspi_output }}'
+    state: directory
+
+- name: Create config
+  ansible.builtin.template:
+    src: config.j2
+    dest: '{{ config_image_raspi_output }}/config'
+
+- name: Create install.sh
+  ansible.builtin.template:
+    src: install.sh.j2
+    dest: '{{ config_image_raspi_output }}/install.sh'

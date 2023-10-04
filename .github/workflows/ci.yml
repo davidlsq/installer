@@ -59,9 +59,9 @@ jobs:
       - name: make
         uses: ./.github/actions/nix-shell
         with:
-          command: make virtual/image.iso
+          command: make virtual/virtual.iso
       - name: check
-        run: ls -lh virtual; [ -f virtual/image.iso ]
+        run: ls -lh virtual; [ -f virtual/virtual.iso ]
   dependabot:
     name: dependabot
     runs-on: ubuntu-latest
@@ -72,8 +72,8 @@ jobs:
         uses: actions/checkout@v4
       - name: dependabot
         uses: marocchino/validate-dependabot@v2
-  server-playbook-check:
-    name: server-playbook-check
+  playbook-check:
+    name: playbook-check
     runs-on: ubuntu-latest
     concurrency: server
     needs: changes
@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: server-playbook-check
+      - name: playbook-check
         uses: ./.github/actions/nix-shell
         with:
           command: make github-playbook-check

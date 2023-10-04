@@ -1,0 +1,18 @@
+- name: Create config
+  loop: '{{ config_wireguard_client_interfaces }}'
+  loop_control:
+    index_var: index
+  ansible.builtin.copy:
+    content: |
+      [Interface]
+      Address = {{ config_wireguard_client_peer.ip_address }}.{{ index + 2 }}/24
+      ListenPort = {{ config_wireguard_client_peer.port }}
+      PrivateKey = {{ lookup("file", item.key) }}
+      DNS = {{ config_wireguard_client_peer.dns | join(" ") }}
+
+      [Peer]
+      PublicKey = {{ lookup("file", config_wireguard_client_peer.key_pub) }}
+      AllowedIPs = 0.0.0.0/0, ::/0
+      Endpoint = {{ config_wireguard_client_peer.public_domain }}:{{ config_wireguard_client_peer.port }}
+    dest: '{{ item.output }}'
+  no_log: true

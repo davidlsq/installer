@@ -1,0 +1,20 @@
+- name: Create dir
+  ansible.builtin.file:
+    path: '{{ config_image_debian_ouput }}'
+    state: directory
+
+- name: Create preseed.cfg
+  ansible.builtin.template:
+    src: preseed.cfg.j2
+    dest: '{{ config_image_debian_ouput }}/preseed.cfg'
+  no_log: true
+
+- name: Create recipe
+  ansible.builtin.template:
+    src: recipe.j2
+    dest: '{{ config_image_debian_ouput }}/recipe'
+
+- name: Create install.sh
+  ansible.builtin.template:
+    src: install.sh.j2
+    dest: '{{ config_image_debian_ouput }}/install.sh'

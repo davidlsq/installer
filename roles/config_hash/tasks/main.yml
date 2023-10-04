@@ -1,3 +1,25 @@
-- name: Hash
-  with_items: '{{ config_hash }}'
-  ansible.builtin.include_tasks: hash.yml
+- name: Include hash
+  ansible.builtin.include_vars: '{{ config_hash_output }}'
+  failed_when: false
+  no_log: true
+
+- name: Create hash
+  ansible.builtin.copy:
+    content: |
+        ---
+
+        {% for var in config_hash_vars %}
+        {% if var.method == "crypt" %}
+        {% set salt = lookup("vars", var.salt, default=lookup("community.general.random_string", length=16, special=false)) %}
+        {{ var.salt }}: {{ salt }}
+        {{ var.name }}: {{ lookup("vars", var.password) | password_hash(salt=salt) }}
+        {% elif var.method == "sha256" %}
+        {{ var.name }}: {{ lookup("vars", var.password) | hash("sha256") | hash("sha256") }}
+        {% endif %}
+        {% endfor %}
+    dest: '{{ config_hash_output }}'
+  no_log: true
+
+- name: Include hash
+  ansible.builtin.include_vars: '{{ config_hash_output }}'
+  no_log: true

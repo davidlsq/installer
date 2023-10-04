@@ -1,0 +1,176 @@
+- name: Config
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Create config dir
+      ansible.builtin.file:
+        path: '{{ config_dir }}'
+        state: directory
+  roles:
+    - role: config_password
+      config_password_output: '{{ config_dir }}/raspi_password.yml'
+      config_password_vars:
+        - name: raspi_password_user_root
+        - name: raspi_password_user_regular
+        - name: raspi_password_user_ansible
+        - name: raspi_password_pihole
+    - role: config_hash
+      config_hash_output: '{{ config_dir }}/raspi_hash.yml'
+      config_hash_vars:
+        - name: raspi_hash_user_root
+          salt: raspi_salt_user_root
+          password: raspi_password_user_root
+          method: crypt
+        - name: raspi_hash_user_regular
+          salt: raspi_salt_user_regular
+          password: raspi_password_user_regular
+          method: crypt
+        - name: raspi_hash_user_ansible
+          salt: raspi_salt_user_ansible
+          password: raspi_password_user_ansible
+          method: crypt
+        - name: raspi_hash_pihole
+          password: raspi_password_pihole
+          method: sha256
+    - role: config_password
+      config_password_output: '{{ config_dir }}/server_password.yml'
+      config_password_vars:
+        - name: server_password_user_root
+        - name: server_password_user_regular
+        - name: server_password_user_ansible
+    - role: config_password
+      config_password_output: '{{ config_dir }}/server_password_samba.yml'
+      config_password_vars:
+        - name: server_password_samba
+    - role: config_hash
+      config_hash_output: '{{ config_dir }}/server_hash.yml'
+      config_hash_vars:
+        - name: server_hash_user_root
+          salt: server_salt_user_root
+          password: server_password_user_root
+          method: crypt
+        - name: server_hash_user_regular
+          salt: server_salt_user_regular
+          password: server_password_user_regular
+          method: crypt
+        - name: server_hash_user_ansible
+          salt: server_salt_user_ansible
+          password: server_password_user_ansible
+          method: crypt
+    - role: config_ssh_keys
+      config_ssh_keys:
+        - '{{ config_dir }}/raspi_ssh_keys_host'
+        - '{{ config_dir }}/raspi_ssh_keys_{{ user_regular_name }}'
+        - '{{ config_dir }}/raspi_ssh_keys_{{ user_ansible_name }}'
+        - '{{ config_dir }}/server_ssh_keys_host'
+        - '{{ config_dir }}/server_ssh_keys_{{ user_regular_name }}'
+        - '{{ config_dir }}/server_ssh_keys_{{ user_ansible_name }}'
+    - role: config_ssh_known_host
+      config_ssh_known_host_output: '{{ config_dir }}/ssh_known_host'
+      config_ssh_known_host_vars:
+        - key_pub: '{{ config_dir }}/raspi_ssh_keys_host.pub'
+          hosts:
+            - '{{ raspi_network_local_ip_address }}'
+            - '{{ raspi_network_local_domain }}'
+            - '{{ network_public_domain }}'
+        - key_pub: '{{ config_dir }}/server_ssh_keys_host.pub'
+          hosts:
+            - '{{ server_network_local_ip_address }}'
+            - '{{ server_network_local_domain }}'
+            - '{{ network_public_domain }}'
+    - role: config_ssh_client
+      config_ssh_client_output: '{{ config_dir }}/ssh_client'
+      config_ssh_client_known_host: '{{ config_dir }}/ssh_known_host'
+      config_ssh_client_vars:
+        - user: '{{ user_regular_name }}'
+          port: '{{ raspi_ssh_port }}'
+          key: '{{ config_dir }}/raspi_ssh_keys_{{ user_regular_name }}'
+          hosts:
+            - host: '{{ raspi_network_local_ip_address }}'
+            - host: '{{ raspi_network_local_domain }}'
+            - host: '{{ raspi_network_public_domain }}'
+              name: '{{ network_public_domain }}'
+        - user: '{{ user_ansible_name }}'
+          port: '{{ raspi_ssh_port }}'
+          key: '{{ config_dir }}/raspi_ssh_keys_{{ user_ansible_name }}'
+          hosts:
+            - host: '{{ raspi_network_local_ip_address }}'
+            - host: '{{ raspi_network_local_domain }}'
+            - host: '{{ raspi_network_public_domain }}'
+              name: '{{ network_public_domain }}'
+        - user: '{{ user_regular_name }}'
+          port: '{{ server_ssh_port }}'
+          key: '{{ config_dir }}/server_ssh_keys_{{ user_regular_name }}'
+          hosts:
+            - host: '{{ server_network_local_ip_address }}'
+            - host: '{{ server_network_local_domain }}'
+            - host: '{{ server_network_public_domain }}'
+              name: '{{ network_public_domain }}'
+        - user: '{{ user_ansible_name }}'
+          port: '{{ server_ssh_port }}'
+          key: '{{ config_dir }}/server_ssh_keys_{{ user_ansible_name }}'
+          hosts:
+            - host: '{{ server_network_local_ip_address }}'
+            - host: '{{ server_network_local_domain }}'
+            - host: '{{ server_network_public_domain }}'
+              name: '{{ network_public_domain }}'
+    - role: config_wireguard_keys
+      config_wireguard_keys:
+        - '{{ config_dir }}/server_wireguard_keys_host'
+        - '{{ config_dir }}/server_wireguard_keys_macbook'
+        - '{{ config_dir }}/server_wireguard_keys_iphone'
+    - role: config_wireguard_client
+      config_wireguard_client_peer:
+        ip_address: '{{ server_wireguard_ip_adress }}'
+        public_domain: '{{ network_public_domain }}'
+        port: '{{ server_wireguard_port }}'
+        key_pub: '{{ config_dir }}/server_wireguard_keys_host'
+        dns:
+          - '{{ network_dns_1 }}'
+          - '{{ network_dns_2 }}'
+      config_wireguard_client_interfaces:
+        - output: '{{ config_dir }}/wireguard_client_macbook'
+          key: '{{ config_dir }}/server_wireguard_keys_macbook'
+        - output: '{{ config_dir }}/wireguard_client_iphone'
+          key: '{{ config_dir }}/server_wireguard_keys_iphone'
+    - role: config_inventory
+      config_inventory_output: '{{ config_dir }}/inventory_local_ip_address'
+      config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
+      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_vars:
+        - name: raspi
+          host: '{{ raspi_network_local_ip_address }}'
+        - name: server
+          host: '{{ server_network_local_ip_address }}'
+    - role: config_inventory
+      config_inventory_output: '{{ config_dir }}/inventory_local_domain'
+      config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
+      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_vars:
+        - name: raspi
+          host: '{{ raspi_network_local_domain }}'
+        - name: server
+          host: '{{ server_network_local_domain }}'
+    - role: config_inventory
+      config_inventory_output: '{{ config_dir }}/inventory_public_domain'
+      config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
+      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_vars:
+        - name: raspi
+          host: '{{ raspi_network_public_domain }}'
+        - name: server
+          host: '{{ server_network_public_domain }}'
+    - role: config_image_raspi
+      config_image_raspi_output: '{{ config_dir }}/raspi_image'
+      config_image_raspi_name: raspi
+      config_image_raspi_network_hostname: '{{ raspi_network_hostname }}'
+    - role: config_image_debian
+      config_image_debian_ouput: '{{ config_dir }}/server_image'
+      config_image_debian_name: server
+      config_image_debian_hash_user_root: '{{ server_hash_user_root }}'
+      config_image_debian_disk_system: '{{ server_disk_system }}'
+      config_image_debian_network_interface: '{{ server_network_interface }}'
+      config_image_debian_network_hostname: '{{ server_network_hostname }}'
+      config_image_debian_recipe_home: 16384
+      config_image_debian_recipe_tmp: 16384
+      config_image_debian_recipe_swap: 32768

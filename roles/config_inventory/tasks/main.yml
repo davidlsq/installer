@@ -1,13 +1,7 @@
-- name: Create inventory dir
-  ansible.builtin.file:
-    path: '{{ config_dir }}/inventory'
-    state: directory
-
 - name: Create inventory
   ansible.builtin.copy:
-    content: >
-      host ansible_connection=ssh ansible_ssh_host="{{ item }}"
-      ansible_ssh_extra_args="-F {{ config_dir}}/ssh/config"
-      ansible_user={{ config_inventory_user }}
-    dest: '{{ config_dir }}/inventory/{{ item }}'
-  with_items: '{{ config_inventory_domains }}'
+    content: |
+      {% for var in config_inventory_vars -%}
+      {{ var.name }} ansible_connection=ssh ansible_ssh_host="{{ var.host }}" ansible_ssh_extra_args="-F {{ config_inventory_ssh_client }}" ansible_user={{ config_inventory_user }}
+      {% endfor %}
+    dest: '{{ config_inventory_output }}'

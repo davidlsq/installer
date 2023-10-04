@@ -1,3 +1,19 @@
-- name: Password
-  with_items: '{{ config_password }}'
-  ansible.builtin.include_tasks: password.yml
+- name: Include password
+  ansible.builtin.include_vars: '{{ config_password_output }}'
+  failed_when: false
+  no_log: true
+
+- name: Create password
+  ansible.builtin.copy:
+    content: |
+        ---
+
+        {% for var in config_password_vars %}
+        {{ var.name }}: {{ lookup("vars", var.name, default=lookup("community.general.random_string", length=16, special=false)) }}
+        {% endfor %}
+    dest: '{{ config_password_output }}'
+  no_log: true
+
+- name: Include password
+  ansible.builtin.include_vars: '{{ config_password_output }}'
+  no_log: true

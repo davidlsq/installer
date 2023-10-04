@@ -1,0 +1,4 @@
+- name: Create config
+  ansible.builtin.template:
+    src: client.j2
+    dest: '{{ config_ssh_client_output }}'
