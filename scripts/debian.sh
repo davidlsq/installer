@@ -45,8 +45,8 @@ while [[ $# -gt 0 ]]; do
       ISO="$2"
       shift 2
       ;;
-    --image)
-      IMAGE="$2"
+    --playbook)
+      ANSIBLE_PLAYBOOK="$2"
       shift 2
       ;;
     --output)
@@ -59,12 +59,17 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-DEBIAN_CONFIG="$IMAGE/config/debian"
+ANSIBLE_NAME="$(basename ${ANSIBLE_PLAYBOOK%.yml})"
+ANSIBLE_GROUPVARS="$(dirname "$ANSIBLE_PLAYBOOK")/group_vars"
+ANSIBLE_HOSTVARS="$(dirname "$ANSIBLE_PLAYBOOK")/host_vars/$ANSIBLE_NAME"
+ANSIBLE_FILES="$(dirname "$ANSIBLE_PLAYBOOK")/files/$ANSIBLE_NAME"
+CONFIG_IMAGE="$(dirname "$ANSIBLE_PLAYBOOK")/config/${ANSIBLE_NAME}_image"
+SCRIPT_FILES=scripts/debian
 
 OUTPUT_TMP="$OUTPUT.tmp"
 OUTPUT_EFI="$OUTPUT_TMP/efi.img"
 OUTPUT_CONTENT="$OUTPUT_TMP/content"
-OUTPUT_CONFIG="$OUTPUT_CONTENT/.config"
+OUTPUT_INSTALL="$OUTPUT_CONTENT/.install"
 
 rm -rf "$OUTPUT_TMP"
 mkdir "$OUTPUT_TMP"
@@ -75,16 +80,19 @@ extract-iso-content "$ISO" "$OUTPUT_CONTENT"
 rm -rf "$OUTPUT_CONTENT/install"
 ln -sr "$OUTPUT_CONTENT/install."* "$OUTPUT_CONTENT/install"
 
-mkdir "$OUTPUT_CONFIG"
-cp -r roles "$OUTPUT_CONFIG"
-cp -rL "$IMAGE/files" "$OUTPUT_CONFIG"
-cp -rL "$IMAGE/group_vars" "$OUTPUT_CONFIG"
-cp "$IMAGE/install.yml" "$OUTPUT_CONFIG"
-cp "$DEBIAN_CONFIG/"* "$OUTPUT_CONFIG"
-chmod +x "$OUTPUT_CONFIG/install.sh" "$OUTPUT_CONFIG/playbook.sh"
-ln -sfr "$OUTPUT_CONFIG/grub.cfg" "$OUTPUT_CONTENT/boot/grub/grub.cfg"
-chmod -R go-rwx "$OUTPUT_CONFIG"
+mkdir -p "$OUTPUT_INSTALL/host_vars" "$OUTPUT_INSTALL/files"
+cp -r roles "$OUTPUT_INSTALL"
+cp "$ANSIBLE_PLAYBOOK" "$OUTPUT_INSTALL/install.yml"
+cp -rL "$ANSIBLE_GROUPVARS" "$OUTPUT_INSTALL"
+cp -rL "$ANSIBLE_HOSTVARS" "$OUTPUT_INSTALL/host_vars"
+cp -rL "$ANSIBLE_FILES" "$OUTPUT_INSTALL/files"
+cp "$CONFIG_IMAGE/"* "$OUTPUT_INSTALL"
+cp "$SCRIPT_FILES/"* "$OUTPUT_INSTALL"
+chmod +x "$OUTPUT_INSTALL/chroot.sh" "$OUTPUT_INSTALL/install.sh"
+ln -sfr "$OUTPUT_INSTALL/grub.cfg" "$OUTPUT_CONTENT/boot/grub/grub.cfg"
+chmod -R go-rwx "$OUTPUT_INSTALL"
 
 create-iso "$OUTPUT_EFI" "$OUTPUT_CONTENT" "$OUTPUT_TMP/image.iso"
+
 mv "$OUTPUT_TMP/image.iso" "$OUTPUT"
 rm -rf "$OUTPUT_TMP"

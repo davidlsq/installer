@@ -1,9 +1,0 @@
-- name: Create dir
-  ansible.builtin.file:
-    path: '{{ config_dir }}/raspi'
-    state: directory
-
-- name: Create config
-  ansible.builtin.template:
-    src: config.j2
-    dest: '{{ config_dir }}/raspi/config'

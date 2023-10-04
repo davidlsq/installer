@@ -1,0 +1,52 @@
+---
+
+- name: Base
+  hosts: virtual
+  gather_facts: false
+  become: true
+  tags: base
+  roles:
+    - role: systemctl
+      tags: systemctl
+    - role: cdrom
+      tags: cdrom
+    - role: keyboard
+      tags: keyboard
+    - role: network
+      tags: network
+      network_interface: '{{ virtual_network_interface }}'
+    - role: apt
+      tags: apt
+    - role: grub
+      tags: grub
+    - role: ssh
+      tags: ssh
+      ssh_key: virtual/ssh_keys_host
+      ssh_key_pub: virtual/ssh_keys_host.pub
+    - role: user
+      tags: user
+      user_name: root
+      user_password: '{{ virtual_hash_user_root }}'
+      user_shell: /bin/zsh
+    - role: user
+      tags: user
+      user_id: '{{ user_regular_id }}'
+      user_name: '{{ virtual_user_regular_name }}'
+      user_password: '{{ virtual_hash_user_regular }}'
+      user_key_pub: 'virtual/ssh_keys_{{ virtual_user_regular_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: true
+    - role: user
+      tags: user
+      user_id: '{{ user_ansible_id }}'
+      user_name: '{{ virtual_user_ansible_name }}'
+      user_password: '{{ virtual_hash_user_ansible }}'
+      user_key_pub: 'virtual/ssh_keys_{{ virtual_user_ansible_name }}.pub'
+      user_shell: /bin/zsh
+      user_sudo: yes-no-password
+    - role: ohmyzsh
+      ohmyzsh_user_name: root
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ virtual_user_regular_name }}'
+    - role: ohmyzsh
+      ohmyzsh_user_name: '{{ virtual_user_ansible_name }}'

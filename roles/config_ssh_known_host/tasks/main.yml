@@ -1,0 +1,10 @@
+- name: Create known_host
+  ansible.builtin.copy:
+    content: |
+      {% for var in config_ssh_known_host_vars %}
+      {% for host in var.hosts %}
+      {{ host }} {{ lookup("file", var.key_pub) }}
+      {% endfor %}
+      {% endfor %}
+    dest: '{{ config_ssh_known_host_output }}'
+  no_log: true

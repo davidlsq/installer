@@ -1,0 +1,47 @@
+partitionning ::
+{% for count in range(3) %}{{ config_image_debian_recipe_efi | default(config_image_debian_recipe_efi) }} {% endfor %}fat32
+    $primary{ }
+    method{ efi }
+    format{ } .
+{% for count in range(3) %}{{ config_image_debian_recipe_boot | default(config_image_debian_recipe_boot) }} {% endfor %}ext4
+    $primary{ }
+    $bootable{ }
+    method{ format }
+    format{ }
+    label{ BOOT }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ /boot } .
+{% if config_image_debian_recipe_home is defined %}
+{% for count in range(3) %}{{ config_image_debian_recipe_home }} {% endfor %}ext4
+    $primary{ }
+    method{ format }
+    format{ }
+    label{ HOME }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ /home } .
+{% endif %}
+{% if config_image_debian_recipe_tmp is defined %}
+{% for count in range(3) %}{{ config_image_debian_recipe_tmp }} {% endfor %}ext4
+    $primary{ }
+    method{ format }
+    format{ }
+    label{ TMP }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ /tmp } .
+{% endif %}
+{% for count in range(3) %}{{ config_image_debian_recipe_swap | default(config_image_debian_recipe_swap) }} {% endfor %}linux-swap
+    $primary{ }
+    method{ swap }
+    format{ }
+    label{ SWAP } .
+1 1 -1 ext4
+    $primary{ }
+    method{ format }
+    format{ }
+    label{ ROOT }
+    use_filesystem{ }
+    filesystem{ ext4 }
+    mountpoint{ / } .

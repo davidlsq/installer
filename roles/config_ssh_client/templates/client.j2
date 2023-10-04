@@ -1,0 +1,15 @@
+{% for var in config_ssh_client_vars %}
+{% for host in var.hosts %}
+Match user {{ var.user }} host {{ host.host }}
+  IdentitiesOnly yes
+  StrictHostKeyChecking yes
+{% if host.name is defined %}
+  HostName {{ host.name }}
+{% endif %}
+{% if var.port is defined %}
+  Port {{ var.port }}
+{% endif %}
+  GlobalKnownHostsFile {{ config_ssh_client_known_host | realpath }}
+  IdentityFile {{ var.key | realpath }}
+{% endfor %}
+{% endfor %}

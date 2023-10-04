@@ -9,5 +9,6 @@ on_chroot << EOF
   source /install/ansible-venv/bin/activate
   python3 -m pip install ansible
   chown -R root:root /install
-  chmod -R go=-rw /install
+  chmod -R go=-rwx /install
+  chmod u=+x /install/install.sh
 EOF

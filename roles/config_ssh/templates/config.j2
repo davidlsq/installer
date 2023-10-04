@@ -1,8 +1,0 @@
-{% for user in config_ssh_users %}
-{% for domain in config_ssh_domains %}
-Match user {{ user }} host {{ domain }}
-  IdentitiesOnly yes
-  GlobalKnownHostsFile {{ config_dir }}/ssh/known_host
-  IdentityFile {{ config_dir }}/ssh/keys/{{ user }}
-{% endfor %}
-{% endfor %}

@@ -1,0 +1,15 @@
+[Interface]
+PrivateKey = {{ lookup("file", wireguard_interface_key) }}
+Address = {{ wireguard_interface_ip_adress }}.1/24
+ListenPort = {{ wireguard_interface_port }}
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o {{ wireguard_interface_device }} -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o {{ wireguard_interface_device }} -j MASQUERADE
+
+{% for peer in wireguard_peers %}
+[Peer]
+PublicKey = {{ lookup("file", peer.key_pub) }}
+AllowedIPs = {{ wireguard_interface_ip_adress }}.{{ loop.index + 1 }}/32
+{%- if not loop.last %}
+
+{% endif %}  
+{% endfor %}
