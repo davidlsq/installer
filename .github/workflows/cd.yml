@@ -25,8 +25,8 @@ jobs:
               - 'roles/**'
               - 'server/**'
               - ansible.cfg
-  server-playbook:
-    name: server-playbook
+  playbook:
+    name: playbook
     runs-on: ubuntu-latest
     concurrency: server
     needs: changes
@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: server-playbook-check
+      - name: playbook
         uses: ./.github/actions/nix-shell
         with:
           command: make github-playbook

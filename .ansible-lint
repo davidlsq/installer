@@ -5,11 +5,8 @@ skip_list:
   - no-handler
   - yaml[line-length]
   - yaml[document-start]
+  - risky-file-permissions
 
 exclude_paths:
-  - roles/config
   - virtual/config
-  - virtual/group_vars/all/hash
-  - server/config
-  - server/group_vars/all/password
-  - server/group_vars/all/hash
+  - infra/config

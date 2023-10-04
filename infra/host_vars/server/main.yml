@@ -1,0 +1,25 @@
+---
+
+server_user_media_id: 1012
+server_user_media_name: media
+
+server_disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
+server_disk_2: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
+server_disk_3: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
+
+server_qbittorrent_1_name: qbittorrent
+server_qbittorrent_1_port: 8010
+server_sabnzbd_1_name: sabnzbd
+server_sabnzbd_1_port: 8020
+server_prowlarr_1_name: prowlarr
+server_prowlarr_1_port: 8031
+server_jackett_1_name: jackett
+server_jackett_1_port: 8041
+server_radarr_1_name: radarr-1
+server_radarr_1_port: 8051
+server_radarr_2_name: radarr-2
+server_radarr_2_port: 8052
+server_sonarr_1_name: sonarr-1
+server_sonarr_1_port: 8061
+server_sonarr_2_name: sonarr-2
+server_sonarr_2_port: 8062

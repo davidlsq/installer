@@ -1,0 +1,7 @@
+- name: Create keys
+  with_items: '{{ config_ssh_keys }}'
+  ansible.builtin.command: >
+    ssh-keygen -C "" -N "" -t ed25519 -f {{ item }}
+  args:
+    creates: '{{ item }}*'
+  no_log: true
