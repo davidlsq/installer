@@ -18,15 +18,10 @@
           salt: virtual_salt_user_regular
           password: virtual_password_user_regular
           method: crypt
-        - name: virtual_hash_user_ansible
-          salt: virtual_salt_user_ansible
-          password: virtual_password_user_ansible
-          method: crypt
     - role: config_ssh_keys
       config_ssh_keys:
         - '{{ config_dir }}/virtual_ssh_keys_host'
         - '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_regular_name }}'
-        - '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_ansible_name }}'
     - role: config_ssh_known_host
       config_ssh_known_host_output: '{{ config_dir }}/ssh_known_host'
       config_ssh_known_host_vars:
@@ -41,14 +36,10 @@
           key: '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_regular_name }}'
           hosts:
             - host: '{{ virtual_network_local_domain }}'
-        - user: '{{ virtual_user_ansible_name }}'
-          key: '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_ansible_name }}'
-          hosts:
-            - host: '{{ virtual_network_local_domain }}'
     - role: config_inventory
       config_inventory_output: '{{ config_dir }}/inventory_local_domain'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
-      config_inventory_user: '{{ virtual_user_ansible_name }}'
+      config_inventory_user: '{{ virtual_user_regular_name }}'
       config_inventory_vars:
         - name: virtual
           host: '{{ virtual_network_local_domain }}'
