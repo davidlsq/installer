@@ -124,7 +124,7 @@
         ip_address: '{{ server_wireguard_ip_adress }}'
         public_domain: '{{ network_public_domain }}'
         port: '{{ server_wireguard_port }}'
-        key_pub: '{{ config_dir }}/server_wireguard_keys_host'
+        key_pub: '{{ config_dir }}/server_wireguard_keys_host.pub'
         dns:
           - '{{ network_dns_1 }}'
           - '{{ network_dns_2 }}'

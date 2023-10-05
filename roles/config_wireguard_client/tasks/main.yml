@@ -8,7 +8,9 @@
       Address = {{ config_wireguard_client_peer.ip_address }}.{{ index + 2 }}/24
       ListenPort = {{ config_wireguard_client_peer.port }}
       PrivateKey = {{ lookup("file", item.key) }}
-      DNS = {{ config_wireguard_client_peer.dns | join(" ") }}
+      {% for dns in config_wireguard_client_peer.dns | default([]) %}
+      DNS = {{ dns }}
+      {% endfor %}
 
       [Peer]
       PublicKey = {{ lookup("file", config_wireguard_client_peer.key_pub) }}
