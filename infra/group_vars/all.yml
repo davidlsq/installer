@@ -2,8 +2,8 @@
 
 user_regular_id: 1000
 user_regular_name: david
-user_ansible_id: 1001
-user_ansible_name: ansible
+user_github_id: 1001
+user_github_name: github
 
 network_public_domain: home.davidlsq.fr
 network_dns_1: 9.9.9.9

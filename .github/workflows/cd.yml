@@ -35,8 +35,15 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: playbook
-        uses: ./.github/actions/nix-shell
-        with:
-          command: make github-playbook
+        run: |
+          make github-pull
+          ssh -p 22 -i infra/config/raspi_ssh_keys_github \
+              -o GlobalKnownHostsFile=infra/config/ssh_known_host \
+              github@home.davidlsq.fr \
+              sudo /usr/lib/installer/run.sh main
+          ssh -p 23 -i infra/config/server_ssh_keys_github \
+              -o GlobalKnownHostsFile=infra/config/ssh_known_host \
+              github@home.davidlsq.fr \
+              sudo /usr/lib/installer/run.sh main
         env:
-          SERVER_ARCHIVE: ${{ secrets.SERVER_ARCHIVE }}
+          GIHUB_SSH: ${{ secrets.GIHUB_SSH }}

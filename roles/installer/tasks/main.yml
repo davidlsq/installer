@@ -1,0 +1,53 @@
+# Install package
+
+- name: Package
+  ansible.builtin.apt:
+    name:
+      - git
+      - python3
+      - python3-venv
+    state: present
+
+# Create lib
+
+- name: Create venv
+  ansible.builtin.pip:
+    name: ansible
+    virtualenv: '{{ installer_venv }}'
+    virtualenv_command: python3 -m venv
+    virtualenv_site_packages: true
+    umask: '0077'
+
+- name: Create lib dir
+  ansible.builtin.file:
+    path: '{{ installer_lib }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=
+
+- name: Copy archive
+  ansible.builtin.copy:
+    src: '{{ installer_archive }}'
+    dest: '{{ installer_lib }}/archive.tar.gz'
+    owner: root
+    group: root
+    mode: u=rw,go=
+
+- name: Create script
+  ansible.builtin.template:
+    src: run.sh.j2
+    dest: '{{ installer_lib }}/run.sh'
+    owner: root
+    group: root
+    mode: u=rwx,go=
+
+# Create var
+
+- name: Create var dir
+  ansible.builtin.file:
+    path: '{{ installer_var }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=

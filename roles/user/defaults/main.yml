@@ -1,2 +1,2 @@
 user_sudo: false
-user_shell: /bin/zsh
+user_shell: /bin/bash

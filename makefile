@@ -66,14 +66,8 @@ playbook: infra/config
 .PHONY: github-push github-pull github-playbook-check github-playbook
 
 github-push: infra/config
-	(find infra/files infra/group_vars infra/host_vars infra/github -type l; echo infra/host_vars/server/secrets.yml) | \
-	  tar -T - -hcz | base64 -w 0 | gh secret set SERVER_ARCHIVE -R davidlsq/installer
+	@tar -cz infra/config/raspi_ssh_keys_github infra/config/server_ssh_keys_github infra/config/ssh_known_host \
+	  | gh secret set GIHUB_SSH -R davidlsq/installer
 
 github-pull:
-	@echo "${SERVER_ARCHIVE}" | base64 -d | tar zxf -
-
-github-playbook-check: github-pull
-	ansible-playbook -i infra/github/inventory -C infra/raspi.yml infra/server.yml
-
-github-playbook: github-pull
-	ansible-playbook -i infra/github/inventory infra/raspi.yml infra/server.yml
+	@echo "${GIHUB_SSH}" | base64 -d | tar -xzf -
