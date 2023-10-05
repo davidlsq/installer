@@ -48,12 +48,26 @@
 
 - name: Set sudo without password
   ansible.builtin.copy:
-    content: '{{ user_name }} ALL=(ALL) NOPASSWD:ALL'
-    dest: '/etc/sudoers.d/ansible_nopasswd_{{ user_name }}'
+    content: >
+      {{ user_name }} ALL=(ALL) NOPASSWD:ALL
+    dest: '/etc/sudoers.d/ansible_sudo_without_password_{{ user_name }}'
     owner: root
     group: root
-    mode: u=r,go=
+    mode: ug=r,o=
   when: user_sudo == 'yes-no-password'
+
+- name: Set sudo command
+  ansible.builtin.copy:
+    content: >
+      {{ user_name }} ALL=(ALL) NOPASSWD: {{ item }}
+    dest: '/etc/sudoers.d/ansible_sudo_command_{{ user_name }}_{{ index }}'
+    owner: root
+    group: root
+    mode: ug=r,o=
+  loop: '{{ user_sudo_commands }}'
+  loop_control:
+    index_var: index
+  when: user_sudo_commands is defined
 
 - name: Set shell
   ansible.builtin.user:

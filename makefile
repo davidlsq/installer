@@ -9,18 +9,21 @@ common/debian-amd64.iso: | common
 
 virtual/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
+	./scripts/archive.sh --directory virtual --host virtual --output $@/virtual.tar.gz
 
 virtual/virtual.iso: common/debian-arm64.iso virtual/config
-	./scripts/debian.sh --iso $< --playbook virtual/virtual.yml --output $@
+	./scripts/debian.sh --iso $< --directory virtual --host virtual --output $@
 
 infra/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
+	./scripts/archive.sh --directory infra --host server --output $@/server.tar.gz
+	./scripts/archive.sh --directory infra --host raspi --output $@/raspi.tar.gz
 
 infra/raspi.img: infra/config
-	./scripts/raspi.sh  --playbook infra/raspi.yml --output $@
+	./scripts/raspi.sh  --directory infra --host raspi --output $@
 
 infra/server.iso: common/debian-amd64.iso infra/config
-	./scripts/debian.sh --iso $< --playbook infra/server.yml --output $@
+	./scripts/debian.sh --iso $< --directory infra --host server --output $@
 
 DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso
 CONFIG   = virtual/config infra/config
@@ -63,14 +66,8 @@ playbook: infra/config
 .PHONY: github-push github-pull github-playbook-check github-playbook
 
 github-push: infra/config
-	(find infra/files infra/group_vars infra/host_vars infra/github -type l; echo infra/host_vars/server/secrets.yml) | \
-	  tar -T - -hcz | base64 -w 0 | gh secret set SERVER_ARCHIVE -R davidlsq/installer
+	@tar -cz infra/config/raspi_ssh_keys_github infra/config/server_ssh_keys_github infra/config/ssh_known_host \
+	  | gh secret set GIHUB_SSH -R davidlsq/installer
 
 github-pull:
-	@echo "${SERVER_ARCHIVE}" | base64 -d | tar zxf -
-
-github-playbook-check: github-pull
-	ansible-playbook -i infra/github/inventory -C infra/raspi.yml infra/server.yml
-
-github-playbook: github-pull
-	ansible-playbook -i infra/github/inventory infra/raspi.yml infra/server.yml
+	@echo "${GIHUB_SSH}" | base64 -d | tar -xzf -

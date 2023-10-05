@@ -12,7 +12,7 @@
       config_password_vars:
         - name: raspi_password_user_root
         - name: raspi_password_user_regular
-        - name: raspi_password_user_ansible
+        - name: raspi_password_user_github
         - name: raspi_password_pihole
     - role: config_hash
       config_hash_output: '{{ config_dir }}/raspi_hash.yml'
@@ -25,9 +25,9 @@
           salt: raspi_salt_user_regular
           password: raspi_password_user_regular
           method: crypt
-        - name: raspi_hash_user_ansible
-          salt: raspi_salt_user_ansible
-          password: raspi_password_user_ansible
+        - name: raspi_hash_user_github
+          salt: raspi_salt_user_github
+          password: raspi_password_user_github
           method: crypt
         - name: raspi_hash_pihole
           password: raspi_password_pihole
@@ -37,7 +37,7 @@
       config_password_vars:
         - name: server_password_user_root
         - name: server_password_user_regular
-        - name: server_password_user_ansible
+        - name: server_password_user_github
     - role: config_password
       config_password_output: '{{ config_dir }}/server_password_samba.yml'
       config_password_vars:
@@ -53,18 +53,18 @@
           salt: server_salt_user_regular
           password: server_password_user_regular
           method: crypt
-        - name: server_hash_user_ansible
-          salt: server_salt_user_ansible
-          password: server_password_user_ansible
+        - name: server_hash_user_github
+          salt: server_salt_user_github
+          password: server_password_user_github
           method: crypt
     - role: config_ssh_keys
       config_ssh_keys:
         - '{{ config_dir }}/raspi_ssh_keys_host'
         - '{{ config_dir }}/raspi_ssh_keys_{{ user_regular_name }}'
-        - '{{ config_dir }}/raspi_ssh_keys_{{ user_ansible_name }}'
+        - '{{ config_dir }}/raspi_ssh_keys_{{ user_github_name }}'
         - '{{ config_dir }}/server_ssh_keys_host'
         - '{{ config_dir }}/server_ssh_keys_{{ user_regular_name }}'
-        - '{{ config_dir }}/server_ssh_keys_{{ user_ansible_name }}'
+        - '{{ config_dir }}/server_ssh_keys_{{ user_github_name }}'
     - role: config_ssh_known_host
       config_ssh_known_host_output: '{{ config_dir }}/ssh_known_host'
       config_ssh_known_host_vars:
@@ -90,9 +90,9 @@
             - host: '{{ raspi_network_local_domain }}'
             - host: '{{ raspi_network_public_domain }}'
               name: '{{ network_public_domain }}'
-        - user: '{{ user_ansible_name }}'
+        - user: '{{ user_github_name }}'
           port: '{{ raspi_ssh_port }}'
-          key: '{{ config_dir }}/raspi_ssh_keys_{{ user_ansible_name }}'
+          key: '{{ config_dir }}/raspi_ssh_keys_{{ user_github_name }}'
           hosts:
             - host: '{{ raspi_network_local_ip_address }}'
             - host: '{{ raspi_network_local_domain }}'
@@ -106,9 +106,9 @@
             - host: '{{ server_network_local_domain }}'
             - host: '{{ server_network_public_domain }}'
               name: '{{ network_public_domain }}'
-        - user: '{{ user_ansible_name }}'
+        - user: '{{ user_github_name }}'
           port: '{{ server_ssh_port }}'
-          key: '{{ config_dir }}/server_ssh_keys_{{ user_ansible_name }}'
+          key: '{{ config_dir }}/server_ssh_keys_{{ user_github_name }}'
           hosts:
             - host: '{{ server_network_local_ip_address }}'
             - host: '{{ server_network_local_domain }}'
@@ -136,7 +136,7 @@
     - role: config_inventory
       config_inventory_output: '{{ config_dir }}/inventory_local_ip_address'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
-      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_user: '{{ user_regular_name }}'
       config_inventory_vars:
         - name: raspi
           host: '{{ raspi_network_local_ip_address }}'
@@ -145,7 +145,7 @@
     - role: config_inventory
       config_inventory_output: '{{ config_dir }}/inventory_local_domain'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
-      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_user: '{{ user_regular_name }}'
       config_inventory_vars:
         - name: raspi
           host: '{{ raspi_network_local_domain }}'
@@ -154,7 +154,7 @@
     - role: config_inventory
       config_inventory_output: '{{ config_dir }}/inventory_public_domain'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
-      config_inventory_user: '{{ user_ansible_name }}'
+      config_inventory_user: '{{ user_regular_name }}'
       config_inventory_vars:
         - name: raspi
           host: '{{ raspi_network_public_domain }}'

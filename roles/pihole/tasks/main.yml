@@ -23,22 +23,21 @@
     user_service_name: pihole
     user_service_id: '{{ pihole_user_id }}'
 
-- name: Create var
+- name: Create var directory
+  ansible.builtin.file:
+    path: '{{ pihole_var }}'
+    state: directory
+    owner: pihole
+    group: pihole
+    mode: ug=rwx,o=rx
+
+- name: Create var link
   when: 'pihole_var != "/etc/pihole"'
-  block:
-    - name: Create var directory
-      ansible.builtin.file:
-        path: '{{ pihole_var }}'
-        state: directory
-        owner: pihole
-        group: pihole
-        mode: ug=rwx,o=rx
-    - name: Create var link
-      ansible.builtin.file:
-        src: '{{ pihole_var }}'
-        dest: /etc/pihole
-        state: link
-        force: true
+  ansible.builtin.file:
+    src: '{{ pihole_var }}'
+    dest: /etc/pihole
+    state: link
+    force: true
 
 # Configure
 

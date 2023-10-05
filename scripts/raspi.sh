@@ -4,8 +4,12 @@ set -e -o pipefail
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --playbook)
-      ANSIBLE_PLAYBOOK="$2"
+    --directory)
+      DIRECTORY="$2"
+      shift 2
+      ;;
+    --host)
+      HOST="$2"
       shift 2
       ;;
     --output)
@@ -18,13 +22,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ANSIBLE_NAME="$(basename ${ANSIBLE_PLAYBOOK%.yml})"
-ANSIBLE_GROUPVARS="$(dirname "$ANSIBLE_PLAYBOOK")/group_vars"
-ANSIBLE_HOSTVARS="$(dirname "$ANSIBLE_PLAYBOOK")/host_vars/$ANSIBLE_NAME"
-ANSIBLE_FILES="$(dirname "$ANSIBLE_PLAYBOOK")/files/$ANSIBLE_NAME"
-CONFIG_IMAGE="$(dirname "$ANSIBLE_PLAYBOOK")/config/${ANSIBLE_NAME}_image"
-SCRIPT_FILES=scripts/raspi
-
 OUTPUT_TMP="$OUTPUT.tmp"
 OUTPUT_INSTALL="$OUTPUT_TMP/install"
 OUTPUT_PIGEN="$OUTPUT_TMP/pi-gen"
@@ -36,16 +33,20 @@ mkdir "$OUTPUT_TMP"
 
 git clone --depth 1 --branch arm64 https://github.com/RPI-Distro/pi-gen.git "$OUTPUT_PIGEN"
 
-mkdir -p "$OUTPUT_INSTALL/host_vars" "$OUTPUT_INSTALL/files"
+mkdir -p "$OUTPUT_INSTALL/config" "$OUTPUT_INSTALL/host_vars" "$OUTPUT_INSTALL/files"
 cp -r roles "$OUTPUT_INSTALL"
-cp "$ANSIBLE_PLAYBOOK" "$OUTPUT_INSTALL/install.yml"
-cp -rL "$ANSIBLE_GROUPVARS" "$OUTPUT_INSTALL"
-cp -rL "$ANSIBLE_HOSTVARS" "$OUTPUT_INSTALL/host_vars"
-cp -rL "$ANSIBLE_FILES" "$OUTPUT_INSTALL/files"
-cp "$CONFIG_IMAGE/install.sh" "$OUTPUT_INSTALL"
+cp "$DIRECTORY/$HOST.yml" "$OUTPUT_INSTALL/install.yml"
+cp -r "$DIRECTORY/group_vars" "$OUTPUT_INSTALL/group_vars"
+cp -r "$DIRECTORY/host_vars/$HOST" "$OUTPUT_INSTALL/host_vars/$HOST"
+cp -r "$DIRECTORY/files/$HOST" "$OUTPUT_INSTALL/files/$HOST"
+cp -r "$DIRECTORY/config/$HOST.tar.gz" "$OUTPUT_INSTALL/config/$HOST.tar.gz"
+tar -xzf "$DIRECTORY/config/$HOST.tar.gz" -C "$OUTPUT_INSTALL"
 
-cp -r "$CONFIG_IMAGE/config" "$OUTPUT_PIGEN"
-cp -r "$SCRIPT_FILES/stage" "$OUTPUT_PIGEN"
+CONFIG_IMAGE="$DIRECTORY/config/${HOST}_image"
+cp "$CONFIG_IMAGE/install.sh" "$OUTPUT_INSTALL/install.sh"
+cp "$CONFIG_IMAGE/config" "$OUTPUT_PIGEN/config"
+
+cp -r "scripts/raspi/stage" "$OUTPUT_PIGEN/stage"
 mkdir "$OUTPUT_PIGEN/stage/00-install/files"
 tar -czf "$OUTPUT_PIGEN/stage/00-install/files/install.tar.gz" -C "$OUTPUT_TMP" install
 
