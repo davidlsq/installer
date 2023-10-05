@@ -21,5 +21,5 @@ rm -rf "$REPOSITORY"
 git clone --depth 1 --branch "$BRANCH" "{{ installer_git }}" "$REPOSITORY"
 tar --owner=root --group=root --mode=u=rw,go= -zxf "{{ installer_lib }}/archive.tar.gz" -C "$REPOSITORY/{{ installer_directory }}"
 cp "{{ installer_lib }}/archive.tar.gz" "$REPOSITORY/{{ installer_directory }}/config/{{ installer_host }}.tar.gz"
-(cd "$REPOSITORY" && ansible-playbook -i "{{ installer_host }}," -c local "$CHECK" "{{ installer_directory }}/{{ installer_host }}.yml")
+(cd "$REPOSITORY" && ansible-playbook -i "{{ installer_host }}," -c local $CHECK "{{ installer_directory }}/{{ installer_host }}.yml")
 rm -rf "$REPOSITORY"
