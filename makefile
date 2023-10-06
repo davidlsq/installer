@@ -47,6 +47,14 @@ all: image
 
 test:
 
+.PHONY: dd-raspi dd-server
+
+dd-raspi: infra/raspi.img
+	@./scripts/dd-image.sh --image infra/raspi.img
+
+dd-server: infra/server.iso
+	@./scripts/dd-image.sh --image infra/server.iso
+
 .PHONY: bitwarden-push
 
 bitwarden-push: infra/config
