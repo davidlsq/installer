@@ -13,6 +13,7 @@ let
     pkgs.xorriso
     pkgs.gnumake
     pkgs.ansible-lint
+    pkgs.gitleaks
     pkgs.openssh
     pkgs.wireguard-tools
     pkgs.bitwarden-cli
@@ -32,6 +33,14 @@ let
         name = "ansiblelint";
         entry = "ansible-lint -v --force-color";
         language = "python";
+        pass_filenames = false;
+        always_run = false;
+      };
+      gitleaks = {
+        enable = true;
+        name = "gitleaks";
+        entry = "gitleaks protect --verbose --redact --staged";
+        language = "golang";
         pass_filenames = false;
         always_run = false;
       };
