@@ -66,8 +66,7 @@ playbook: infra/config
 .PHONY: github-push github-pull github-playbook-check github-playbook
 
 github-push: infra/config
-	@tar -cz infra/config/raspi_ssh_keys_github infra/config/server_ssh_keys_github infra/config/ssh_known_host \
-	  | gh secret set GIHUB_SSH -R davidlsq/installer
-
-github-pull:
-	@echo "${GIHUB_SSH}" | base64 -d | tar -xzf -
+	./scripts/github-push.sh --file infra/config/raspi_ssh_keys_github --var RASPI_GITHUB_SSH_KEY
+	./scripts/github-push.sh --file infra/config/raspi_ssh_keys_host.pub --var RASPI_HOST_SSH_KEY
+	./scripts/github-push.sh --file infra/config/server_ssh_keys_github --var SERVER_GITHUB_SSH_KEY
+	./scripts/github-push.sh --file infra/config/server_ssh_keys_host.pub --var SERVER_HOST_SSH_KEY
