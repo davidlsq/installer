@@ -83,14 +83,14 @@ jobs:
       - name: playbook-check-raspi
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 22
-          sudo /usr/lib/installer/run.sh ${{ github.head_ref }} -C
+          sudo /usr/lib/installer/run.sh check ${{ github.head_ref }}
         env:
           SSH_USER_KEY: ${{ secrets.RASPI_GITHUB_SSH_KEY }}
           SSH_HOST_KEY: ${{ secrets.RASPI_HOST_SSH_KEY }}
       - name: playbook-check-server
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 23
-          sudo /usr/lib/installer/run.sh ${{ github.head_ref }} -C
+          sudo /usr/lib/installer/run.sh check ${{ github.head_ref }}
         env:
           SSH_USER_KEY: ${{ secrets.SERVER_GITHUB_SSH_KEY }}
           SSH_HOST_KEY: ${{ secrets.SERVER_HOST_SSH_KEY }}

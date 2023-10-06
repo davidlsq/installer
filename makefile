@@ -9,15 +9,12 @@ common/debian-amd64.iso: | common
 
 virtual/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
-	./scripts/archive.sh --directory virtual --host virtual --output $@/virtual.tar.gz
 
 virtual/virtual.iso: common/debian-arm64.iso virtual/config
 	./scripts/debian.sh --iso $< --directory virtual --host virtual --output $@
 
 infra/config:
 	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
-	./scripts/archive.sh --directory infra --host server --output $@/server.tar.gz
-	./scripts/archive.sh --directory infra --host raspi --output $@/raspi.tar.gz
 
 infra/raspi.img: infra/config
 	./scripts/raspi.sh  --directory infra --host raspi --output $@

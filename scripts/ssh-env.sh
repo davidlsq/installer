@@ -11,6 +11,6 @@ shift 1
 touch "$TMP/user"; chmod u=rw,go= $_
 echo "$SSH_USER_KEY" | base64 -d > "$TMP/user"
 echo "$HOST  $(echo "$SSH_HOST_KEY" | base64 -d)" > "$TMP/known_host"
-ssh "$USER@$HOST" -i "$TMP/user" -o "GlobalKnownHostsFile=$TMP/known_host" $@ || true
+ssh "$USER@$HOST" -i "$TMP/user" -o "GlobalKnownHostsFile=$TMP/known_host" $@
 
 rm -r "$TMP"
