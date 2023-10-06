@@ -4,6 +4,7 @@
   ansible.builtin.apt:
     name:
       - git
+      - rsync
       - python3
       - python3-venv
     state: present
@@ -26,13 +27,18 @@
     group: root
     mode: u=rwx,go=
 
-- name: Copy archive
+- name: Copy files
+  with_items:
+    - 'files/{{ installer_host }}/'
+    - 'host_vars/{{ installer_host }}/'
+    - 'group_vars/'
   ansible.builtin.copy:
-    src: '{{ installer_archive }}'
-    dest: '{{ installer_lib }}/archive.tar.gz'
+    src: '{{ item }}'
+    dest: '{{ installer_lib }}/archive/{{ item }}/'
     owner: root
     group: root
     mode: u=rw,go=
+    directory_mode: u=rx,go=
 
 - name: Create script
   ansible.builtin.template:

@@ -49,7 +49,6 @@
   tags: installer
   roles:
     - role: installer
-      installer_archive: config/server.tar.gz
       installer_directory: infra
       installer_host: server
     - role: user
