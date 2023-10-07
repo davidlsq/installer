@@ -11,4 +11,5 @@ on_chroot << EOF
   chown -R root:root /install
   chmod -R go=-rwx /install
   chmod u=+x /install/install.sh
+  python3 -m pip cache purge
 EOF

@@ -9,6 +9,15 @@
     mode: u=rw,go=r
   register: create_config
 
+- name: Edit dhclient
+  when: network_dns is defined
+  ansible.builtin.lineinfile:
+    path: /etc/dhcp/dhclient.conf
+    regexp: ^supersede domain-name-servers
+    line: 'supersede domain-name-servers {{ network_dns | join(", ") }};'
+    create: true
+  register: edit_dhclient
+
 # Start service
 
 - name: Enable
@@ -22,7 +31,8 @@
     state: restarted
     daemon_reload: true
   when: >
-    create_config is changed
+    create_config is changed or
+    edit_dhclient is changed
 
 - name: Start
   ansible.builtin.systemd:

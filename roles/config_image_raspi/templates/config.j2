@@ -5,3 +5,11 @@ FIRST_USER_NAME=root
 FIRST_USER_PASS=root
 DISABLE_FIRST_BOOT_USER_RENAME=1
 STAGE_LIST="stage0 stage1 stage"
+_NETWORK_INTERFACE="{{ config_image_raspi_network_interface }}"
+{% if config_image_raspi_network_manual is defined %}
+_NETWORK_MANUAL=true
+_NETWORK_MANUAL_ADDRESS="{{ config_image_raspi_network_manual.address }}"
+_NETWORK_MANUAL_NETMASK="{{ config_image_raspi_network_manual.netmask }}"
+_NETWORK_MANUAL_GATEWAY="{{ config_image_raspi_network_manual.gateway }}"
+_NETWORK_MANUAL_DNS="{{ config_image_raspi_network_manual.dns | join(" ") }}"
+{% endif %}
