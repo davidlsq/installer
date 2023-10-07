@@ -223,13 +223,13 @@
       tags: certbot
       certbot_var: /mnt/data/certbot
       certbot_domain: '{{ network_public_domain }}'
-      certbot_ovh_application_key: '{{ server_ovh_application_key }}'
-      certbot_ovh_application_secret: '{{ server_ovh_application_secret }}'
-      certbot_ovh_consumer_key: '{{ server_ovh_consumer_key }}'
+      certbot_ovh_application_key: '{{ bitwarden_ovh_application_key }}'
+      certbot_ovh_application_secret: '{{ bitwarden_ovh_application_secret }}'
+      certbot_ovh_consumer_key: '{{ bitwarden_ovh_application_consumer_key }}'
     - role: ddclient
       tags: ddclient
-      ddclient_login: '{{ server_ddclient_login }}'
-      ddclient_password: '{{ server_ddclient_password }}'
+      ddclient_login: '{{ bitwarden_ovh_dns_username }}'
+      ddclient_password: '{{ bitwarden_ovh_dns_password }}'
       ddclient_domains: ['{{ network_public_domain }}']
 
 - name: Local Network

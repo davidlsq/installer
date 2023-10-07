@@ -6,8 +6,6 @@
 - name: Create hash
   ansible.builtin.copy:
     content: |
-        ---
-
         {% for var in config_hash_vars %}
         {% if var.method == "crypt" %}
         {% set salt = lookup("vars", var.salt, default=lookup("community.general.random_string", length=16, special=false)) %}

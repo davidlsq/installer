@@ -8,18 +8,27 @@ common/debian-amd64.iso: | common
 	wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
 
 virtual/config:
-	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
+	mkdir -p $@
 
-virtual/virtual.iso: common/debian-arm64.iso virtual/config
+virtual/config/playbook: | virtual/config
+	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' virtual/config.yml
+
+virtual/virtual.iso: common/debian-arm64.iso virtual/config/playbook
 	./scripts/debian.sh --iso $< --directory virtual --host virtual --output $@
 
 infra/config:
-	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' $@.yml
+	mkdir -p $@
 
-infra/raspi.img: infra/config
+infra/config/bitwarden.yml: | infra/config
+	./scripts/bitwarden-import.py  --organization Infra --output $@
+
+infra/config/playbook: | infra/config
+	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' infra/config.yml
+
+infra/raspi.img: infra/config/playbook
 	./scripts/raspi.sh  --directory infra --host raspi --output $@
 
-infra/server.iso: common/debian-amd64.iso infra/config
+infra/server.iso: common/debian-amd64.iso infra/config/bitwarden.yml infra/config/playbook
 	./scripts/debian.sh --iso $< --directory infra --host server --output $@
 
 DOWNLOAD = common/debian-arm64.iso common/debian-amd64.iso

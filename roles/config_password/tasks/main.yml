@@ -6,8 +6,6 @@
 - name: Create password
   ansible.builtin.copy:
     content: |
-        ---
-
         {% for var in config_password_vars %}
         {{ var.name }}: {{ lookup("vars", var.name, default=lookup("community.general.random_string", length=16, special=false)) }}
         {% endfor %}
