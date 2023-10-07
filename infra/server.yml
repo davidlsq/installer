@@ -15,6 +15,9 @@
     - role: network
       tags: network
       network_interface: '{{ server_network_interface }}'
+      network_dns:
+        - '{{ network_dns_1 }}'
+        - '{{ network_dns_2 }}'
     - role: apt
       tags: apt
     - role: grub

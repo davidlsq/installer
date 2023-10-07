@@ -11,6 +11,9 @@
     - role: network
       tags: network
       network_interface: '{{ raspi_network_interface }}'
+      network_dns:
+        - '{{ network_dns_1 }}'
+        - '{{ network_dns_2 }}'
     - role: ssh
       tags: ssh
       ssh_port: '{{ raspi_ssh_port }}'
