@@ -15,6 +15,7 @@ let
     pkgs.ansible-lint
     pkgs.gitleaks
     pkgs.openssh
+    pkgs.rsync
     pkgs.wireguard-tools
     pkgs.bitwarden-cli
     pkgs.gh

@@ -20,40 +20,35 @@
     umask: '0077'
 
 - name: Create lib dir
+  with_items:
+    - '{{ installer_lib }}'
+    - '{{ installer_lib }}/archive'
   ansible.builtin.file:
-    path: '{{ installer_lib }}'
+    path: '{{ item }}'
     state: directory
     owner: root
     group: root
     mode: u=rwx,go=
 
 - name: Copy files
-  with_items:
-    - 'files/{{ installer_host }}/'
-    - 'host_vars/{{ installer_host }}/'
-    - 'group_vars/'
-  ansible.builtin.copy:
-    src: '{{ item }}'
-    dest: '{{ installer_lib }}/archive/{{ item }}/'
-    owner: root
-    group: root
-    mode: u=rw,go=
-    directory_mode: u=rx,go=
+  ansible.posix.synchronize:
+    src: '{{ playbook_dir }}/'
+    dest: '{{ installer_lib }}/archive/'
+    rsync_opts:
+      - --copy-links
+      - --chown="root:root"
+      - --chmod=Du="rwx,go=,Fu=rw,og="
+      - --filter="+ group_vars/***"
+      - '--filter="+ host_vars" --filter="+ host_vars/{{ installer_host }}/***" --filter="- host_vars/*"'
+      - '--filter="+ files" --filter="+ files/{{ installer_host }}/***" --filter="- files/*"'
+      - --filter="- *"
+    use_ssh_args: true
+    verify_host: true
 
 - name: Create script
   ansible.builtin.template:
     src: run.sh.j2
     dest: '{{ installer_lib }}/run.sh'
-    owner: root
-    group: root
-    mode: u=rwx,go=
-
-# Create var
-
-- name: Create var dir
-  ansible.builtin.file:
-    path: '{{ installer_var }}'
-    state: directory
     owner: root
     group: root
     mode: u=rwx,go=
