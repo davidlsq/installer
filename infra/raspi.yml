@@ -90,4 +90,4 @@
     - role: network
       tags: network
       network_interface: '{{ raspi_network_interface }}'
-      network_dns: [127.0.0.1]
+      network_dns: ['{{ network_local_dns }}']
