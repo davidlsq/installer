@@ -30,6 +30,9 @@ if [ "$COMMAND" == "check" ]; then
    ARG="-C"
 fi
 
-ANSIBLE_CONFIG="$REPOSITORY/ansible.cfg" ansible-playbook -i "{{ installer_host }}," -c local $ARG "$REPOSITORY/{{ installer_directory }}/{{ installer_host }}.yml"
+ANSIBLE_CONFIG="$REPOSITORY/ansible.cfg" \
+  ansible-playbook -i "{{ installer_host }}," -c local $ARG \
+  --skip-tags installer \
+  "$REPOSITORY/{{ installer_directory }}/{{ installer_host }}.yml"
 
 rm -rf "$REPOSITORY"
