@@ -28,7 +28,7 @@
       user_password: '{{ raspi_hash_user_regular }}'
       user_key_pub: 'raspi/ssh_keys_{{ user_regular_name }}.pub'
       user_shell: /bin/zsh
-      user_sudo: yes-no-password
+      user_sudo_group: yes-no-password
     - role: ohmyzsh
       ohmyzsh_user_name: root
     - role: ohmyzsh
@@ -60,7 +60,7 @@
       user_name: '{{ user_github_name }}'
       user_password: '{{ raspi_hash_user_github }}'
       user_key_pub: 'raspi/ssh_keys_{{ user_github_name }}.pub'
-      user_sudo: false
+      user_sudo_group: false
       user_sudo_commands:
         - /usr/lib/installer/run.sh *
 

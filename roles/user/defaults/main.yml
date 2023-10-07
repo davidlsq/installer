@@ -1,2 +1,2 @@
-user_sudo: false
+user_sudo_group: false
 user_shell: /bin/bash

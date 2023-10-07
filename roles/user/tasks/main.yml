@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: sudo
     state: present
-  when: user_sudo in [True, "yes", "yes-no-password"]
+  when: user_sudo_group in [True, "yes", "yes-no-password"]
 
 - name: Package zsh
   ansible.builtin.apt:
@@ -44,7 +44,7 @@
     name: '{{ user_name }}'
     groups: sudo
     append: true
-  when: user_sudo in [True, "yes", "yes-no-password"]
+  when: user_sudo_group in [True, "yes", "yes-no-password"]
 
 - name: Set sudo without password
   ansible.builtin.copy:
@@ -54,7 +54,7 @@
     owner: root
     group: root
     mode: ug=r,o=
-  when: user_sudo == 'yes-no-password'
+  when: user_sudo_group == 'yes-no-password'
 
 - name: Set sudo command
   ansible.builtin.copy:
