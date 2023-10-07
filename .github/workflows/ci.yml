@@ -16,7 +16,7 @@ jobs:
     outputs:
       make: ${{ steps.changes.outputs.make }}
       dependabot: ${{ steps.changes.outputs.dependabot }}
-      server: ${{ steps.changes.outputs.server }}
+      infra: ${{ steps.changes.outputs.infra }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
               - makefile
             dependabot:
               - .github/dependabot.yml
-            server:
+            infra:
               - 'roles/**'
               - 'infra/**'
               - ansible.cfg
@@ -74,20 +74,20 @@ jobs:
   playbook-check:
     name: playbook-check
     runs-on: ubuntu-latest
-    concurrency: server
+    concurrency: infra
     needs: changes
-    if: needs.changes.outputs.server == 'true'
+    if: needs.changes.outputs.infra == 'true'
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: playbook-check-raspi
+      - name: playbook-check-infra-raspi
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 22
           sudo /usr/lib/installer/run.sh check ${{ github.head_ref }}
         env:
           SSH_USER_KEY: ${{ secrets.RASPI_GITHUB_SSH_KEY }}
           SSH_HOST_KEY: ${{ secrets.RASPI_HOST_SSH_KEY }}
-      - name: playbook-check-server
+      - name: playbook-check-infra-server
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 23
           sudo /usr/lib/installer/run.sh check ${{ github.head_ref }}
