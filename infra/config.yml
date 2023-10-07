@@ -126,8 +126,8 @@
         port: '{{ server_wireguard_port }}'
         key_pub: '{{ config_dir }}/server_wireguard_keys_host.pub'
         dns:
-          - '{{ network_dns_1 }}'
-          - '{{ network_dns_2 }}'
+          - '{{ network_public_dns_1 }}'
+          - '{{ network_public_dns_2 }}'
       config_wireguard_client_interfaces:
         - output: '{{ config_dir }}/wireguard_client_macbook'
           key: '{{ config_dir }}/server_wireguard_keys_macbook'
@@ -163,7 +163,15 @@
     - role: config_image_raspi
       config_image_raspi_output: '{{ config_dir }}/raspi_image'
       config_image_raspi_name: raspi
+      config_image_raspi_network_interface: '{{ raspi_network_interface }}'
       config_image_raspi_network_hostname: '{{ raspi_network_hostname }}'
+      config_image_raspi_network_manual:
+        address: '{{ raspi_network_local_ip_address }}'
+        netmask: '{{ network_local_netmask }}'
+        gateway: '{{ network_local_gateway }}'
+        dns:
+          - '{{ network_public_dns_1 }}'
+          - '{{ network_public_dns_2 }}'
     - role: config_image_debian
       config_image_debian_ouput: '{{ config_dir }}/server_image'
       config_image_debian_name: server
@@ -171,6 +179,13 @@
       config_image_debian_disk_system: '{{ server_disk_system }}'
       config_image_debian_network_interface: '{{ server_network_interface }}'
       config_image_debian_network_hostname: '{{ server_network_hostname }}'
+      config_image_debian_network_manual:
+        address: '{{ server_network_local_ip_address }}'
+        netmask: '{{ network_local_netmask }}'
+        gateway: '{{ network_local_gateway }}'
+        dns:
+          - '{{ network_public_dns_1 }}'
+          - '{{ network_public_dns_2 }}'
       config_image_debian_recipe_home: 16384
       config_image_debian_recipe_tmp: 16384
       config_image_debian_recipe_swap: 32768

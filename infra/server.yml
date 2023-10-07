@@ -12,12 +12,6 @@
       tags: cdrom
     - role: keyboard
       tags: keyboard
-    - role: network
-      tags: network
-      network_interface: '{{ server_network_interface }}'
-      network_dns:
-        - '{{ network_dns_1 }}'
-        - '{{ network_dns_2 }}'
     - role: apt
       tags: apt
     - role: grub
@@ -237,3 +231,14 @@
       ddclient_login: '{{ server_ddclient_login }}'
       ddclient_password: '{{ server_ddclient_password }}'
       ddclient_domains: ['{{ network_public_domain }}']
+
+- name: Local Network
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: base
+  roles:
+    - role: network
+      tags: network
+      network_interface: '{{ server_network_interface }}'
+      network_dns: ['{{ network_local_dns }}']

@@ -5,11 +5,16 @@ user_regular_name: david
 user_github_id: 1001
 user_github_name: github
 
+network_local_netmask: 255.255.255.0
+network_local_gateway: 192.168.100.1
+network_local_dns: '{{ raspi_network_local_ip_address }}'
+
 network_public_domain: home.davidlsq.fr
-network_dns_1: 9.9.9.9
-network_dns_2: 149.112.112.112
+network_public_dns_1: 9.9.9.9
+network_public_dns_2: 149.112.112.112
 
 raspi_network_hostname: raspi
+raspi_network_interface: eth0
 raspi_network_local_ip_address: 192.168.100.2
 raspi_network_local_domain: '{{ raspi_network_hostname }}.local'
 raspi_network_public_domain: '{{ raspi_network_hostname }}.{{ network_public_domain }}'

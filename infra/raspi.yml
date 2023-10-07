@@ -8,12 +8,6 @@
   roles:
     - role: systemctl
       tags: systemctl
-    - role: network
-      tags: network
-      network_interface: '{{ raspi_network_interface }}'
-      network_dns:
-        - '{{ network_dns_1 }}'
-        - '{{ network_dns_2 }}'
     - role: ssh
       tags: ssh
       ssh_port: '{{ raspi_ssh_port }}'
@@ -84,5 +78,16 @@
       pihole_user_id: 1010
       pihole_password: '{{ raspi_hash_pihole }}'
       pihole_interface: '{{ raspi_network_interface }}'
-      pihole_dns_1: '{{ network_dns_1 }}'
-      pihole_dns_2: '{{ network_dns_2 }}'
+      pihole_dns_1: '{{ network_public_dns_1 }}'
+      pihole_dns_2: '{{ network_public_dns_2 }}'
+
+- name: Local Network
+  hosts: raspi
+  gather_facts: false
+  become: true
+  tags: base
+  roles:
+    - role: network
+      tags: network
+      network_interface: '{{ raspi_network_interface }}'
+      network_dns: [127.0.0.1]

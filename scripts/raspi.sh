@@ -44,14 +44,22 @@ CONFIG_IMAGE="$DIRECTORY/config/${HOST}_image"
 cp "$CONFIG_IMAGE/install.sh" "$OUTPUT_INSTALL/install.sh"
 cp "$CONFIG_IMAGE/config" "$OUTPUT_PIGEN/config"
 
-cp -r "scripts/raspi/stage" "$OUTPUT_PIGEN/stage"
-mkdir "$OUTPUT_PIGEN/stage/00-install/files"
-tar -czf "$OUTPUT_PIGEN/stage/00-install/files/install.tar.gz" -C "$OUTPUT_TMP" install
+STAGE="$OUTPUT_PIGEN/stage"
+STAGE_FILES="$STAGE/00-install/files"
+cp -r "scripts/raspi/stage" "$STAGE"
+mkdir "$STAGE_FILES"
+cp "$CONFIG_IMAGE/config" "$STAGE_FILES"
+tar -czf "$STAGE_FILES/install.tar.gz" -C "$OUTPUT_TMP" install
 
+# Avoid DNS errors during debian bootstrap
 DEB_DOMAIN=debian.proxad.net
 DEB_IP="$(host "$DEB_DOMAIN" | awk '/has address/ { print $4 ; exit }')"
 sed -i "s/deb\.debian\.org/$DEB_IP/g" "$OUTPUT_PIGEN/stage0/prerun.sh"
-(cd "./$OUTPUT_PIGEN" && ./build-docker.sh)
-(cd "./$OUTPUT_PIGEN/deploy" && mv *-raspi.img raspi.img)
-mv "./$OUTPUT_PIGEN/deploy/raspi.img" "$OUTPUT"
+
+# Remove pi-gen DNS config
+rm -r "$OUTPUT_PIGEN/export-image/03-network"
+
+(cd "$OUTPUT_PIGEN" && ./build-docker.sh)
+(cd "$OUTPUT_PIGEN/deploy" && mv *-raspi.img raspi.img)
+mv "$OUTPUT_PIGEN/deploy/raspi.img" "$OUTPUT"
 rm -rf "$OUTPUT_TMP"
