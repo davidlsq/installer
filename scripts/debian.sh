@@ -68,6 +68,8 @@ OUTPUT_EFI="$OUTPUT_TMP/efi.img"
 OUTPUT_CONTENT="$OUTPUT_TMP/content"
 OUTPUT_INSTALL="$OUTPUT_CONTENT/.install"
 
+trap "rm -r $OUTPUT_TMP" EXIT
+
 rm -rf "$OUTPUT_TMP"
 mkdir "$OUTPUT_TMP"
 
@@ -92,4 +94,3 @@ chmod -R go-rwx "$OUTPUT_INSTALL"
 create-iso "$OUTPUT_EFI" "$OUTPUT_CONTENT" "$OUTPUT_TMP/image.iso"
 
 mv "$OUTPUT_TMP/image.iso" "$OUTPUT"
-rm -rf "$OUTPUT_TMP"

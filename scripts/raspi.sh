@@ -26,6 +26,8 @@ OUTPUT_TMP="$OUTPUT.tmp"
 OUTPUT_INSTALL="$OUTPUT_TMP/install"
 OUTPUT_PIGEN="$OUTPUT_TMP/pi-gen"
 
+trap "rm -r $OUTPUT_TMP" EXIT
+
 rm -rf "$OUTPUT_TMP"
 docker rm -v pigen_work || true
 
@@ -62,4 +64,3 @@ rm -r "$OUTPUT_PIGEN/export-image/03-network"
 (cd "$OUTPUT_PIGEN" && ./build-docker.sh)
 (cd "$OUTPUT_PIGEN/deploy" && mv *-raspi.img raspi.img)
 mv "$OUTPUT_PIGEN/deploy/raspi.img" "$OUTPUT"
-rm -rf "$OUTPUT_TMP"
