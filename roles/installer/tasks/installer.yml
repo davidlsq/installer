@@ -1,0 +1,56 @@
+# Install package
+
+- name: Package
+  ansible.builtin.apt:
+    name:
+      - git
+      - rsync
+      - python3
+      - python3-venv
+    state: present
+
+# Create lib
+
+- name: Create venv
+  ansible.builtin.pip:
+    name: ansible
+    virtualenv: '{{ installer_venv }}'
+    virtualenv_command: python3 -m venv
+    virtualenv_site_packages: true
+    umask: '0077'
+
+- name: Create lib dir
+  with_items:
+    - '{{ installer_lib }}'
+    - '{{ installer_lib }}/archive'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=
+
+- name: Copy files
+  ansible.posix.synchronize:
+    src: '{{ playbook_dir }}/'
+    dest: '{{ installer_lib }}/archive/'
+    rsync_opts:
+      - --checksum
+      - --delete
+      - --copy-links
+      - --chown="root:root"
+      - --chmod=Du="rwx,go=,Fu=rw,og="
+      - --filter="+ group_vars/***"
+      - '--filter="+ host_vars" --filter="+ host_vars/{{ installer_host }}/***" --filter="- host_vars/*"'
+      - '--filter="+ files" --filter="+ files/{{ installer_host }}/***" --filter="- files/*"'
+      - --filter="- *"
+    use_ssh_args: true
+    verify_host: true
+
+- name: Create script
+  ansible.builtin.template:
+    src: run.sh.j2
+    dest: '{{ installer_lib }}/run.sh'
+    owner: root
+    group: root
+    mode: u=rwx,go=

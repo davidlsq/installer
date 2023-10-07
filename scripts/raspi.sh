@@ -40,7 +40,7 @@ cp -rL "$DIRECTORY/group_vars" "$OUTPUT_INSTALL/group_vars"
 cp -rL "$DIRECTORY/host_vars/$HOST" "$OUTPUT_INSTALL/host_vars/$HOST"
 cp -rL "$DIRECTORY/files/$HOST" "$OUTPUT_INSTALL/files/$HOST"
 
-CONFIG_IMAGE="$DIRECTORY/config/${HOST}_image"
+CONFIG_IMAGE="$DIRECTORY/config/playbook/${HOST}_image"
 cp "$CONFIG_IMAGE/install.sh" "$OUTPUT_INSTALL/install.sh"
 cp "$CONFIG_IMAGE/config" "$OUTPUT_PIGEN/config"
 
