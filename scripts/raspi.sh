@@ -26,7 +26,7 @@ OUTPUT_TMP="$OUTPUT.tmp"
 OUTPUT_INSTALL="$OUTPUT_TMP/install"
 OUTPUT_PIGEN="$OUTPUT_TMP/pi-gen"
 
-trap "rm -r $OUTPUT_TMP" EXIT
+trap "rm -rf $OUTPUT_TMP" EXIT
 
 rm -rf "$OUTPUT_TMP"
 docker rm -v pigen_work || true

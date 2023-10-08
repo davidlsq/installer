@@ -2,6 +2,8 @@
 
 set -e -o pipefail
 
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 if [ ! -f /install/expand.done ]; then
   export PATH=$PATH:/usr/sbin/
   /usr/bin/raspi-config --expand-rootfs

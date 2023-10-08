@@ -1,0 +1,3 @@
+checkmk_htpasswd: '/omd/sites/{{ checkmk_site }}/etc/htpasswd'
+checkmk_api_url: 'http://127.0.0.1:{{ checkmk_port }}/{{ checkmk_site }}/check_mk/api/1.0'
+checkmk_deb_url: 'https://download.checkmk.com/checkmk/2.2.0p11/check-mk-raw-{{ checkmk_version }}_0.bookworm_amd64.deb'

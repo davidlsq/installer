@@ -1,0 +1,46 @@
+# Package
+
+- name: Package
+  ansible.builtin.apt:
+    name: jq
+    state: present
+
+- name: Download package
+  ansible.builtin.get_url:
+    url: '{{ checkmk_agent_deb_url }}'
+    dest: '{{ checkmk_agent_deb }}'
+    force: true
+    owner: root
+    group: root
+    mode: ug=rw,o=r
+
+- name: Install package
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if ! dpkg -l | grep check-mk-agent; then
+      apt-get update
+      apt-get install -y {{ checkmk_agent_deb }}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: package
+  changed_when: package.stdout.endswith("CHANGED")
+
+- name: Register
+  when: checkmk_agent_register
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    unconnected=$(cmk-agent-ctl status --json | jq '.connections | length == 0')
+    error=$(cmk-agent-ctl status --json | jq '.connections | map(.remote.error != null) | any')
+    if [ "$unconnected" = "true" ] || [ "$error" = "true" ]; then
+      cmk-agent-ctl register --trust-cert \
+      --server {{ checkmk_address }} --site {{ checkmk_site }} \
+      --hostname {{ checkmk_agent_name }} \
+      --user automation --password {{ checkmk_automation_password }}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: register
+  changed_when: register.stdout.endswith("CHANGED")

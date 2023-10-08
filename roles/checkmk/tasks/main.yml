@@ -1,0 +1,117 @@
+# Package
+
+- name: Download package
+  ansible.builtin.get_url:
+    url: '{{ checkmk_deb_url }}'
+    dest: '{{ checkmk_deb }}'
+    force: false
+    owner: root
+    group: root
+    mode: ug=rw,o=r
+
+- name: Install package
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if ! dpkg -l | grep check-mk-raw-{{ checkmk_version }}; then
+      apt-get update
+      apt-get install -y {{ checkmk_deb }}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: package
+  changed_when: package.stdout.endswith("CHANGED")
+
+# Create var
+
+- name: Create new
+  ansible.builtin.command: >
+    omd create -u {{ server_checkmk_user_id }} -g {{ server_checkmk_user_id }} {{ checkmk_site }}
+  args:
+    creates: '/omd/sites/{{ checkmk_site }}'
+
+- name: Reinstall
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if ! id {{ checkmk_site }}; then
+      omd backup {{ checkmk_site }} /root/checkmk_{{ checkmk_site }}.tar.gz
+      rm -r /omd/sites/{{ checkmk_site }}
+      omd restore -u {{ server_checkmk_user_id }} -g {{ server_checkmk_user_id }} /root/checkmk_{{ checkmk_site }}.tar.gz
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: reinstall
+  changed_when: reinstall.stdout.endswith("CHANGED")
+
+- name: Config
+  loop:
+    - [APACHE_TCP_PORT, '{{ checkmk_port }}']
+    - [AGENT_RECEIVER_PORT, '{{ checkmk_agent_port }}']
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if [ ! "$(omd config {{ checkmk_site }} show {{ item[0] }})" = "{{ item[1] }}" ]; then
+      omd stop {{ checkmk_site }}
+      omd config {{ checkmk_site }} set {{ item[0] }} "{{ item[1] }}"
+      omd update-apache-config {{ checkmk_site }}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: config
+  changed_when: config.stdout.endswith("CHANGED")
+
+- name: Set automation password
+  ansible.builtin.copy:
+    content: |
+      {{ checkmk_automation_password }}
+    dest: /omd/sites/{{ checkmk_site }}/var/check_mk/web/automation/automation.secret
+    owner: '{{ checkmk_site }}'
+    group: '{{ checkmk_site }}'
+    mode: ug=rw,o=
+  no_log: true
+
+- name: Start
+  ansible.builtin.command: >
+    omd start {{ checkmk_site }}
+  register: config
+  changed_when: config.rc == 0
+  failed_when:
+    - config.rc != 0
+    - config.rc != 2
+
+# Create users
+
+- name: Create user
+  loop: '{{ checkmk_users | map(attribute="name") }}'
+  ansible.builtin.include_tasks:
+    file: user.yml
+
+# Set passwords
+
+- name: Set password
+  loop: '{{ [{"name": "cmkadmin", "password": checkmk_cmkadmin_password}] + checkmk_users }}'
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if ! htpasswd -vb {{ checkmk_htpasswd }} {{ item.name }} {{ item.password }}; then
+      htpasswd -bB {{ checkmk_htpasswd }} {{ item.name }} {{ item.password }}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  register: config
+  changed_when: config.stdout.endswith("CHANGED")
+  no_log: true
+
+# Create hosts
+
+- name: Create host
+  loop: '{{ checkmk_hosts }}'
+  ansible.builtin.include_tasks:
+    file: host.yml
+
+# Trigger changes
+
+- name: Apply change
+  ansible.builtin.include_tasks:
+    file: change.yml

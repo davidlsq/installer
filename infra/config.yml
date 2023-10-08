@@ -42,6 +42,12 @@
       config_password_output: '{{ config_dir }}/server_password_samba.yml'
       config_password_vars:
         - name: server_password_samba
+        - name: server_password_checkmk_cmkadmin
+        - name: server_password_checkmk_regular
+    - role: config_password
+      config_password_output: '{{ config_dir }}/infra_password.yml'
+      config_password_vars:
+        - name: server_password_checkmk_automation
     - role: config_hash
       config_hash_output: '{{ config_dir }}/server_hash.yml'
       config_hash_vars:

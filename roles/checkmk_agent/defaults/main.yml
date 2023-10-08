@@ -1,0 +1,4 @@
+checkmk_site: monitoring
+checkmk_agent_version: 2.2.0p11
+checkmk_agent_deb: '/usr/lib/checkmk-agent-{{ checkmk_agent_version }}.deb'
+checkmk_agent_register: false

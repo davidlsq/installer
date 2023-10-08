@@ -2,10 +2,10 @@ common:
 	mkdir -p $@
 
 common/debian-arm64.iso: | common
-	wget -q https://cdimage.debian.org/images/release/12.1.0/arm64/iso-cd/debian-12.1.0-arm64-netinst.iso -O $@
+	wget -q https://cdimage.debian.org/images/release/12.2.0/arm64/iso-cd/debian-12.2.0-arm64-netinst.iso -O $@
 
 common/debian-amd64.iso: | common
-	wget -q https://cdimage.debian.org/images/release/12.1.0/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -O $@
+	wget -q https://cdimage.debian.org/images/release/12.2.0/amd64/iso-cd/debian-12.2.0-amd64-netinst.iso -O $@
 
 virtual/config:
 	mkdir -p $@
