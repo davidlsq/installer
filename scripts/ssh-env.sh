@@ -4,7 +4,7 @@ set -e -o pipefail
 
 TMP=$(mktemp -d)
 
-trap "rm -r $TMP" EXIT
+trap "rm -rf $TMP" EXIT
 
 USER=$(echo "$1" | cut -d '@' -f 1)
 HOST=$(echo "$1" | cut -d '@' -f 2)

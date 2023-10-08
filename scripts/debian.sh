@@ -68,7 +68,7 @@ OUTPUT_EFI="$OUTPUT_TMP/efi.img"
 OUTPUT_CONTENT="$OUTPUT_TMP/content"
 OUTPUT_INSTALL="$OUTPUT_CONTENT/.install"
 
-trap "rm -r $OUTPUT_TMP" EXIT
+trap "rm -rf $OUTPUT_TMP" EXIT
 
 rm -rf "$OUTPUT_TMP"
 mkdir "$OUTPUT_TMP"

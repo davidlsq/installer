@@ -42,6 +42,19 @@
       vg_disks:
         - '{{ raspi_disk_1 }}'
 
+- name: CheckMK Agent
+  hosts: raspi
+  gather_facts: false
+  become: true
+  tags: checkmk_agent
+  roles:
+    - role: checkmk_agent
+      checkmk_site: '{{ server_checkmk_site }}'
+      checkmk_address: '{{ server_network_local_ip_address }}'
+      checkmk_automation_password: '{{ server_password_checkmk_automation }}'
+      checkmk_agent_name: server
+      checkmk_agent_register: false
+
 - name: Installer
   hosts: raspi
   gather_facts: false

@@ -76,6 +76,52 @@
       vg_disks:
         - /dev/md0
 
+- name: CheckMK
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: checkmk
+  roles:
+    - role: lvm_lv
+      tags: data
+      vg_name: data
+      lv_name: checkmk
+      lv_size: 10G
+      lv_opts: --type linear
+      lv_mount: /opt/omd
+    - role: checkmk
+      checkmk_site: '{{ server_checkmk_site }}'
+      checkmk_user_id: '{{ server_checkmk_user_id }}'
+      checkmk_port: '{{ server_checkmk_port }}'
+      checkmk_agent_port: '{{ server_checkmk_agent_port }}'
+      checkmk_cmkadmin_password: '{{ server_password_checkmk_cmkadmin }}'
+      checkmk_automation_password: '{{ server_password_checkmk_automation }}'
+      checkmk_users:
+        - name: '{{ user_regular_name }}'
+          password: '{{ server_password_checkmk_regular }}'
+      checkmk_hosts:
+        - name: raspi
+          ip_address: '{{ raspi_network_local_ip_address }}'
+        - name: server
+          ip_address: '{{ server_network_local_ip_address }}'
+        - name: gateway
+          ip_address: '{{ network_local_gateway }}'
+        - name: box
+          ip_address: 192.168.0.1
+
+- name: CheckMK Agent
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: checkmk_agent
+  roles:
+    - role: checkmk_agent
+      checkmk_site: '{{ server_checkmk_site }}'
+      checkmk_address: 127.0.0.1
+      checkmk_automation_password: '{{ server_password_checkmk_automation }}'
+      checkmk_agent_name: server
+      checkmk_agent_register: true
+
 - name: Wireguard
   hosts: server
   gather_facts: false
