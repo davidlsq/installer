@@ -14,7 +14,7 @@ network_interface: enp0s31f6
 network_local_domain: '{{ network_hostname }}.local'
 network_public_sub_domain: '{{ network_hostname }}.{{ network_public_domain }}'
 
-wireguard_ip_adress: 10.0.100
+wireguard_address: 10.0.100
 
 disk_system: /dev/disk/by-id/nvme-KINGSTON_SNV2S500G_50026B7685F960D0
 disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB

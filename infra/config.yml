@@ -122,7 +122,7 @@
         - '{{ config_dir }}/server_wireguard_keys_iphone'
     - role: config_wireguard_client
       config_wireguard_client_peer:
-        ip_address: '{{ hostvars.server.wireguard_ip_adress }}'
+        address: '{{ hostvars.server.wireguard_address }}'
         public_domain: '{{ hostvars.server.network_public_sub_domain }}'
         port: '{{ hostvars.server.port_wireguard }}'
         key_pub: '{{ config_dir }}/server_wireguard_keys_host.pub'
@@ -135,7 +135,7 @@
         - output: '{{ config_dir }}/wireguard_client_iphone'
           key: '{{ config_dir }}/server_wireguard_keys_iphone'
     - role: config_inventory
-      config_inventory_output: '{{ config_dir }}/inventory_local_ip_address'
+      config_inventory_output: '{{ config_dir }}/inventory_local_address'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
       config_inventory_user: '{{ user_name_regular }}'
       config_inventory_vars:
