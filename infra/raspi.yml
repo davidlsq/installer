@@ -16,13 +16,13 @@
     - role: user
       tags: user
       user_name: root
-      user_password: '{{ raspi_hash_user_root }}'
+      user_password: '{{ hash_root }}'
       user_shell: /bin/zsh
     - role: user
       tags: user
       user_id: '{{ user_id_regular }}'
       user_name: '{{ user_name_regular }}'
-      user_password: '{{ raspi_hash_user_regular }}'
+      user_password: '{{ hash_regular }}'
       user_key_pub: 'raspi/ssh_keys_{{ user_name_regular }}.pub'
       user_shell: /bin/zsh
       user_sudo_group: yes-no-password
@@ -67,7 +67,7 @@
       tags: user
       user_id: '{{ user_id_github }}'
       user_name: '{{ user_name_github }}'
-      user_password: '{{ raspi_hash_user_github }}'
+      user_password: '{{ hash_github }}'
       user_key_pub: 'raspi/ssh_keys_{{ user_name_github }}.pub'
       user_sudo_group: false
       user_sudo_commands:
@@ -89,7 +89,7 @@
     - role: pihole
       pihole_var: /mnt/data/pihole
       pihole_user_id: 1010
-      pihole_password: '{{ raspi_hash_pihole }}'
+      pihole_password: '{{ hash_pihole }}'
       pihole_interface: '{{ network_interface }}'
       pihole_dns_1: '{{ network_public_dns_1 }}'
       pihole_dns_2: '{{ network_public_dns_2 }}'

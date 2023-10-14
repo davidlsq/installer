@@ -10,12 +10,12 @@
     - role: config_hash
       config_hash_output: '{{ config_dir }}/virtual_hash.yml'
       config_hash_vars:
-        - hash_name: virtual_hash_user_root
-          salt_name: virtual_salt_user_root
+        - hash_name: hash_root
+          salt_name: salt_root
           password: '{{ hostvars.virtual.password_root }}'
           method: crypt
-        - hash_name: virtual_hash_user_regular
-          salt_name: virtual_salt_user_regular
+        - hash_name: hash_regular
+          salt_name: salt_regular
           password: '{{ hostvars.virtual.password_regular }}'
           method: crypt
     - role: config_ssh_keys
@@ -46,7 +46,7 @@
     - role: config_image_debian
       config_image_debian_ouput: '{{ config_dir }}/virtual_image'
       config_image_debian_name: virtual
-      config_image_debian_hash_user_root: '{{ virtual_hash_user_root }}'
+      config_image_debian_hash_user_root: '{{ hash_root }}'
       config_image_debian_disk_system: '{{ hostvars.virtual.disk_system }}'
       config_image_debian_network_interface: '{{ hostvars.virtual.network_interface }}'
       config_image_debian_network_hostname: '{{ hostvars.virtual.network_hostname }}'
