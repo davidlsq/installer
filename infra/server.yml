@@ -25,13 +25,13 @@
     - role: user
       tags: user
       user_name: root
-      user_password: '{{ server_hash_user_root }}'
+      user_password: '{{ hash_root }}'
       user_shell: /bin/zsh
     - role: user
       tags: user
       user_id: '{{ user_id_regular }}'
       user_name: '{{ user_name_regular }}'
-      user_password: '{{ server_hash_user_regular }}'
+      user_password: '{{ hash__regular }}'
       user_key_pub: 'server/ssh_keys_{{ user_name_regular }}.pub'
       user_shell: /bin/zsh
       user_sudo_group: yes-no-password
@@ -53,7 +53,7 @@
       tags: user
       user_id: '{{ user_id_github }}'
       user_name: '{{ user_name_github }}'
-      user_password: '{{ server_hash_user_github }}'
+      user_password: '{{ hash_github }}'
       user_key_pub: 'server/ssh_keys_{{ user_name_github }}.pub'
       user_sudo_group: false
       user_sudo_commands:
@@ -124,7 +124,7 @@
     user_id: '{{ user_id_grafana }}'
     grafana_vg: data
     grafana_admin_name: '{{ user_name_regular }}'
-    grafana_admin_password: '{{ server_password_grafana }}'
+    grafana_admin_password: '{{ password_grafana }}'
     grafana_address: '{{ network_private_address }}'
     grafana_port: '{{ port_grafana }}'
 
@@ -162,7 +162,7 @@
     - role: samba
       samba_var: /mnt/data/timemachine
       samba_user: '{{ user_name_regular }}'
-      samba_password: '{{ server_password_samba }}'
+      samba_password: '{{ password_samba }}'
       samba_section: TimeMachine
       samba_section_conf: timemachine.conf.j2
 

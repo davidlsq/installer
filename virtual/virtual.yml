@@ -25,12 +25,12 @@
     - role: user
       tags: user
       user_name: root
-      user_password: '{{ virtual_hash_user_root }}'
+      user_password: '{{ hash_root }}'
       user_shell: /bin/zsh
     - role: user
       tags: user
       user_name: '{{ user_name_regular }}'
-      user_password: '{{ virtual_hash_user_regular }}'
+      user_password: '{{ hash_regular }}'
       user_key_pub: 'virtual/ssh_keys_{{ user_name_regular }}.pub'
       user_shell: /bin/zsh
       user_sudo_group: yes-no-password

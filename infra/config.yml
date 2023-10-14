@@ -10,53 +10,53 @@
     - role: config_password
       config_password_output: '{{ config_dir }}/raspi_password.yml'
       config_password_vars:
-        - name: raspi_password_user_root
-        - name: raspi_password_user_regular
-        - name: raspi_password_user_github
-        - name: raspi_password_pihole
+        - name: password_root
+        - name: password_regular
+        - name: password_github
+        - name: password_pihole
     - role: config_hash
       config_hash_output: '{{ config_dir }}/raspi_hash.yml'
       config_hash_vars:
-        - hash_name: raspi_hash_user_root
-          salt_name: raspi_salt_user_root
-          password_name: raspi_password_user_root
+        - hash_name: hash_root
+          salt_name: salt_root
+          password_name: password_root
           method: crypt
-        - hash_name: raspi_hash_user_regular
-          salt_name: raspi_salt_user_regular
-          password_name: raspi_password_user_regular
+        - hash_name: hash_regular
+          salt_name: salt_regular
+          password_name: password_regular
           method: crypt
-        - hash_name: raspi_hash_user_github
-          salt_name: raspi_salt_user_github
-          password_name: raspi_password_user_github
+        - hash_name: hash_github
+          salt_name: salt_github
+          password_name: password_github
           method: crypt
-        - hash_name: raspi_hash_pihole
-          password_name: raspi_password_pihole
+        - hash_name: hash_pihole
+          password_name: password_pihole
           method: sha256
     - role: config_password
       config_password_output: '{{ config_dir }}/server_password_1.yml'
       config_password_vars:
-        - name: server_password_user_root
-        - name: server_password_user_regular
-        - name: server_password_user_github
+        - name: password_root
+        - name: password_regular
+        - name: password_github
     - role: config_password
       config_password_output: '{{ config_dir }}/server_password_2.yml'
       config_password_vars:
-        - name: server_password_samba
-        - name: server_password_grafana
+        - name: password_samba
+        - name: password_grafana
     - role: config_hash
       config_hash_output: '{{ config_dir }}/server_hash.yml'
       config_hash_vars:
-        - hash_name: server_hash_user_root
-          salt_name: server_salt_user_root
-          password_name: server_password_user_root
+        - hash_name: hash_root
+          salt_name: salt_root
+          password_name: password_root
           method: crypt
-        - hash_name: server_hash_user_regular
-          salt_name: server_salt_user_regular
-          password_name: server_password_user_regular
+        - hash_name: hash_regular
+          salt_name: salt_regular
+          password_name: password_regular
           method: crypt
-        - hash_name: server_hash_user_github
-          salt_name: server_salt_user_github
-          password_name: server_password_user_github
+        - hash_name: hash_github
+          salt_name: salt_github
+          password_name: password_github
           method: crypt
     - role: config_ssh_keys
       config_ssh_keys:
@@ -176,7 +176,7 @@
     - role: config_image_debian
       config_image_debian_ouput: '{{ config_dir }}/server_image'
       config_image_debian_name: server
-      config_image_debian_hash_user_root: '{{ server_hash_user_root }}'
+      config_image_debian_hash_user_root: '{{ hash_root }}'
       config_image_debian_disk_system: '{{ hostvars.server.disk_system }}'
       config_image_debian_network_interface: '{{ hostvars.server.network_interface }}'
       config_image_debian_network_hostname: '{{ hostvars.server.network_hostname }}'
