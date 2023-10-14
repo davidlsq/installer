@@ -1,7 +1,0 @@
-checkmk_site: monitoring
-checkmk_version: 2.2.0p11
-checkmk_deb: '/usr/lib/checkmk-{{ checkmk_version }}.deb'
-checkmk_var: '/omd/sites/{{ checkmk_name }}'
-checkmk_port: 5000
-checkmk_agent_port: 6000
-checkmk_users: []

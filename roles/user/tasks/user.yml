@@ -1,0 +1,79 @@
+- name: Install package "sudo"
+  when: user_sudo_group in [True, "yes", "yes-no-password"]
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+
+- name: Install package "zsh"
+  when: user_shell == '/bin/zsh'
+  ansible.builtin.apt:
+    name: zsh
+    state: present
+
+# Create user
+
+- name: 'Group "{{ user_name }}" exists'
+  ansible.builtin.group:
+    name: '{{ user_name }}'
+    gid: '{{ user_id | default(omit) }}'
+    system: false
+  when: user_name != "root"
+
+- name: 'User "{{ user_name }}" exists'
+  ansible.builtin.user:
+    name: '{{ user_name }}'
+    uid: '{{ user_id | default(omit) }}'
+    group: '{{ user_name }}'
+    create_home: true
+    system: false
+  when: user_name != "root"
+
+- name: 'Password of "{{ user_name }}" is set'
+  when: user_password is defined
+  ansible.builtin.user:
+    name: '{{ user_name }}'
+    password: '{{ user_password }}'
+  no_log: true
+
+- name: 'User "{{ user_name }}" is in "sudo" group'
+  when: user_sudo_group in [True, "yes", "yes-no-password"]
+  ansible.builtin.user:
+    name: '{{ user_name }}'
+    groups: sudo
+    append: true
+
+- name: 'User "{{ user_name }}" is sudo without password'
+  when: user_sudo_group == 'yes-no-password'
+  ansible.builtin.copy:
+    content: >
+      {{ user_name }} ALL=(ALL) NOPASSWD:ALL
+    dest: '/etc/sudoers.d/ansible_sudo_without_password_{{ user_name }}'
+    owner: root
+    group: root
+    mode: ug=r,o=
+
+- name: 'User "{{ user_name }}" can run commands as sudo without password'
+  when: user_sudo_commands is defined
+  loop: '{{ user_sudo_commands }}'
+  loop_control:
+    index_var: index
+    label: 'User "{{ user_name }}" can run "{{ item }}" as sudo without password'
+  ansible.builtin.copy:
+    content: >
+      {{ user_name }} ALL=(ALL) NOPASSWD: {{ item }}
+    dest: '/etc/sudoers.d/ansible_sudo_command_{{ user_name }}_{{ index }}'
+    owner: root
+    group: root
+    mode: ug=r,o=
+
+- name: 'User "{{ user_name }}" use "{{ user_shell }}" as shell'
+  ansible.builtin.user:
+    name: '{{ user_name }}'
+    shell: '{{ user_shell }}'
+
+- name: 'User "{{ user_name }}" has an authorized key'
+  when: user_key_pub is defined
+  ansible.posix.authorized_key:
+    user: '{{ user_name }}'
+    key: '{{ lookup("file", user_key_pub) }}'
+  no_log: true

@@ -1,0 +1,22 @@
+---
+
+- name: 'Package "lvm2" is installed'
+  ansible.builtin.apt:
+    name: lvm2
+    state: present
+
+- name: 'Volume group "{{ lvm_vg }}" exists'
+  when: lvm_vgdisks is defined
+  community.general.lvg:
+    vg: '{{ lvm_vg }}'
+    pesize: 64
+    pvs: '{{ lvm_vgdisks | join(",") }}'
+
+- name: 'Logical volumes of "{{ lvm_vg }}" exists'
+  when: lvm_lvs is defined
+  loop: '{{ lvm_lvs }}'
+  loop_control:
+    loop_var: lv
+    label: >
+      Logical volume "{{ lvm_vg | default(omit) }}/{{ lv.name }}" exists
+  ansible.builtin.include_tasks: lv.yml

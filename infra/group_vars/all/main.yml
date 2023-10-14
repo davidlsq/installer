@@ -27,7 +27,6 @@ server_network_local_ip_address: 192.168.100.3
 server_network_local_domain: '{{ server_network_hostname }}.local'
 server_network_public_domain: '{{ server_network_hostname }}.{{ network_public_domain }}'
 
-server_checkmk_site: infra
 server_ssh_port: 23
 
 server_disk_system: /dev/disk/by-id/nvme-KINGSTON_SNV2S500G_50026B7685F960D0

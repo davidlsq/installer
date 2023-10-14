@@ -6,6 +6,7 @@ skip_list:
   - yaml[line-length]
   - yaml[document-start]
   - risky-file-permissions
+  - name[template]
 
 exclude_paths:
   - virtual/config

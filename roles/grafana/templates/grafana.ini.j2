@@ -1,0 +1,33 @@
+app_mode = production
+instance_name = {{ service_name }}
+
+[paths]
+data = {{ service_var }}/data
+logs = {{ service_log }}
+plugins = {{ service_var }}/plugins
+provisioning = {{ service_var }}/provisioning
+
+[server]
+protocol = http
+http_addr = {{ grafana_address }}
+http_port = {{ grafana_port }}
+router_logging = true
+
+[analytics]
+reporting_enabled = true
+check_for_updates = true
+check_for_plugin_updates = true
+
+[security]
+disable_initial_admin_creation = false
+admin_user = {{ grafana_admin_name }}
+admin_password = {{ grafana_admin_password }}
+
+[plugins]
+plugin_admin_enabled = true
+
+[news]
+news_feed_enabled = true
+
+[metrics]
+enabled = true

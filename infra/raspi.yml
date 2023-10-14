@@ -37,23 +37,11 @@
   become: true
   tags: data
   roles:
-    - role: lvm_vg
-      vg_name: data
-      vg_disks:
+    - role: lvm
+      tags: data
+      lvm_vg: data
+      lvm_vgdisks:
         - '{{ raspi_disk_1 }}'
-
-- name: CheckMK Agent
-  hosts: raspi
-  gather_facts: false
-  become: true
-  tags: checkmk_agent
-  roles:
-    - role: checkmk_agent
-      checkmk_site: '{{ server_checkmk_site }}'
-      checkmk_address: '{{ server_network_local_ip_address }}'
-      checkmk_automation_password: '{{ server_password_checkmk_automation }}'
-      checkmk_agent_name: server
-      checkmk_agent_register: false
 
 - name: Installer
   hosts: raspi
@@ -80,12 +68,13 @@
   become: true
   tags: pihole
   roles:
-    - role: lvm_lv
+    - role: lvm
       tags: data
-      vg_name: data
-      lv_name: pihole
-      lv_size: 10G
-      lv_opts: --type linear
+      lvm_vg: data
+      lvm_lvs:
+        - name: pihole
+          size: 10G
+          mount: /mnt/data/pihole
     - role: pihole
       pihole_var: /mnt/data/pihole
       pihole_user_id: 1010

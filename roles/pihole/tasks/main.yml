@@ -18,10 +18,11 @@
 
 - name: Create user
   ansible.builtin.include_role:
-    name: user_service
+    name: user
   vars:
-    user_service_name: pihole
-    user_service_id: '{{ pihole_user_id }}'
+    user_service: true
+    user_name: pihole
+    user_id: '{{ pihole_user_id }}'
 
 - name: Create var directory
   ansible.builtin.file:
