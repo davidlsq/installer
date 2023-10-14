@@ -35,12 +35,14 @@ mkdir "$OUTPUT_TMP"
 
 git clone --depth 1 --branch arm64 https://github.com/RPI-Distro/pi-gen.git "$OUTPUT_PIGEN"
 
-mkdir -p "$OUTPUT_INSTALL/config" "$OUTPUT_INSTALL/host_vars" "$OUTPUT_INSTALL/files"
+mkdir "$OUTPUT_INSTALL"
 cp -r roles "$OUTPUT_INSTALL"
 cp "$DIRECTORY/$HOST.yml" "$OUTPUT_INSTALL/install.yml"
 cp -rL "$DIRECTORY/group_vars" "$OUTPUT_INSTALL/group_vars"
-cp -rL "$DIRECTORY/host_vars/$HOST" "$OUTPUT_INSTALL/host_vars/$HOST"
-cp -rL "$DIRECTORY/files/$HOST" "$OUTPUT_INSTALL/files/$HOST"
+cp -r "$DIRECTORY/host_vars" "$OUTPUT_INSTALL/host_vars"
+rm -rf "$_/$HOST" && cp -rL "$DIRECTORY/host_vars/$HOST" "$_"
+cp -r "$DIRECTORY/files" "$OUTPUT_INSTALL/files"
+rm -rf "$_/$HOST" && cp -rL "$DIRECTORY/files/$HOST" "$_"
 
 CONFIG_IMAGE="$DIRECTORY/config/playbook/${HOST}_image"
 cp "$CONFIG_IMAGE/install.sh" "$OUTPUT_INSTALL/install.sh"

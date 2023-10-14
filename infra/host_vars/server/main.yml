@@ -1,5 +1,7 @@
 ---
 
+facts_arch: amd64
+
 server_prometheus_user_id: 900
 server_grafana_user_id: 901
 server_media_user_id: 902

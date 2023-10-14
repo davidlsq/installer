@@ -10,6 +10,6 @@ service_exec_start: |
 
 archive_url:
   "https://github.com/prometheus/node_exporter/releases/download/\
-   v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+   v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ facts_arch }}.tar.gz"
 archive_version: '{{ node_exporter_version }}'
-archive_transform: 'node_exporter-{{ node_exporter_version }}.linux-amd64'
+archive_transform: 'node_exporter-{{ node_exporter_version }}.linux-{{ facts_arch }}'

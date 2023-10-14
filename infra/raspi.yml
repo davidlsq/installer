@@ -31,6 +31,17 @@
     - role: ohmyzsh
       ohmyzsh_user_name: '{{ user_regular_name }}'
 
+- name: Node Exporter
+  hosts: raspi
+  gather_facts: false
+  become: true
+  tags: node_exporter
+  roles:
+    - role: node_exporter
+  vars:
+    node_exporter_address: '{{ raspi_network_local_ip_address }}'
+    node_exporter_port: '{{ raspi_node_exporter_port }}'
+
 - name: Data Disks
   hosts: raspi
   gather_facts: false

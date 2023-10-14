@@ -100,6 +100,7 @@
         static_configs:
           - targets:
               - '{{ server_network_local_ip_address }}:{{ server_node_exporter_port }}'
+              - '{{ raspi_network_local_ip_address }}:{{ hostvars["raspi"].raspi_node_exporter_port }}'
 
 - name: Node Exporter
   hosts: server
