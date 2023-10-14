@@ -1,1 +1,0 @@
-checkmk_agent_deb_url: 'http://{{ checkmk_address }}/{{ checkmk_site }}/check_mk/agents/check-mk-agent_{{ checkmk_agent_version }}-1_all.deb'

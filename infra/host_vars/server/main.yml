@@ -7,10 +7,6 @@ server_disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
 server_disk_2: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
 server_disk_3: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
 
-server_checkmk_user_id: 900
-server_checkmk_port: 8000
-server_checkmk_agent_port: 7000
-
 server_qbittorrent_1_name: qbittorrent
 server_qbittorrent_1_port: 8010
 server_sabnzbd_1_name: sabnzbd
