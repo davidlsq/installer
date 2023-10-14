@@ -10,43 +10,43 @@
     - role: config_hash
       config_hash_output: '{{ config_dir }}/virtual_hash.yml'
       config_hash_vars:
-        - name: virtual_hash_user_root
-          salt: virtual_salt_user_root
-          password: virtual_password_user_root
+        - hash_name: virtual_hash_user_root
+          salt_name: virtual_salt_user_root
+          password: '{{ hostvars.virtual.password_root }}'
           method: crypt
-        - name: virtual_hash_user_regular
-          salt: virtual_salt_user_regular
-          password: virtual_password_user_regular
+        - hash_name: virtual_hash_user_regular
+          salt_name: virtual_salt_user_regular
+          password: '{{ hostvars.virtual.password_regular }}'
           method: crypt
     - role: config_ssh_keys
       config_ssh_keys:
         - '{{ config_dir }}/virtual_ssh_keys_host'
-        - '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_regular_name }}'
+        - '{{ config_dir }}/virtual_ssh_keys_{{ hostvars.virtual.user_name_regular }}'
     - role: config_ssh_known_host
       config_ssh_known_host_output: '{{ config_dir }}/ssh_known_host'
       config_ssh_known_host_vars:
         - key_pub: '{{ config_dir }}/virtual_ssh_keys_host.pub'
           hosts:
-            - '{{ virtual_network_local_domain }}'
+            - '{{ hostvars.virtual.network_local_domain }}'
     - role: config_ssh_client
       config_ssh_client_output: '{{ config_dir }}/ssh_client'
       config_ssh_client_known_host: '{{ config_dir }}/ssh_known_host'
       config_ssh_client_vars:
-        - user: '{{ virtual_user_regular_name }}'
-          key: '{{ config_dir }}/virtual_ssh_keys_{{ virtual_user_regular_name }}'
+        - user: '{{ hostvars.virtual.user_name_regular }}'
+          key: '{{ config_dir }}/virtual_ssh_keys_{{ hostvars.virtual.user_name_regular }}'
           hosts:
-            - host: '{{ virtual_network_local_domain }}'
+            - host: '{{ hostvars.virtual.network_local_domain }}'
     - role: config_inventory
       config_inventory_output: '{{ config_dir }}/inventory_local_domain'
       config_inventory_ssh_client: '{{ config_dir }}/ssh_client'
-      config_inventory_user: '{{ virtual_user_regular_name }}'
+      config_inventory_user: '{{ hostvars.virtual.user_name_regular }}'
       config_inventory_vars:
         - name: virtual
-          host: '{{ virtual_network_local_domain }}'
+          host: '{{ hostvars.virtual.network_local_domain }}'
     - role: config_image_debian
       config_image_debian_ouput: '{{ config_dir }}/virtual_image'
       config_image_debian_name: virtual
       config_image_debian_hash_user_root: '{{ virtual_hash_user_root }}'
-      config_image_debian_disk_system: '{{ virtual_disk_system }}'
-      config_image_debian_network_interface: '{{ virtual_network_interface }}'
-      config_image_debian_network_hostname: '{{ virtual_network_hostname }}'
+      config_image_debian_disk_system: '{{ hostvars.virtual.disk_system }}'
+      config_image_debian_network_interface: '{{ hostvars.virtual.network_interface }}'
+      config_image_debian_network_hostname: '{{ hostvars.virtual.network_hostname }}'

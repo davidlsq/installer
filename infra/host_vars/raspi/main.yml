@@ -1,3 +1,14 @@
 ---
 
-raspi_disk_1: /dev/disk/by-id/usb-USB_SanDisk_3.2Gen1_0501a120c729a1492f84ff75ab3e5fe8170c463ca2bf2a9f57f0150f42956ed0dd1500000000000000000000d037527d0007191083558107adad0231-0:0
+arch: arm64
+
+network_private_address: 192.168.100.2
+network_hostname: raspi
+network_interface: eth0
+network_local_domain: '{{ network_hostname }}.local'
+network_public_sub_domain: '{{ network_hostname }}.{{ network_public_domain }}'
+
+disk_1: /dev/disk/by-id/usb-USB_SanDisk_3.2Gen1_0501a120c729a1492f84ff75ab3e5fe8170c463ca2bf2a9f57f0150f42956ed0dd1500000000000000000000d037527d0007191083558107adad0231-0:0
+
+port_ssh: 22
+port_node_exporter: 9000

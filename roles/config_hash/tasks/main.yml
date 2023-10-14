@@ -7,12 +7,17 @@
   ansible.builtin.copy:
     content: |
         {% for var in config_hash_vars %}
+        {% if var.password is defined %}
+        {% set password = var.password %}
+        {% else %}
+        {% set password = lookup("vars", var.password_name) %}
+        {% endif %}
         {% if var.method == "crypt" %}
-        {% set salt = lookup("vars", var.salt, default=lookup("community.general.random_string", length=16, special=false)) %}
-        {{ var.salt }}: {{ salt }}
-        {{ var.name }}: {{ lookup("vars", var.password) | password_hash(salt=salt) }}
+        {% set salt = lookup("vars", var.salt_name, default=lookup("community.general.random_string", length=16, special=false)) %}
+        {{ var.salt_name }}: {{ salt }}
+        {{ var.hash_name }}: {{ password | password_hash(salt=salt) }}
         {% elif var.method == "sha256" %}
-        {{ var.name }}: {{ lookup("vars", var.password) | hash("sha256") | hash("sha256") }}
+        {{ var.hash_name }}: {{ password | hash("sha256") | hash("sha256") }}
         {% endif %}
         {% endfor %}
     dest: '{{ config_hash_output }}'

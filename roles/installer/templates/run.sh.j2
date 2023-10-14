@@ -2,6 +2,8 @@
 
 set -e -o pipefail
 
+umask 0077
+
 COMMAND="$1"
 BRANCH="$2"
 
@@ -22,7 +24,7 @@ git clone --depth 1 --branch "$BRANCH" "{{ installer_git }}" "$REPOSITORY"
 
 for DIR in "group_vars" "host_vars/{{ installer_host }}" "files/{{ installer_host }}"; do
    find "$REPOSITORY/{{ installer_directory }}/$DIR" -type l -delete
-   rsync --ignore-existing --chown="root:root" --chmod=Du="rwx,go=,Fu=rw,og=" -r \
+   rsync --ignore-existing --chown="root:root" --chmod="Du=rwx,go=,Fu=rw,og=" -r \
      "{{ installer_lib }}/archive/$DIR/" "$REPOSITORY/{{ installer_directory }}/$DIR/"
 done
 
@@ -30,8 +32,9 @@ if [ "$COMMAND" == "check" ]; then
    ARG="-C"
 fi
 
+ANSIBLE_HOSTS="$(ls "$REPOSITORY/{{ installer_directory }}/host_vars" | tr '\n' ',')"
 ANSIBLE_CONFIG="$REPOSITORY/ansible.cfg" \
-  ansible-playbook -i "{{ installer_host }}," -c local $ARG \
+  ansible-playbook -i "$ANSIBLE_HOSTS" -c local $ARG \
   --skip-tags installer \
   "$REPOSITORY/{{ installer_directory }}/{{ installer_host }}.yml"
 

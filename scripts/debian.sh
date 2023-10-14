@@ -79,12 +79,18 @@ extract-iso-content "$ISO" "$OUTPUT_CONTENT"
 rm -rf "$OUTPUT_CONTENT/install"
 ln -sr "$OUTPUT_CONTENT/install."* "$OUTPUT_CONTENT/install"
 
-mkdir -p "$OUTPUT_INSTALL/config" "$OUTPUT_INSTALL/host_vars" "$OUTPUT_INSTALL/files"
+mkdir "$OUTPUT_INSTALL"
 cp -r roles "$OUTPUT_INSTALL/roles"
 cp "$DIRECTORY/$HOST.yml" "$OUTPUT_INSTALL/install.yml"
-cp -rL "$DIRECTORY/group_vars" "$OUTPUT_INSTALL/group_vars"
-cp -rL "$DIRECTORY/host_vars/$HOST" "$OUTPUT_INSTALL/host_vars/$HOST"
-cp -rL "$DIRECTORY/files/$HOST" "$OUTPUT_INSTALL/files/$HOST"
+test -d "$DIRECTORY/group_vars" \
+  && cp -rL "$DIRECTORY/group_vars" "$OUTPUT_INSTALL/group_vars"
+for DIR in host_vars files; do
+  test -d "$DIRECTORY/$DIR" \
+    && cp -r "$DIRECTORY/$DIR" "$OUTPUT_INSTALL/$DIR"
+  test -d "$DIRECTORY/$DIR/$HOST" \
+    && rm -rf "$OUTPUT_INSTALL/$DIR/$HOST" \
+    && cp -rL "$DIRECTORY/$DIR/$HOST" "$OUTPUT_INSTALL/$DIR/$HOST"
+done
 cp "$DIRECTORY/config/playbook/${HOST}_image/"* "$OUTPUT_INSTALL"
 cp "scripts/debian/"* "$OUTPUT_INSTALL"
 chmod +x "$OUTPUT_INSTALL/chroot.sh" "$OUTPUT_INSTALL/install.sh"
