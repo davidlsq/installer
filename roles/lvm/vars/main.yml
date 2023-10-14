@@ -1,0 +1,3 @@
+---
+
+__lvm_lv_service: '{{ lv.mount | replace("/", " ") | trim | replace(" ", "-") }}.mount'

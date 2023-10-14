@@ -1,82 +1,11 @@
-# Install package
+---
 
-- name: Package sudo
-  ansible.builtin.apt:
-    name: sudo
-    state: present
-  when: user_sudo_group in [True, "yes", "yes-no-password"]
+- name: Include "system.yml"
+  when: user_system
+  ansible.builtin.include_tasks:
+    file: system.yml
 
-- name: Package zsh
-  ansible.builtin.apt:
-    name: zsh
-    state: present
-  when: user_shell == '/bin/zsh'
-
-# Create user
-
-- name: Create user with id
-  when: user_id is defined
-  block:
-    - name: Create group with id
-      ansible.builtin.group:
-        name: '{{ user_name }}'
-        gid: '{{ user_id }}'
-    - name: Create user with id
-      ansible.builtin.user:
-        name: '{{ user_name }}'
-        uid: '{{ user_id }}'
-        group: '{{ user_name }}'
-
-- name: Create user without id
-  ansible.builtin.user:
-    name: '{{ user_name }}'
-  when: user_id is not defined
-
-- name: Set password
-  ansible.builtin.user:
-    name: '{{ user_name }}'
-    password: '{{ user_password }}'
-  when: user_password is defined
-  no_log: true
-
-- name: Add to sudo group
-  ansible.builtin.user:
-    name: '{{ user_name }}'
-    groups: sudo
-    append: true
-  when: user_sudo_group in [True, "yes", "yes-no-password"]
-
-- name: Set sudo without password
-  ansible.builtin.copy:
-    content: >
-      {{ user_name }} ALL=(ALL) NOPASSWD:ALL
-    dest: '/etc/sudoers.d/ansible_sudo_without_password_{{ user_name }}'
-    owner: root
-    group: root
-    mode: ug=r,o=
-  when: user_sudo_group == 'yes-no-password'
-
-- name: Set sudo command
-  ansible.builtin.copy:
-    content: >
-      {{ user_name }} ALL=(ALL) NOPASSWD: {{ item }}
-    dest: '/etc/sudoers.d/ansible_sudo_command_{{ user_name }}_{{ index }}'
-    owner: root
-    group: root
-    mode: ug=r,o=
-  loop: '{{ user_sudo_commands }}'
-  loop_control:
-    index_var: index
-  when: user_sudo_commands is defined
-
-- name: Set shell
-  ansible.builtin.user:
-    name: '{{ user_name }}'
-    shell: '{{ user_shell }}'
-
-- name: Add public key
-  ansible.posix.authorized_key:
-    user: '{{ user_name }}'
-    key: '{{ lookup("file", user_key_pub) }}'
-  when: user_key_pub is defined
-  no_log: true
+- name: Include "user.yml"
+  when: not user_system
+  ansible.builtin.include_tasks:
+    file: user.yml

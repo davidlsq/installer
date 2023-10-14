@@ -1,5 +1,9 @@
 ---
 
+server_prometheus_user_id: 900
+server_grafana_user_id: 901
+server_media_user_id: 902
+
 server_user_media_id: 1012
 server_user_media_name: media
 
@@ -7,6 +11,9 @@ server_disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
 server_disk_2: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
 server_disk_3: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
 
+server_prometheus_port: 9000
+server_node_exporter_port: 9001
+server_grafana_port: 9002
 server_qbittorrent_1_name: qbittorrent
 server_qbittorrent_1_port: 8010
 server_sabnzbd_1_name: sabnzbd

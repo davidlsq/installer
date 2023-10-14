@@ -1,0 +1,78 @@
+[Unit]
+Description={{ service_name }}
+
+After=network-online.target
+Wants=network-online.target
+
+After=local-fs.target
+Requires=local-fs.target
+
+RequiresMountsFor={{ service_lib }}
+RequiresMountsFor={{ service_etc }}
+RequiresMountsFor={{ service_run }}
+RequiresMountsFor={{ service_var }}
+RequiresMountsFor={{ service_log }}
+
+StartLimitInterval=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=300
+
+User={{ user_name }}
+Group={{ user_name }}
+UMask=0077
+
+{% if service_chroot %}
+RootDirectory={{ service_opt }}/chroot
+RootDirectoryStartOnly=yes
+BindReadOnlyPaths={{ service_lib }}
+BindReadOnlyPaths={{ service_etc }}
+BindPaths={{ service_run }}
+BindPaths={{ service_var }}
+BindPaths={{ service_log }}
+{% else %}
+ReadWritePaths={{ service_run }}
+ReadWritePaths={{ service_var }}
+ReadWritePaths={{ service_log }}
+{% endif %}
+
+ExecStart={{ service_exec_start }}
+{% if service_exec_reload is defined %}
+ExecReload={{ service_exec_reload }}
+{% endif %}
+
+{% if service_timeout_stop is defined %}
+TimeoutStopSec={{ service_timeout_stop }}
+{% endif %}
+{% if service_limit_file is defined %}
+LimitNOFILE={{ service_limit_file }}
+{% endif %}
+
+DevicePolicy=closed
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateTmp=yes
+PrivateUsers=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+
+SyslogIdentifier={{ service_name }}
+StandardOutput=journal
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,30 @@
+---
+
+- name: 'Directory "{{ service_var }}" is populated'
+  loop:
+    - data
+    - plugins
+    - provisioning
+    - provisioning/alerting
+    - provisioning/dashboards
+    - provisioning/datasources
+    - provisioning/notifiers
+    - provisioning/plugins
+  loop_control:
+    label: 'Directory "{{ service_var }}/{{ item }}" exists'
+  ansible.builtin.file:
+    path: '{{ service_var }}/{{ item }}'
+    state: directory
+    owner: '{{ user_name }}'
+    group: '{{ user_name }}'
+    mode: u=rwx,go=r
+
+- name: 'Config "{{ service_etc }}/grafana.ini" exists'
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: '{{ service_etc }}/grafana.ini'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  no_log: true
+  notify: service restart

@@ -33,21 +33,16 @@
           password: raspi_password_pihole
           method: sha256
     - role: config_password
-      config_password_output: '{{ config_dir }}/server_password.yml'
+      config_password_output: '{{ config_dir }}/server_password_1.yml'
       config_password_vars:
         - name: server_password_user_root
         - name: server_password_user_regular
         - name: server_password_user_github
     - role: config_password
-      config_password_output: '{{ config_dir }}/server_password_samba.yml'
+      config_password_output: '{{ config_dir }}/server_password_2.yml'
       config_password_vars:
         - name: server_password_samba
-        - name: server_password_checkmk_cmkadmin
-        - name: server_password_checkmk_regular
-    - role: config_password
-      config_password_output: '{{ config_dir }}/infra_password.yml'
-      config_password_vars:
-        - name: server_password_checkmk_automation
+        - name: server_password_grafana
     - role: config_hash
       config_hash_output: '{{ config_dir }}/server_hash.yml'
       config_hash_vars:

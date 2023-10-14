@@ -1,0 +1,8 @@
+---
+
+service_opt: '/opt/{{ service_name }}'
+service_lib: '{{ service_opt }}/lib'
+service_etc: '{{ service_opt }}/etc'
+service_run: '{{ service_opt }}/run'
+service_var: '{{ service_opt }}/var'
+service_log: '{{ service_opt }}/log'

@@ -1,0 +1,19 @@
+---
+
+- name: 'Group "{{ user_name }}" exists'
+  ansible.builtin.group:
+    name: '{{ user_name }}'
+    gid: '{{ user_id | default(omit) }}'
+    system: true
+  notify: '{{ user_notify | default(omit) }}'
+
+- name: 'User "{{ user_name }}" exists'
+  ansible.builtin.user:
+    name: '{{ user_name }}'
+    uid: '{{ user_id | default(omit) }}'
+    group: '{{ user_name }}'
+    shell: /usr/sbin/nologin
+    home: /nonexistent
+    create_home: false
+    system: true
+  notify: '{{ user_notify | default(omit) }}'

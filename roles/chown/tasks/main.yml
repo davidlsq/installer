@@ -1,0 +1,23 @@
+---
+
+- name: 'Directory "{{ chown_path }}" is owned by user "{{ chown_user_name }}"'
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if test -d "{{ chown_path }}"; then
+      find "{{ chown_path }}" \
+        ! -user root ! -group root \
+        ! -user {{ chown_user_name }} ! -group {{ chown_user_name }} \
+        -print \
+      {% if not ansible_check_mode %}
+        -exec chown {{ chown_user_name }}:{{ chown_user_name }} {} \; \
+      {% endif %}
+      | wc -l
+    else
+      echo 0
+    fi
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: __chown_output
+  changed_when: __chown_output.stdout != "0"
+  notify: '{{ chown_notify | default(omit) }}'

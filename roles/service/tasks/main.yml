@@ -1,0 +1,71 @@
+---
+
+- name: 'Directory "/opt" exists'
+  ansible.builtin.file:
+    path: /opt
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: 'Directory "{{ service_opt }}" exists'
+  ansible.builtin.file:
+    path: '{{ service_opt }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: 'Directory "{{ service_opt }}" is populated'
+  loop:
+    - name: '{{ service_lib }}'
+    - name: '{{ service_etc }}'
+    - name: '{{ service_run }}'
+      owner: '{{ user_name }}'
+      mode: u=rwx,go=
+    - name: '{{ service_var }}'
+      owner: '{{ user_name }}'
+      mode: u=rwx,go=
+    - name: '{{ service_log }}'
+      owner: '{{ user_name }}'
+      mode: u=rwx,go=
+  loop_control:
+    label: 'Directory "{{ item.name }}" exists'
+  ansible.builtin.file:
+    path: '{{ item.name }}'
+    state: directory
+    owner: '{{ item.owner | default("root") }}'
+    group: '{{ item.owner | default("root") }}'
+    mode: '{{ item.mode | default("u=rwx,go=rx") }}'
+
+- name: 'Chroot "{{ service_opt }}/chroot" exists'
+  when: service_chroot
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    debootstrap bookworm "{{ service_opt }}/chroot" http://deb.debian.org/debian
+    {% if service_packages is defined %}
+    chroot "{{ service_chroot }}" apt-get install -y {{ service_packages | join(" ") }}
+    {% endif %}
+  args:
+    executable: /bin/bash
+    creates: '{{ service_opt }}/chroot'
+
+- name: 'Service "{{ service_name }}" packages are installed'
+  when: not service_chroot and service_packages is defined
+  ansible.builtin.apt:
+    name: '{{ service_packages }}'
+    state: present
+
+- name: 'Config "{{ service_name }}.service" exists'
+  ansible.builtin.template:
+    src: service.j2
+    dest: '/etc/systemd/system/{{ service_name }}.service'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  notify: service restart
+
+- name: 'Service "{{ service_name }}" is enabled'
+  ansible.builtin.systemd:
+    name: '{{ service_name }}'
+    enabled: true

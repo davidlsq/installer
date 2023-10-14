@@ -1,0 +1,34 @@
+---
+
+- name: 'Logical volume "{{ lvm_vg }}/{{ lv.name }}" exists'
+  community.general.lvol:
+    vg: '{{ lvm_vg }}'
+    lv: '{{ lv.name }}'
+    size: '{{ lv.size }}'
+    opts: '{{ lv.opts | default(lvm_lv_opts) }}'
+    resizefs: true
+
+- name: 'Logical volume "{{ lvm_vg }}/{{ lv.name }}" is formatted'
+  community.general.filesystem:
+    dev: '/dev/{{ lvm_vg }}/{{ lv.name }}'
+    fstype: ext4
+    force: false
+    opts: -m 0
+
+- name: 'Service "{{ __lvm_lv_service }}" exists'
+  ansible.builtin.template:
+    src: mount.j2
+    dest: '/etc/systemd/system/{{ __lvm_lv_service }}'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+
+- name: 'Service "{{ __lvm_lv_service }}" is enabled'
+  ansible.builtin.systemd:
+    name: '{{ __lvm_lv_service }}'
+    enabled: true
+
+- name: 'Service "{{ __lvm_lv_service }}" is started'
+  ansible.builtin.systemd:
+    name: '{{ __lvm_lv_service }}'
+    state: started

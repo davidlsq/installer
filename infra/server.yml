@@ -5,6 +5,7 @@
   gather_facts: false
   become: true
   tags: base
+  pre_tasks:
   roles:
     - role: systemctl
       tags: systemctl
@@ -71,10 +72,59 @@
         - '{{ server_disk_1 }}'
         - '{{ server_disk_2 }}'
         - '{{ server_disk_3 }}'
-    - role: lvm_vg
-      vg_name: data
-      vg_disks:
+    - role: lvm
+      tags: data
+      lvm_vg: data
+      lvm_vgdisks:
         - /dev/md0
+
+- name: Prometheus
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: prometheus
+  roles:
+    - role: prometheus
+  vars:
+    user_id: '{{ server_prometheus_user_id }}'
+    prometheus_vg: data
+    prometheus_address: '{{ server_network_local_ip_address }}'
+    prometheus_port: '{{ server_prometheus_port }}'
+    prometheus_retention_time: 90d
+    prometheus_scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets:
+              - '{{ server_network_local_ip_address }}:{{ server_prometheus_port }}'
+      - job_name: node
+        static_configs:
+          - targets:
+              - '{{ server_network_local_ip_address }}:{{ server_node_exporter_port }}'
+
+- name: Node Exporter
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: node_exporter
+  roles:
+    - role: node_exporter
+  vars:
+    node_exporter_address: '{{ server_network_local_ip_address }}'
+    node_exporter_port: '{{ server_node_exporter_port }}'
+
+- name: Grafana
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: grafana
+  roles:
+    - role: grafana
+  vars:
+    grafana_vg: data
+    grafana_admin_name: '{{ user_regular_name }}'
+    grafana_admin_password: '{{ server_password_grafana }}'
+    grafana_address: '{{ server_network_local_ip_address }}'
+    grafana_port: '{{ server_grafana_port }}'
 
 - name: Wireguard
   hosts: server
@@ -100,12 +150,13 @@
   become: true
   tags: timemachine
   roles:
-    - role: lvm_lv
+    - role: lvm
       tags: data
-      vg_name: data
-      lv_name: timemachine
-      lv_size: 500G
-      lv_opts: --type linear
+      lvm_vg: data
+      lvm_lvs:
+        - name: timemachine
+          size: 500G
+          mount: /mnt/data/timemachine
     - role: samba
       samba_var: /mnt/data/timemachine
       samba_user: '{{ user_regular_name }}'
@@ -119,16 +170,18 @@
   become: true
   tags: media
   roles:
-    - role: lvm_lv
+    - role: lvm
       tags: data
-      vg_name: data
-      lv_name: media
-      lv_size: 15T
-      lv_opts: --type linear
-    - role: user_service
-      tags: data
-      user_service_id: '{{ server_user_media_id }}'
-      user_service_name: '{{ server_user_media_name }}'
+      lvm_vg: data
+      lvm_lvs:
+        - name: media
+          size: 15T
+          mount: /mnt/data/media
+    - role: user
+      tags: [data, user]
+      user_system: true
+      user_id: '{{ server_user_media_id }}'
+      user_name: '{{ server_user_media_name }}'
     - role: library
       tags: data
       library_user: '{{ server_user_media_name }}'
@@ -213,12 +266,13 @@
   become: true
   tags: public_network
   roles:
-    - role: lvm_lv
+    - role: lvm
       tags: [data, certbot]
-      vg_name: data
-      lv_name: certbot
-      lv_size: 64M
-      lv_opts: --type linear
+      lvm_vg: data
+      lvm_lvs:
+        - name: certbot
+          size: 64M
+          mount: /mnt/data/certbot
     - role: certbot
       tags: certbot
       certbot_var: /mnt/data/certbot

@@ -1,0 +1,13 @@
+---
+
+dependencies:
+  - role: lvm
+    when: grafana_vg is defined
+    vars:
+      lvm_vg: '{{ grafana_vg }}'
+      lvm_lvs:
+        - name: '{{ service_name }}'
+          size: '{{ grafana_v_size }}'
+          mount: '{{ service_var }}'
+  - role: service
+  - role: archive
