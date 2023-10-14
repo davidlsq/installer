@@ -5,7 +5,7 @@
   ansible.builtin.copy:
     content: |
       [Interface]
-      Address = {{ config_wireguard_client_peer.ip_address }}.{{ index + 2 }}/24
+      Address = {{ config_wireguard_client_peer.address }}.{{ index + 2 }}/24
       ListenPort = {{ config_wireguard_client_peer.port }}
       PrivateKey = {{ lookup("file", item.key) }}
       {% for dns in config_wireguard_client_peer.dns | default([]) %}

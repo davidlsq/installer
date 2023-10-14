@@ -72,10 +72,10 @@ bitwarden-push: infra/config
 .PHONY: playbook-check playbook
 
 playbook-check: infra/config
-	ansible-playbook -i infra/config/inventory_local_ip_address -C infra/raspi.yml infra/server.yml
+	ansible-playbook -i infra/config/inventory_local_address -C infra/raspi.yml infra/server.yml
 
 playbook: infra/config
-	ansible-playbook -i infra/config/inventory_local_ip_address infra/raspi.yml infra/server.yml
+	ansible-playbook -i infra/config/inventory_local_address infra/raspi.yml infra/server.yml
 
 .PHONY: github-push github-pull github-playbook-check github-playbook
 
