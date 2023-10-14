@@ -1,34 +1,36 @@
 ---
 
-facts_arch: amd64
+arch: amd64
 
-server_prometheus_user_id: 900
-server_grafana_user_id: 901
-server_media_user_id: 902
+user_id_prometheus: 900
+user_id_grafana: 901
+user_id_media: 1012
 
-server_user_media_id: 1012
-server_user_media_name: media
+user_name_media: media
 
-server_disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
-server_disk_2: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
-server_disk_3: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
+network_private_address: 192.168.100.3
+network_hostname: server
+network_interface: enp0s31f6
+network_local_domain: '{{ network_hostname }}.local'
+network_public_sub_domain: '{{ network_hostname }}.{{ network_public_domain }}'
 
-server_prometheus_port: 9000
-server_node_exporter_port: 9001
-server_grafana_port: 9002
-server_qbittorrent_1_name: qbittorrent
-server_qbittorrent_1_port: 8010
-server_sabnzbd_1_name: sabnzbd
-server_sabnzbd_1_port: 8020
-server_prowlarr_1_name: prowlarr
-server_prowlarr_1_port: 8031
-server_jackett_1_name: jackett
-server_jackett_1_port: 8041
-server_radarr_1_name: radarr-1
-server_radarr_1_port: 8051
-server_radarr_2_name: radarr-2
-server_radarr_2_port: 8052
-server_sonarr_1_name: sonarr-1
-server_sonarr_1_port: 8061
-server_sonarr_2_name: sonarr-2
-server_sonarr_2_port: 8062
+wireguard_ip_adress: 10.0.100
+
+disk_system: /dev/disk/by-id/nvme-KINGSTON_SNV2S500G_50026B7685F960D0
+disk_1: /dev/disk/by-id/ata-ST10000NT001-3LY101_WWY07EXB
+disk_2: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP0023PL
+disk_3: /dev/disk/by-id/ata-ST10000NT001-3LY101_WP012NTN
+
+port_ssh: 23
+port_wireguard: 51820
+port_prometheus: 9000
+port_node_exporter: 9001
+port_grafana: 9002
+port_qbittorrent: 8010
+port_sabnzbd: 8020
+port_prowlarr: 8031
+port_jackett: 8041
+port_radarr_1: 8051
+port_radarr_2: 8052
+port_sonarr_1: 8061
+port_sonarr_2: 8062

@@ -1,4 +1,12 @@
 ---
 
-virtual_user_regular_id: 1000
-virtual_user_ansible_id: 1001
+user_name_regular: david
+
+password_root: password
+password_regular: password
+
+network_hostname: virtual
+network_interface: enp0s1
+network_local_domain: '{{ network_hostname }}.local'
+
+disk_system: /dev/vda

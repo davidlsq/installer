@@ -11,7 +11,7 @@ virtual/config:
 	mkdir -p $@
 
 virtual/config/playbook: | virtual/config
-	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' virtual/config.yml
+	ansible-playbook -i "localhost,virtual" -c local -e '{"config_dir":"$(shell pwd)/$@"}' virtual/config.yml
 
 virtual/virtual.iso: common/debian-arm64.iso virtual/config/playbook
 	./scripts/debian.sh --iso $< --directory virtual --host virtual --output $@
@@ -23,7 +23,7 @@ infra/config/bitwarden.yml: | infra/config
 	./scripts/bitwarden-import.py  --organization Infra --output $@
 
 infra/config/playbook: | infra/config
-	ansible-playbook -i "localhost," -c local -e '{"config_dir":"$(shell pwd)/$@"}' infra/config.yml
+	ansible-playbook -i "localhost,raspi,server" -c local -e '{"config_dir":"$(shell pwd)/$@"}' infra/config.yml
 
 infra/raspi.img: infra/config/playbook
 	./scripts/raspi.sh  --directory infra --host raspi --output $@

@@ -1,35 +1,15 @@
 ---
 
-user_regular_id: 1000
-user_regular_name: david
-user_github_id: 1001
-user_github_name: github
+user_id_regular: 1000
+user_id_github: 1001
+
+user_name_regular: david
+user_name_github: github
 
 network_local_netmask: 255.255.255.0
 network_local_gateway: 192.168.100.1
-network_local_dns: '{{ raspi_network_local_ip_address }}'
+network_local_dns: '{{ hostvars.raspi.network_private_address }}'
 
 network_public_domain: home.davidlsq.fr
 network_public_dns_1: 9.9.9.9
 network_public_dns_2: 149.112.112.112
-
-raspi_network_hostname: raspi
-raspi_network_interface: eth0
-raspi_network_local_ip_address: 192.168.100.2
-raspi_network_local_domain: '{{ raspi_network_hostname }}.local'
-raspi_network_public_domain: '{{ raspi_network_hostname }}.{{ network_public_domain }}'
-
-raspi_ssh_port: 22
-
-server_network_hostname: server
-server_network_interface: enp0s31f6
-server_network_local_ip_address: 192.168.100.3
-server_network_local_domain: '{{ server_network_hostname }}.local'
-server_network_public_domain: '{{ server_network_hostname }}.{{ network_public_domain }}'
-
-server_ssh_port: 23
-
-server_disk_system: /dev/disk/by-id/nvme-KINGSTON_SNV2S500G_50026B7685F960D0
-
-server_wireguard_ip_adress: 10.0.100
-server_wireguard_port: 51820

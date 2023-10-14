@@ -19,7 +19,7 @@
       tags: grub
     - role: ssh
       tags: ssh
-      ssh_port: '{{ server_ssh_port }}'
+      ssh_port: '{{ port_ssh }}'
       ssh_key: server/ssh_keys_host
       ssh_key_pub: server/ssh_keys_host.pub
     - role: user
@@ -29,16 +29,16 @@
       user_shell: /bin/zsh
     - role: user
       tags: user
-      user_id: '{{ user_regular_id }}'
-      user_name: '{{ user_regular_name }}'
+      user_id: '{{ user_id_regular }}'
+      user_name: '{{ user_name_regular }}'
       user_password: '{{ server_hash_user_regular }}'
-      user_key_pub: 'server/ssh_keys_{{ user_regular_name }}.pub'
+      user_key_pub: 'server/ssh_keys_{{ user_name_regular }}.pub'
       user_shell: /bin/zsh
       user_sudo_group: yes-no-password
     - role: ohmyzsh
       ohmyzsh_user_name: root
     - role: ohmyzsh
-      ohmyzsh_user_name: '{{ user_regular_name }}'
+      ohmyzsh_user_name: '{{ user_name_regular }}'
 
 - name: Installer
   hosts: server
@@ -51,10 +51,10 @@
       installer_host: server
     - role: user
       tags: user
-      user_id: '{{ user_github_id }}'
-      user_name: '{{ user_github_name }}'
+      user_id: '{{ user_id_github }}'
+      user_name: '{{ user_name_github }}'
       user_password: '{{ server_hash_user_github }}'
-      user_key_pub: 'server/ssh_keys_{{ user_github_name }}.pub'
+      user_key_pub: 'server/ssh_keys_{{ user_name_github }}.pub'
       user_sudo_group: false
       user_sudo_commands:
         - /usr/lib/installer/run.sh *
@@ -69,9 +69,9 @@
       mdadm_name: md0
       mdadm_level: 5
       mdadm_disks:
-        - '{{ server_disk_1 }}'
-        - '{{ server_disk_2 }}'
-        - '{{ server_disk_3 }}'
+        - '{{ disk_1 }}'
+        - '{{ disk_2 }}'
+        - '{{ disk_3 }}'
     - role: lvm
       tags: data
       lvm_vg: data
@@ -86,21 +86,21 @@
   roles:
     - role: prometheus
   vars:
-    user_id: '{{ server_prometheus_user_id }}'
+    user_id: '{{ user_id_prometheus }}'
     prometheus_vg: data
-    prometheus_address: '{{ server_network_local_ip_address }}'
-    prometheus_port: '{{ server_prometheus_port }}'
+    prometheus_address: '{{ network_private_address }}'
+    prometheus_port: '{{ port_prometheus }}'
     prometheus_retention_time: 90d
     prometheus_scrape_configs:
       - job_name: prometheus
         static_configs:
           - targets:
-              - '{{ server_network_local_ip_address }}:{{ server_prometheus_port }}'
+              - '{{ network_private_address }}:{{ port_prometheus }}'
       - job_name: node
         static_configs:
           - targets:
-              - '{{ server_network_local_ip_address }}:{{ server_node_exporter_port }}'
-              - '{{ raspi_network_local_ip_address }}:{{ hostvars["raspi"].raspi_node_exporter_port }}'
+              - '{{ network_private_address }}:{{ port_node_exporter }}'
+              - '{{ hostvars.raspi.network_private_address }}:{{ hostvars.raspi.port_node_exporter }}'
 
 - name: Node Exporter
   hosts: server
@@ -110,8 +110,8 @@
   roles:
     - role: node_exporter
   vars:
-    node_exporter_address: '{{ server_network_local_ip_address }}'
-    node_exporter_port: '{{ server_node_exporter_port }}'
+    node_exporter_address: '{{ network_private_address }}'
+    node_exporter_port: '{{ port_node_exporter }}'
 
 - name: Grafana
   hosts: server
@@ -121,11 +121,12 @@
   roles:
     - role: grafana
   vars:
+    user_id: '{{ user_id_grafana }}'
     grafana_vg: data
-    grafana_admin_name: '{{ user_regular_name }}'
+    grafana_admin_name: '{{ user_name_regular }}'
     grafana_admin_password: '{{ server_password_grafana }}'
-    grafana_address: '{{ server_network_local_ip_address }}'
-    grafana_port: '{{ server_grafana_port }}'
+    grafana_address: '{{ network_private_address }}'
+    grafana_port: '{{ port_grafana }}'
 
 - name: Wireguard
   hosts: server
@@ -135,9 +136,9 @@
   roles:
     - role: wireguard
       wireguard_interface_name: wg0
-      wireguard_interface_device: '{{ server_network_interface }}'
-      wireguard_interface_ip_adress: '{{ server_wireguard_ip_adress }}'
-      wireguard_interface_port: '{{ server_wireguard_port }}'
+      wireguard_interface_device: '{{ network_interface }}'
+      wireguard_interface_ip_adress: '{{ wireguard_ip_adress }}'
+      wireguard_interface_port: '{{ port_wireguard }}'
       wireguard_interface_key: server/wireguard_keys_host
       wireguard_peers:
         - name: macbook
@@ -160,7 +161,7 @@
           mount: /mnt/data/timemachine
     - role: samba
       samba_var: /mnt/data/timemachine
-      samba_user: '{{ user_regular_name }}'
+      samba_user: '{{ user_name_regular }}'
       samba_password: '{{ server_password_samba }}'
       samba_section: TimeMachine
       samba_section_conf: timemachine.conf.j2
@@ -181,85 +182,85 @@
     - role: user
       tags: [data, user]
       user_system: true
-      user_id: '{{ server_user_media_id }}'
-      user_name: '{{ server_user_media_name }}'
+      user_id: '{{ user_id_media }}'
+      user_name: '{{ user_name_media }}'
     - role: library
       tags: data
-      library_user: '{{ server_user_media_name }}'
+      library_user: '{{ user_name_media }}'
       library_var: /mnt/data/media/library
     - role: plex
       tags: plex
-      plex_user: '{{ server_user_media_name }}'
+      plex_user: '{{ user_name_media }}'
       plex_var: /mnt/data/media/plex
     - role: qbittorrent
       tags: qbittorrent
-      qbittorrent_name: '{{ server_qbittorrent_1_name }}'
-      qbittorrent_port: '{{ server_qbittorrent_1_port }}'
-      qbittorrent_var: '/mnt/data/media/{{ server_qbittorrent_1_name }}'
-      qbittorrent_user: '{{ server_user_media_name }}'
+      qbittorrent_name: qbittorrent
+      qbittorrent_port: '{{ port_qbittorrent }}'
+      qbittorrent_var: /mnt/data/media/qbittorrent
+      qbittorrent_user: '{{ user_name_media }}'
       qbittorrent_peer_port: 50000
-      qbittorrent_interface: '{{ server_network_interface }}'
-      qbittorrent_address: '{{ server_network_local_ip_address }}'
+      qbittorrent_interface: '{{ network_interface }}'
+      qbittorrent_address: '{{ network_private_address }}'
     - role: joal
       tags: joal
-      joal_user: '{{ server_user_media_name }}'
+      joal_user: '{{ user_name_media }}'
       joal_var: /mnt/data/media/joal
     - role: sabnzbd
       tags: sabnzbd
-      sabnzbd_name: '{{ server_sabnzbd_1_name }}'
-      sabnzbd_port: '{{ server_sabnzbd_1_port }}'
-      sabnzbd_var: '/mnt/data/media/{{ server_sabnzbd_1_name }}'
-      sabnzbd_user: '{{ server_user_media_name }}'
-      sabnzbd_address: '{{ server_network_local_ip_address }}'
+      sabnzbd_name: sabnzbd
+      sabnzbd_port: '{{ port_sabnzbd }}'
+      sabnzbd_var: /mnt/data/media/sabnzbd
+      sabnzbd_user: '{{ user_name_media }}'
+      sabnzbd_address: '{{ network_private_address }}'
       sabnzbd_host_whitelist:
-        - '{{ server_network_local_ip_address }}'
-        - '{{ server_network_local_domain }}'
+        - '{{ network_private_address }}'
+        - '{{ network_local_domain }}'
     - role: servarr
       tags: [servarr, prowlarr]
       servarr_software: prowlarr
-      servarr_name: '{{ server_prowlarr_1_name }}'
-      servarr_port: '{{ server_prowlarr_1_port }}'
-      servarr_var: '/mnt/data/media/{{ server_prowlarr_1_name }}'
-      servarr_user: '{{ server_user_media_name }}'
-      servarr_address: '{{ server_network_local_ip_address }}'
+      servarr_name: prowlarr
+      servarr_port: '{{ port_prowlarr }}'
+      servarr_var: /mnt/data/media/prowlarr
+      servarr_user: '{{ user_name_media }}'
+      servarr_address: '{{ network_private_address }}'
     - role: jackett
       tags: jackett
-      jackett_name: '{{ server_jackett_1_name }}'
-      jackett_port: '{{ server_jackett_1_port }}'
-      jackett_var: '/mnt/data/media/{{ server_jackett_1_name }}'
-      jackett_user: '{{ server_user_media_name }}'
+      jackett_name: jackett
+      jackett_port: '{{ port_jackett }}'
+      jackett_var: /mnt/data/media/jackett
+      jackett_user: '{{ user_name_media }}'
       jackett_external: true
-      jackett_address: '{{ server_network_local_ip_address }}'
+      jackett_address: '{{ network_private_address }}'
     - role: servarr
       tags: [servarr, radarr]
       servarr_software: radarr
-      servarr_name: '{{ server_radarr_1_name }}'
-      servarr_port: '{{ server_radarr_1_port }}'
-      servarr_var: '/mnt/data/media/{{ server_radarr_1_name }}'
-      servarr_user: '{{ server_user_media_name }}'
-      servarr_address: '{{ server_network_local_ip_address }}'
+      servarr_name: radarr-1
+      servarr_port: '{{ port_radarr_1 }}'
+      servarr_var: /mnt/data/media/radarr-1
+      servarr_user: '{{ user_name_media }}'
+      servarr_address: '{{ network_private_address }}'
     - role: servarr
       tags: [servarr, radarr]
       servarr_software: radarr
-      servarr_name: '{{ server_radarr_2_name }}'
-      servarr_port: '{{ server_radarr_2_port }}'
-      servarr_var: '/mnt/data/media/{{ server_radarr_2_name }}'
-      servarr_user: '{{ server_user_media_name }}'
-      servarr_address: '{{ server_network_local_ip_address }}'
+      servarr_name: radarr-2
+      servarr_port: '{{ port_radarr_2 }}'
+      servarr_var: /mnt/data/media/radarr-2
+      servarr_user: '{{ user_name_media }}'
+      servarr_address: '{{ network_private_address }}'
     - role: sonarr
       tags: sonarr
-      sonarr_name: '{{ server_sonarr_1_name }}'
-      sonarr_port: '{{ server_sonarr_1_port }}'
-      sonarr_var: '/mnt/data/media/{{ server_sonarr_1_name }}'
-      sonarr_user: '{{ server_user_media_name }}'
-      sonarr_address: '{{ server_network_local_ip_address }}'
+      sonarr_name: sonarr-1
+      sonarr_port: '{{ port_sonarr_1 }}'
+      sonarr_var: /mnt/data/media/sonarr-1
+      sonarr_user: '{{ user_name_media }}'
+      sonarr_address: '{{ network_private_address }}'
     - role: sonarr
       tags: sonarr
-      sonarr_name: '{{ server_sonarr_2_name }}'
-      sonarr_port: '{{ server_sonarr_2_port }}'
-      sonarr_var: '/mnt/data/media/{{ server_sonarr_2_name }}'
-      sonarr_user: '{{ server_user_media_name }}'
-      sonarr_address: '{{ server_network_local_ip_address }}'
+      sonarr_name: sonarr-2
+      sonarr_port: '{{ port_sonarr_2 }}'
+      sonarr_var: /mnt/data/media/sonarr-2
+      sonarr_user: '{{ user_name_media }}'
+      sonarr_address: '{{ network_private_address }}'
 
 - name: Public Network
   hosts: server
@@ -295,5 +296,4 @@
   roles:
     - role: network
       tags: network
-      network_interface: '{{ server_network_interface }}'
       network_dns: ['{{ network_local_dns }}']
