@@ -14,6 +14,7 @@
     repo: '{{ ohmyzsh_git }}'
     dest: '~{{ ohmyzsh_user_name }}/.oh-my-zsh'
     version: '{{ ohmyzsh_version }}'
+  become_user: '{{ ohmyzsh_user_name }}'
 
 # Configure
 
