@@ -1,0 +1,27 @@
+---
+
+- name: 'Chroot "{{ chroot_dir }}" exists'
+  ansible.builtin.command: >
+    debootstrap bookworm "{{ chroot_dir }}" http://deb.debian.org/debian
+  args:
+    creates: '{{ chroot_dir }}'
+
+- name: 'Chroot "{{ chroot_dir }}" has its packages installed'
+  when: chroot_packages is defined
+  vars:
+    packages: '{{ chroot_packages | join(" ") }}'
+  ansible.builtin.shell: |
+    set -e -o pipefail
+    if ! chroot "{{ chroot_dir }}" dpkg -s {{ packages }}; then
+    {% if not ansible_check_mode %}
+      chroot "{{ chroot_dir }}" apt-get install -y {{ packages }}
+    {% endif %}
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  check_mode: false
+  register: __chroot_package_output
+  changed_when: >
+    __chroot_package_output.stdout_lines | last | default == "CHANGED"
+  notify: '{{ chroot_notify | default(omit) }}'

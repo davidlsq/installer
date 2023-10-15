@@ -2,24 +2,26 @@
 
 service_name: prometheus
 service_chroot: true
-service_exec_start: |
-  {{ service_lib }}/current/prometheus \
-    --config.file={{ service_etc }}/prometheus.yml \
-    --storage.tsdb.path={{ service_var }} \
-  {% if prometheus_retention_time is defined %}
-    --storage.tsdb.retention.time={{ prometheus_retention_time }} \
-  {% endif %}
-  {% if prometheus_retention_size is defined %}
-    --storage.tsdb.retention.size={{ prometheus_retention_size }} \
-  {% endif %}
-    --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
-    --enable-feature=memory-snapshot-on-shutdown \
-    --enable-feature=auto-gomaxprocs \
-    --enable-feature=exemplar-storage \
-    --enable-feature=no-default-scrape-port
-service_exec_reload: /bin/kill -HUP $MAINPID
-service_timeout_stop: 600
-service_limit_file: 65000
+service_config:
+  Service:
+    ExecStart: |
+      {{ service_lib_dir }}/current/prometheus \
+        --config.file={{ service_etc_dir }}/prometheus.yml \
+        --storage.tsdb.path={{ service_var_dir }} \
+      {% if prometheus_retention_time is defined %}
+        --storage.tsdb.retention.time={{ prometheus_retention_time }} \
+      {% endif %}
+      {% if prometheus_retention_size is defined %}
+        --storage.tsdb.retention.size={{ prometheus_retention_size }} \
+      {% endif %}
+        --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
+        --enable-feature=memory-snapshot-on-shutdown \
+        --enable-feature=auto-gomaxprocs \
+        --enable-feature=exemplar-storage \
+        --enable-feature=no-default-scrape-port
+    ExecReload: /bin/kill -HUP $MAINPID
+    TimeoutStopSec: 600
+    LimitNOFILE: 65000
 
 archive_url:
   "https://github.com/prometheus/prometheus/releases/download/\
