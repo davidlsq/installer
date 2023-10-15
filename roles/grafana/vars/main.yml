@@ -7,11 +7,13 @@ service_packages:
   - adduser
   - libfontconfig1
   - musl
-service_exec_start: |
-  {{ service_lib }}/current/bin/grafana server \
-    --homepath={{ service_lib }}/current \
-    --config={{ service_etc }}/grafana.ini \
-    --pidfile={{ service_run }}/pid
+service_config:
+  Service:
+    ExecStart: |
+      {{ service_lib_dir }}/current/bin/grafana server \
+        --homepath={{ service_lib_dir }}/current \
+        --config={{ service_etc_dir }}/grafana.ini \
+        --pidfile={{ service_run_dir }}/pid
 
 archive_url:
   "https://dl.grafana.com/oss/release/\

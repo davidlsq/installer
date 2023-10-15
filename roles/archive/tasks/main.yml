@@ -1,17 +1,17 @@
 ---
 
-- name: 'Archive "{{ service_lib }}/{{ archive_version }}.tar.gz" is downloaded'
+- name: 'Archive "{{ service_lib_dir }}/{{ archive_version }}.tar.gz" is downloaded'
   ansible.builtin.get_url:
     url: '{{ archive_url }}'
-    dest: '{{ service_lib }}/{{ archive_version }}.tar.gz'
+    dest: '{{ service_lib_dir }}/{{ archive_version }}.tar.gz'
     force: false
     owner: root
     group: root
     mode: u=rw,go=r
 
-- name: 'Directory "{{ service_lib }}/{{ archive_version }}" exists'
+- name: 'Directory "{{ service_lib_dir }}/{{ archive_version }}" exists'
   ansible.builtin.file:
-    path: '{{ service_lib }}/{{ archive_version }}'
+    path: '{{ service_lib_dir }}/{{ archive_version }}'
     state: directory
     owner: root
     group: root
@@ -19,13 +19,13 @@
   register: __archive_output
 
 - name: >
-    Archive "{{ service_lib }}/{{ archive_version }}.tar.gz" is extracted into
-    "{{ service_lib }}/{{ archive_version }}"
+    Archive "{{ service_lib_dir }}/{{ archive_version }}.tar.gz" is extracted into
+    "{{ service_lib_dir }}/{{ archive_version }}"
   when: __archive_output is changed
   ansible.builtin.unarchive:
     remote_src: true
-    src: '{{ service_lib }}/{{ archive_version }}.tar.gz'
-    dest: '{{ service_lib }}/{{ archive_version }}'
+    src: '{{ service_lib_dir }}/{{ archive_version }}.tar.gz'
+    dest: '{{ service_lib_dir }}/{{ archive_version }}'
     owner: root
     group: root
     mode: u+rw,go-w+r
@@ -33,10 +33,10 @@
       - --transform
       - 's/^{{ archive_transform | default("") }}//'
 
-- name: 'Symlink {{ service_lib }}/current exists '
+- name: 'Symlink {{ service_lib_dir }}/current exists '
   ansible.builtin.file:
     src: '{{ archive_version }}'
-    dest: '{{ service_lib }}/current'
+    dest: '{{ service_lib_dir }}/current'
     owner: root
     group: root
     state: link

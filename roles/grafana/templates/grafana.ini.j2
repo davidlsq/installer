@@ -2,10 +2,10 @@ app_mode = production
 instance_name = {{ service_name }}
 
 [paths]
-data = {{ service_var }}/data
-logs = {{ service_log }}
-plugins = {{ service_var }}/plugins
-provisioning = {{ service_var }}/provisioning
+data = {{ service_var_dir }}/data
+logs = {{ service_log_dir }}
+plugins = {{ service_var_dir }}/plugins
+provisioning = {{ service_var_dir }}/provisioning
 
 [server]
 protocol = http

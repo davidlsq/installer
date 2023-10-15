@@ -2,11 +2,13 @@
 
 service_name: node_exporter
 service_chroot: false
-service_exec_start: |
-  {{ service_lib }}/current/node_exporter \
-    --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
-    --collector.systemd \
-    --collector.processes
+service_config:
+  Service:
+    ExecStart: |
+      {{ service_lib_dir }}/current/node_exporter \
+        --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
+        --collector.systemd \
+        --collector.processes
 
 archive_url:
   "https://github.com/prometheus/node_exporter/releases/download/\

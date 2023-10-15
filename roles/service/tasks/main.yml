@@ -1,5 +1,12 @@
 ---
 
+- name: Import "user" role
+  ansible.builtin.import_role:
+    name: user
+  vars:
+    user_system: true
+    user_notify: service restart
+
 - name: 'Directory "/opt" exists'
   ansible.builtin.file:
     path: /opt
@@ -8,25 +15,25 @@
     group: root
     mode: u=rwx,go=rx
 
-- name: 'Directory "{{ service_opt }}" exists'
+- name: 'Directory "{{ service_opt_dir }}" exists'
   ansible.builtin.file:
-    path: '{{ service_opt }}'
+    path: '{{ service_opt_dir }}'
     state: directory
     owner: root
     group: root
     mode: u=rwx,go=rx
 
-- name: 'Directory "{{ service_opt }}" is populated'
+- name: 'Directory "{{ service_opt_dir }}" is populated'
   loop:
-    - name: '{{ service_lib }}'
-    - name: '{{ service_etc }}'
-    - name: '{{ service_run }}'
+    - name: '{{ service_lib_dir }}'
+    - name: '{{ service_etc_dir }}'
+    - name: '{{ service_run_dir }}'
       owner: '{{ user_name }}'
       mode: u=rwx,go=
-    - name: '{{ service_var }}'
+    - name: '{{ service_var_dir }}'
       owner: '{{ user_name }}'
       mode: u=rwx,go=
-    - name: '{{ service_log }}'
+    - name: '{{ service_log_dir }}'
       owner: '{{ user_name }}'
       mode: u=rwx,go=
   loop_control:
@@ -38,34 +45,78 @@
     group: '{{ item.owner | default("root") }}'
     mode: '{{ item.mode | default("u=rwx,go=rx") }}'
 
-- name: 'Chroot "{{ service_opt }}/chroot" exists'
-  when: service_chroot
-  ansible.builtin.shell: |
-    set -e -o pipefail
-    debootstrap bookworm "{{ service_opt }}/chroot" http://deb.debian.org/debian
-    {% if service_packages is defined %}
-    chroot "{{ service_chroot }}" apt-get install -y {{ service_packages | join(" ") }}
-    {% endif %}
-  args:
-    executable: /bin/bash
-    creates: '{{ service_opt }}/chroot'
+- name: Import "chown" role
+  ansible.builtin.import_role:
+    name: chown
+  vars:
+    chown_path: '{{ service_run_dir }}'
+    chown_user_name: '{{ user_name }}'
+    chown_notify: service restart
 
-- name: 'Service "{{ service_name }}" packages are installed'
+- name: Import "chown" role
+  ansible.builtin.import_role:
+    name: chown
+  vars:
+    chown_path: '{{ service_var_dir }}'
+    chown_user_name: '{{ user_name }}'
+    chown_notify: service restart
+
+- name: Import "chown" role
+  ansible.builtin.import_role:
+    name: chown
+  vars:
+    chown_path: '{{ service_log_dir }}'
+    chown_user_name: '{{ user_name }}'
+    chown_notify: service restart
+
+- name: Import "chroot" role
+  when: service_chroot
+  ansible.builtin.import_role:
+    name: chroot
+  vars:
+    chroot_dir: '{{ service_chroot_dir }}'
+    chroot_packages: '{{ service_packages }}'
+    chroot_notify: service restart
+
+- name: 'Service "{{ service_name }}" has its packages installed'
   when: not service_chroot and service_packages is defined
   ansible.builtin.apt:
     name: '{{ service_packages }}'
     state: present
 
-- name: 'Config "{{ service_name }}.service" exists'
+- name: 'Directory "{{ service_unit_dir }}" exists'
+  ansible.builtin.file:
+    path: '{{ service_unit_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+
+- name: 'Config "{{ service_unit_dir }}/service.conf" exists'
   ansible.builtin.template:
-    src: service.j2
-    dest: '/etc/systemd/system/{{ service_name }}.service'
+    src: service.conf.j2
+    dest: '{{ service_unit_dir }}/00_service.conf'
     owner: root
     group: root
     mode: u=rw,go=r
   notify: service restart
 
-- name: 'Service "{{ service_name }}" is enabled'
-  ansible.builtin.systemd:
-    name: '{{ service_name }}'
-    enabled: true
+- name: 'Config "{{ service_unit_dir }}/child.conf" exists'
+  when: service_config is defined
+  ansible.builtin.template:
+    src: child.conf.j2
+    dest: '{{ service_unit_dir }}/01_child.conf'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  notify: service restart
+
+- name: 'Config "{{ service_unit_file }}" exists'
+  ansible.builtin.lineinfile:
+    path: '{{ service_unit_file }}'
+    line: '[Install]'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+    create: true
+  notify: service restart

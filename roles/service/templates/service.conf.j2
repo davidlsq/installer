@@ -7,17 +7,16 @@ Wants=network-online.target
 After=local-fs.target
 Requires=local-fs.target
 
-RequiresMountsFor={{ service_lib }}
-RequiresMountsFor={{ service_etc }}
-RequiresMountsFor={{ service_run }}
-RequiresMountsFor={{ service_var }}
-RequiresMountsFor={{ service_log }}
+RequiresMountsFor={{ service_lib_dir }}
+RequiresMountsFor={{ service_etc_dir }}
+RequiresMountsFor={{ service_run_dir }}
+RequiresMountsFor={{ service_var_dir }}
+RequiresMountsFor={{ service_log_dir }}
 
 StartLimitInterval=0
 StartLimitBurst=0
 
 [Service]
-Type=simple
 Restart=always
 RestartSec=300
 
@@ -26,29 +25,17 @@ Group={{ user_name }}
 UMask=0077
 
 {% if service_chroot %}
-RootDirectory={{ service_opt }}/chroot
+RootDirectory={{ service_opt_dir }}/chroot
 RootDirectoryStartOnly=yes
-BindReadOnlyPaths={{ service_lib }}
-BindReadOnlyPaths={{ service_etc }}
-BindPaths={{ service_run }}
-BindPaths={{ service_var }}
-BindPaths={{ service_log }}
+BindReadOnlyPaths={{ service_lib_dir }}
+BindReadOnlyPaths={{ service_etc_dir }}
+BindPaths={{ service_run_dir }}
+BindPaths={{ service_var_dir }}
+BindPaths={{ service_log_dir }}
 {% else %}
-ReadWritePaths={{ service_run }}
-ReadWritePaths={{ service_var }}
-ReadWritePaths={{ service_log }}
-{% endif %}
-
-ExecStart={{ service_exec_start }}
-{% if service_exec_reload is defined %}
-ExecReload={{ service_exec_reload }}
-{% endif %}
-
-{% if service_timeout_stop is defined %}
-TimeoutStopSec={{ service_timeout_stop }}
-{% endif %}
-{% if service_limit_file is defined %}
-LimitNOFILE={{ service_limit_file }}
+ReadWritePaths={{ service_run_dir }}
+ReadWritePaths={{ service_var_dir }}
+ReadWritePaths={{ service_log_dir }}
 {% endif %}
 
 DevicePolicy=closed
