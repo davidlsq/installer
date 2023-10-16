@@ -163,7 +163,6 @@
           host: '{{ hostvars.server.network_public_sub_domain }}'
     - role: config_image_raspi
       config_image_raspi_output: '{{ config_dir }}/raspi_image'
-      config_image_raspi_name: raspi
       config_image_raspi_network_interface: '{{ hostvars.raspi.network_interface }}'
       config_image_raspi_network_hostname: '{{ hostvars.raspi.network_hostname }}'
       config_image_raspi_network_manual:
@@ -175,7 +174,6 @@
           - '{{ network_public_dns_2 }}'
     - role: config_image_debian
       config_image_debian_ouput: '{{ config_dir }}/server_image'
-      config_image_debian_name: server
       config_image_debian_hash_user_root: '{{ hash_root }}'
       config_image_debian_disk_system: '{{ hostvars.server.disk_system }}'
       config_image_debian_network_interface: '{{ hostvars.server.network_interface }}'
