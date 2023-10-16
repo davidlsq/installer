@@ -10,6 +10,7 @@ if [ ! -f /install/install.done ]; then
   python3 -m venv /install/ansible-venv
   source /install/ansible-venv/bin/activate
   python3 -m pip install ansible
-  ansible-playbook -i "{{  config_image_debian_name }}," -c local "/install/install.yml"
+  ANSIBLE_HOSTS="$(ls "/install/host_vars" | tr '\n' ',')"
+  ansible-playbook -i "$ANSIBLE_HOSTS" -c local "/install/install.yml"
   touch /install/install.done
 fi

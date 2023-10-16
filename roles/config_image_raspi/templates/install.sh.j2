@@ -14,6 +14,7 @@ fi
 
 if [ ! -f /install/playbook.done ]; then
   source /install/ansible-venv/bin/activate
-  ansible-playbook -i "{{  config_image_raspi_name }}," -c local "/install/install.yml"
+  ANSIBLE_HOSTS="$(ls "/install/host_vars" | tr '\n' ',')"
+  ansible-playbook -i "$ANSIBLE_HOSTS" -c local "/install/install.yml"
   touch /install/playbook.done
 fi

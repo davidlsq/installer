@@ -1,5 +1,10 @@
 ---
 
+- name: Install package "debootstrap"
+  ansible.builtin.apt:
+    name: debootstrap
+    state: present
+
 - name: Import "user" role
   ansible.builtin.import_role:
     name: user
