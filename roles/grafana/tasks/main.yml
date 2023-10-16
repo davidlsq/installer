@@ -17,7 +17,7 @@
     state: directory
     owner: '{{ user_name }}'
     group: '{{ user_name }}'
-    mode: u=rwx,go=r
+    mode: u=rwx,go=
 
 - name: 'Config "{{ service_etc_dir }}/grafana.ini" exists'
   ansible.builtin.template:
