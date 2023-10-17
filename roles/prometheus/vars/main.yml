@@ -5,7 +5,7 @@ service_chroot: true
 service_config:
   Service:
     ExecStart: |
-      {{ service_lib_dir }}/current/prometheus \
+      {{ service_lib_dir }}/{{ archive_name }}/prometheus \
         --config.file={{ service_etc_dir }}/prometheus.yml \
         --storage.tsdb.path={{ service_var_dir }} \
       {% if prometheus_retention_time is defined %}
@@ -26,5 +26,6 @@ service_config:
 archive_url:
   "https://github.com/prometheus/prometheus/releases/download/\
    v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+archive_name: bin
 archive_version: '{{ prometheus_version }}'
 archive_transform: 'prometheus-{{ prometheus_version }}.linux-amd64'
