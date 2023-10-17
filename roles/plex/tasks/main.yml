@@ -53,7 +53,7 @@
 
 - name: Package
   ansible.builtin.apt:
-    name: "plexmediaserver={{ plex_version }}"
+    name: 'plexmediaserver={{ plex_version }}'
     update_cache: true
     allow_downgrade: true
   register: package
