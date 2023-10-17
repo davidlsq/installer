@@ -2,7 +2,7 @@
 
 - name: 'Chroot "{{ chroot_dir }}" exists'
   ansible.builtin.command: >
-    debootstrap bookworm "{{ chroot_dir }}" http://deb.debian.org/debian
+    debootstrap bookworm "{{ chroot_dir }}"
   args:
     creates: '{{ chroot_dir }}'
 
