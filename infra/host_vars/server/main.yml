@@ -4,6 +4,7 @@ arch: amd64
 
 user_id_prometheus: 900
 user_id_grafana: 901
+user_id_samba: 902
 user_id_media: 1012
 
 user_name_media: media

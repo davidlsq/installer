@@ -7,7 +7,7 @@ dependencies:
       lvm_vg: '{{ grafana_vg }}'
       lvm_lvs:
         - name: '{{ service_name }}'
-          size: '{{ grafana_v_size }}'
-          mount: '{{ service_var }}'
+          size: '{{ grafana_lv_size }}'
+          mount: '{{ service_var_dir }}'
   - role: service
   - role: archive

@@ -1,0 +1,22 @@
+---
+
+service_name: samba
+service_chroot: false
+service_config:
+  Service:
+    Type: notify
+    PIDFile: '{{ service_run_dir }}/smbd.pid'
+    ExecStart: |
+      {{ service_lib_dir }}/bin-{{ samba_version }}/sbin/smbd \
+        --foreground --no-process-group \
+        --debuglevel=1
+    ExecReload: /bin/kill -HUP $MAINPID
+    LimitCORE: infinity
+    PrivateUsers: false
+    AmbientCapabilities: CAP_NET_BIND_SERVICE
+
+archive_url: >
+  https://download.samba.org/pub/samba/samba-{{ samba_version }}.tar.gz
+archive_name: src
+archive_version: '{{ samba_version }}'
+archive_transform: 'samba-{{ samba_version }}'

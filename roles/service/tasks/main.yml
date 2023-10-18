@@ -6,6 +6,7 @@
     state: present
 
 - name: Import "user" role
+  when: user_name != "root"
   ansible.builtin.import_role:
     name: user
   vars:
