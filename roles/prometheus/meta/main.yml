@@ -8,6 +8,6 @@ dependencies:
       lvm_lvs:
         - name: '{{ service_name }}'
           size: '{{ prometheus_lv_size }}'
-          mount: '{{ service_var }}'
+          mount: '{{ service_var_dir }}'
   - role: service
   - role: archive

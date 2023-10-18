@@ -147,25 +147,30 @@
         - name: iphone
           key_pub: server/wireguard_keys_iphone.pub
 
-- name: Time Machine
+- name: Samba
   hosts: server
   gather_facts: false
   become: true
-  tags: timemachine
+  tags: samba
+  vars:
+    user_id: '{{ user_id_samba }}'
+    samba_vg: data
+    samba_address: '{{ network_private_address }}'
+    samba_users:
+      - name: '{{ user_name_regular }}'
+        password: '{{ password_samba }}'
+    samba_shares:
+      - name: TimeMachine
+        timemachine: true
+        lv_size: 500G
+        users:
+          - '{{ user_name_regular }}'
+      - name: Share
+        lv_size: 10G
+        users:
+          - '{{ user_name_regular }}'
   roles:
-    - role: lvm
-      tags: data
-      lvm_vg: data
-      lvm_lvs:
-        - name: timemachine
-          size: 500G
-          mount: /mnt/data/timemachine
     - role: samba
-      samba_var: /mnt/data/timemachine
-      samba_user: '{{ user_name_regular }}'
-      samba_password: '{{ password_samba }}'
-      samba_section: TimeMachine
-      samba_section_conf: timemachine.conf.j2
 
 - name: Media Softwares
   hosts: server
