@@ -2,10 +2,10 @@ app_mode = production
 instance_name = {{ service_name }}
 
 [paths]
-data = {{ service_var_dir }}/data
+data = {{ grafana_var_dir }}/data
 logs = {{ service_log_dir }}
-plugins = {{ service_var_dir }}/plugins
-provisioning = {{ service_var_dir }}/provisioning
+plugins = {{ grafana_var_dir }}/plugins
+provisioning = {{ grafana_var_dir }}/provisioning
 
 [server]
 protocol = http

@@ -31,4 +31,5 @@
 - name: 'Service "{{ __lvm_lv_service }}" is started'
   ansible.builtin.systemd:
     name: '{{ __lvm_lv_service }}'
+    daemon_reload: true
     state: started

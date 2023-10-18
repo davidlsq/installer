@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - role: lvm
+    when: service_lvs | length > 0

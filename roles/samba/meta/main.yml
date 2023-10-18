@@ -1,21 +1,5 @@
 ---
 
 dependencies:
-  - role: lvm
-    when: samba_vg is defined
-    vars:
-      lvm_vg: '{{ samba_vg }}'
-      lvm_lvs: |
-        {% set lvm_lvs = [] %}
-        {% for share in samba_shares %}
-        {% if share.lv_size is defined %}
-        {% set _ = lvm_lvs.append({
-          "name": share.name | lower,
-          "size": share.lv_size,
-          "mount": service_var_dir + "/data/" + (share.name | lower)
-        }) %}
-        {% endif %}
-        {% endfor %}
-        {{ lvm_lvs }}
   - role: service
   - role: archive

@@ -1,6 +1,6 @@
 ---
 
-- name: 'Directory "{{ service_var_dir }}" is populated'
+- name: 'Directory "{{ grafana_var_dir }}" is populated'
   loop:
     - data
     - plugins
@@ -11,9 +11,9 @@
     - provisioning/notifiers
     - provisioning/plugins
   loop_control:
-    label: 'Directory "{{ service_var_dir }}/{{ item }}" exists'
+    label: 'Directory "{{ grafana_var_dir }}/{{ item }}" exists'
   ansible.builtin.file:
-    path: '{{ service_var_dir }}/{{ item }}'
+    path: '{{ grafana_var_dir }}/{{ item }}'
     state: directory
     owner: '{{ user_name }}'
     group: '{{ user_name }}'

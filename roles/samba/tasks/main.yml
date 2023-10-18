@@ -5,24 +5,10 @@
     - state
     - state/run
     - private
-    - data
   loop_control:
     label: 'Directory "{{ service_var_dir }}/{{ item }}" exists'
   ansible.builtin.file:
     path: '{{ service_var_dir }}/{{ item }}'
-    state: directory
-    owner: '{{ user_name }}'
-    group: '{{ user_name }}'
-    mode: u=rwx,go=
-
-- name: 'Directory "{{ service_var_dir }}/data" is populated'
-  loop: '{{ samba_shares | map(attribute="name") }}'
-  loop_control:
-    label: 'Directory "{{ path }}" exists'
-  vars:
-    path: '{{ service_var_dir }}/data/{{ item | lower }}'
-  ansible.builtin.file:
-    path: '{{ path }}'
     state: directory
     owner: '{{ user_name }}'
     group: '{{ user_name }}'
