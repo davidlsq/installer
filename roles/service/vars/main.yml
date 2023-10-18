@@ -9,3 +9,16 @@ service_run_dir: '{{ service_opt_dir }}/run'
 service_var_dir: '{{ service_opt_dir }}/var'
 service_log_dir: '{{ service_opt_dir }}/log'
 service_chroot_dir: '{{ service_opt_dir }}/chroot'
+service_lvs: []
+service_mounts: '{{ lvm_lvs | map(attribute="mount") }}'
+
+lvm_lvs: |
+  {% set result = [] %}
+  {% for lv in service_lvs %}
+  {% set _ = result.append({
+    "name": service_name + "-" + lv.name,
+    "size": lv.size,
+    "mount": "/mnt/" + lvm_vg + "/" + service_name + "/" + lv.name
+  }) %}
+  {% endfor %}
+  {{ result }}

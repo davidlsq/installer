@@ -1,10 +1,5 @@
 ---
 
-- name: Install package "debootstrap"
-  ansible.builtin.apt:
-    name: debootstrap
-    state: present
-
 - name: Import "user" role
   when: user_name != "root"
   ansible.builtin.import_role:
@@ -51,27 +46,35 @@
     group: '{{ item.owner | default("root") }}'
     mode: '{{ item.mode | default("u=rwx,go=rx") }}'
 
-- name: Import "chown" role
-  ansible.builtin.import_role:
-    name: chown
-  vars:
-    chown_path: '{{ service_run_dir }}'
-    chown_user_name: '{{ user_name }}'
-    chown_notify: service restart
+- name: 'Mount directories exists'
+  when: service_lvs | length > 0
+  loop: '{{ service_mounts }}'
+  loop_control:
+    label: 'Directory "{{ item }}" exists'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ user_name }}'
+    group: '{{ user_name }}'
+    mode: u=rwx,go=
 
 - name: Import "chown" role
   ansible.builtin.import_role:
     name: chown
   vars:
-    chown_path: '{{ service_var_dir }}'
+    chown_paths:
+      - '{{ service_run_dir }}'
+      - '{{ service_var_dir }}'
+      - '{{ service_log_dir }}'
     chown_user_name: '{{ user_name }}'
     chown_notify: service restart
 
 - name: Import "chown" role
+  when: service_lvs | length > 0
   ansible.builtin.import_role:
     name: chown
   vars:
-    chown_path: '{{ service_log_dir }}'
+    chown_paths: '{{ service_mounts }}'
     chown_user_name: '{{ user_name }}'
     chown_notify: service restart
 
@@ -98,7 +101,7 @@
     group: root
     mode: u=rwx,go=rx
 
-- name: 'Config "{{ service_unit_dir }}/service.conf" exists'
+- name: 'Config "{{ service_unit_dir }}/00_service.conf" exists'
   ansible.builtin.template:
     src: service.conf.j2
     dest: '{{ service_unit_dir }}/00_service.conf'
@@ -107,7 +110,7 @@
     mode: u=rw,go=r
   notify: service restart
 
-- name: 'Config "{{ service_unit_dir }}/child.conf" exists'
+- name: 'Config "{{ service_unit_dir }}/01_child.conf" exists'
   when: service_config is defined
   ansible.builtin.template:
     src: child.conf.j2

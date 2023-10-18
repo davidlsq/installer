@@ -1,5 +1,7 @@
 ---
 
+prometheus_var_dir: '{{ lvm_vg is defined | ternary(service_mounts[0], service_var_dir) }}'
+
 service_name: prometheus
 service_chroot: true
 service_config:
@@ -7,7 +9,7 @@ service_config:
     ExecStart: |
       {{ service_lib_dir }}/{{ archive_name }}/prometheus \
         --config.file={{ service_etc_dir }}/prometheus.yml \
-        --storage.tsdb.path={{ service_var_dir }} \
+        --storage.tsdb.path={{ prometheus_var_dir }} \
       {% if prometheus_retention_time is defined %}
         --storage.tsdb.retention.time={{ prometheus_retention_time }} \
       {% endif %}
@@ -22,6 +24,9 @@ service_config:
     ExecReload: /bin/kill -HUP $MAINPID
     TimeoutStopSec: 600
     LimitNOFILE: 65000
+service_lvs:
+  - name: data
+    size: '{{ prometheus_lv_size }}'
 
 archive_url:
   "https://github.com/prometheus/prometheus/releases/download/\

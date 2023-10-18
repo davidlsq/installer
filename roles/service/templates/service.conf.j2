@@ -7,11 +7,9 @@ Wants=network-online.target
 After=local-fs.target
 Requires=local-fs.target
 
-RequiresMountsFor={{ service_lib_dir }}
-RequiresMountsFor={{ service_etc_dir }}
-RequiresMountsFor={{ service_run_dir }}
-RequiresMountsFor={{ service_var_dir }}
-RequiresMountsFor={{ service_log_dir }}
+{% for mount in service_mounts %}
+RequiresMountsFor={{ mount }}
+{% endfor %}
 
 StartLimitInterval=0
 StartLimitBurst=0
@@ -32,10 +30,16 @@ BindReadOnlyPaths={{ service_etc_dir }}
 BindPaths={{ service_run_dir }}
 BindPaths={{ service_var_dir }}
 BindPaths={{ service_log_dir }}
+{% for mount in service_mounts %}
+BindPaths={{ mount }}
+{% endfor %}
 {% else %}
 ReadWritePaths={{ service_run_dir }}
 ReadWritePaths={{ service_var_dir }}
 ReadWritePaths={{ service_log_dir }}
+{% for mount in service_mounts %}
+ReadWritePaths={{ mount }}
+{% endfor %}
 {% endif %}
 
 DevicePolicy=closed

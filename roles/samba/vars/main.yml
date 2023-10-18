@@ -8,12 +8,20 @@ service_config:
     PIDFile: '{{ service_run_dir }}/smbd.pid'
     ExecStart: |
       {{ service_lib_dir }}/bin-{{ samba_version }}/sbin/smbd \
-        --foreground --no-process-group \
-        --debuglevel=1
+        --foreground --no-process-group
     ExecReload: /bin/kill -HUP $MAINPID
     LimitCORE: infinity
     PrivateUsers: false
     AmbientCapabilities: CAP_NET_BIND_SERVICE
+service_lvs: |
+  {% set service_lvs = [] %}
+  {% for share in samba_shares %}
+  {% set _ = service_lvs.append({
+    "name": share.name | lower,
+    "size": share.size
+  }) %}
+  {% endfor %}
+  {{ service_lvs }}
 
 archive_url: >
   https://download.samba.org/pub/samba/samba-{{ samba_version }}.tar.gz

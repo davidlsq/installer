@@ -1,9 +1,12 @@
 ---
 
-- name: 'Directory "{{ chown_path }}" is owned by user "{{ chown_user_name }}"'
+- name: 'Directories are owned by user "{{ chown_user_name }}"'
+  loop: '{{ chown_paths }}'
+  loop_control:
+    label: 'Directory "{{ item }}" is owned by user "{{ chown_user_name }}"'
   ansible.builtin.shell: |
     set -e -o pipefail
-    find "{{ chown_path }}" \
+    find "{{ item }}" \
       ! -user root ! -group root \
       ! -user {{ chown_user_name }} ! -group {{ chown_user_name }} \
       -print \

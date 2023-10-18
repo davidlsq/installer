@@ -87,8 +87,8 @@
   roles:
     - role: prometheus
   vars:
+    lvm_vg: data
     user_id: '{{ user_id_prometheus }}'
-    prometheus_vg: data
     prometheus_address: '{{ network_private_address }}'
     prometheus_port: '{{ port_prometheus }}'
     prometheus_retention_time: 90d
@@ -122,8 +122,8 @@
   roles:
     - role: grafana
   vars:
+    lvm_vg: data
     user_id: '{{ user_id_grafana }}'
-    grafana_vg: data
     grafana_admin_name: '{{ user_name_regular }}'
     grafana_admin_password: '{{ password_grafana }}'
     grafana_address: '{{ network_private_address }}'
@@ -153,8 +153,8 @@
   become: true
   tags: samba
   vars:
+    lvm_vg: data
     user_id: '{{ user_id_samba }}'
-    samba_vg: data
     samba_address: '{{ network_private_address }}'
     samba_users:
       - name: '{{ user_name_regular }}'
@@ -162,11 +162,11 @@
     samba_shares:
       - name: TimeMachine
         timemachine: true
-        lv_size: 500G
+        size: 500G
         users:
           - '{{ user_name_regular }}'
       - name: Share
-        lv_size: 10G
+        size: 10G
         users:
           - '{{ user_name_regular }}'
   roles:
