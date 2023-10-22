@@ -1,36 +1,29 @@
 ---
 
-prometheus_var_dir: '{{ lvm_vg is defined | ternary(service_mounts[0], service_var_dir) }}'
+__prometheus_bin: '{{ service_opt }}/bin-{{ prometheus_version }}'
+__prometheus_etc: '{{ service_opt }}/etc'
 
-service_name: prometheus
-service_chroot: true
 service_config:
-  Service:
-    ExecStart: |
-      {{ service_lib_dir }}/{{ archive_name }}/prometheus \
-        --config.file={{ service_etc_dir }}/prometheus.yml \
-        --storage.tsdb.path={{ prometheus_var_dir }} \
-      {% if prometheus_retention_time is defined %}
-        --storage.tsdb.retention.time={{ prometheus_retention_time }} \
-      {% endif %}
-      {% if prometheus_retention_size is defined %}
-        --storage.tsdb.retention.size={{ prometheus_retention_size }} \
-      {% endif %}
-        --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
-        --enable-feature=memory-snapshot-on-shutdown \
-        --enable-feature=auto-gomaxprocs \
-        --enable-feature=exemplar-storage \
-        --enable-feature=no-default-scrape-port
-    ExecReload: /bin/kill -HUP $MAINPID
-    TimeoutStopSec: 600
-    LimitNOFILE: 65000
-service_lvs:
-  - name: data
-    size: '{{ prometheus_lv_size }}'
-
-archive_url:
-  "https://github.com/prometheus/prometheus/releases/download/\
-   v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
-archive_name: bin
-archive_version: '{{ prometheus_version }}'
-archive_transform: 'prometheus-{{ prometheus_version }}.linux-amd64'
+  ExecStart: |
+    {{ __prometheus_bin }}/prometheus \
+      --config.file={{ __prometheus_etc }}/prometheus.yml \
+      --storage.tsdb.path={{ prometheus_data }} \
+    {% if prometheus_retention_time is defined %}
+      --storage.tsdb.retention.time={{ prometheus_retention_time }} \
+    {% endif %}
+    {% if prometheus_retention_size is defined %}
+      --storage.tsdb.retention.size={{ prometheus_retention_size }} \
+    {% endif %}
+      --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
+      --enable-feature=memory-snapshot-on-shutdown \
+      --enable-feature=auto-gomaxprocs \
+      --enable-feature=exemplar-storage \
+      --enable-feature=no-default-scrape-port
+  ExecReload: /bin/kill -HUP $MAINPID
+  LimitNOFILE: 65000
+  TimeoutStopSec: 600
+service_readonly:
+  - '{{ __prometheus_bin }}'
+  - '{{ __prometheus_etc }}'
+service_readwrite:
+  - '{{ prometheus_data }}'

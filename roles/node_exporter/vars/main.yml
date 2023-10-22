@@ -1,18 +1,12 @@
 ---
 
-service_name: node_exporter
-service_chroot: false
-service_config:
-  Service:
-    ExecStart: |
-      {{ service_lib_dir }}/{{ archive_name }}/node_exporter \
-        --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
-        --collector.systemd \
-        --collector.processes
+__node_exporter_bin: '{{ service_opt }}/bin-{{ node_exporter_version }}'
 
-archive_url:
-  "https://github.com/prometheus/node_exporter/releases/download/\
-   v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ arch }}.tar.gz"
-archive_name: bin
-archive_version: '{{ node_exporter_version }}'
-archive_transform: 'node_exporter-{{ node_exporter_version }}.linux-{{ arch }}'
+service_config:
+  ExecStart: |
+    {{ __node_exporter_bin }}/node_exporter \
+      --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
+      --collector.systemd \
+      --collector.processes
+service_readonly:
+  - '{{ __node_exporter_bin }}'

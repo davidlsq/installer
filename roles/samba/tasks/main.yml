@@ -1,68 +1,79 @@
 ---
 
-- name: 'Directory "{{ service_var_dir }}" is populated'
+- name: Include "archive" role
+  ansible.builtin.include_role:
+    name: archive
+  vars:
+    archive_url: >
+      https://download.samba.org/pub/samba/samba-{{ samba_version }}.tar.gz
+    archive_dest: '{{ service_opt }}/src-{{ samba_version }}.tar.gz'
+    archive_content: '{{ __samba_src }}'
+    archive_creates: '{{ __samba_src }}/configure'
+    archive_transform: 'samba-{{ samba_version }}'
+
+- name: 'Directory "{{ __samba_var }}" is populated'
   loop:
     - state
-    - state/run
     - private
   loop_control:
-    label: 'Directory "{{ service_var_dir }}/{{ item }}" exists'
+    label: 'Directory "{{ __samba_var }}/{{ item }}" exists'
   ansible.builtin.file:
-    path: '{{ service_var_dir }}/{{ item }}'
+    path: '{{ __samba_var }}/{{ item }}'
     state: directory
     owner: '{{ user_name }}'
     group: '{{ user_name }}'
     mode: u=rwx,go=
 
-- name: 'Directory "{{ service_lib_dir }}/bin-{{ samba_version }}" exists'
-  ansible.builtin.file:
-    path: '{{ service_lib_dir }}/bin-{{ samba_version }}'
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,go=rx
-
-- name: 'Binaries "{{ service_lib_dir }}/bin-{{ samba_version }}" are compiled'
+- name: 'Binaries "{{ __samba_bin }}" are compiled'
   ansible.builtin.shell: |
     set -e -o pipefail
-    ./bootstrap/generated-dists/debian12/bootstrap.sh
+    ./bootstrap/generated-dists/debian12/bootstrap.sh > make.log 2>&1
     ./configure \
-      --prefix="{{ service_lib_dir }}/bin-{{ samba_version }}" \
-      --sysconfdir="{{ service_etc_dir }}" \
-      --with-piddir="{{ service_run_dir }}" \
-      --localstatedir="{{ service_var_dir }}/state" \
-      --with-privatedir="{{ service_var_dir }}/private" \
-      --with-logfilebase="{{ service_log_dir }}" \
-      > make.log 2>&1
+      --prefix="{{ __samba_bin }}" \
+      --sysconfdir="{{ __samba_etc }}" \
+      --with-piddir="{{ __samba_run }}" \
+      --localstatedir="{{ __samba_var }}/state" \
+      --with-privatedir="{{ __samba_var }}/private" \
+      --with-logfilebase="{{ __samba_log }}" \
+      >> make.log 2>&1
     make -j 8 >> make.log 2>&1
     make -j 8 install >> make.log 2>&1
+    chown -R {{ user_name }}:{{ user_name }} {{ __samba_var }}
   args:
     executable: /bin/bash
-    chdir: '{{ service_lib_dir }}/src'
-    creates: '{{ service_lib_dir }}/bin-{{ samba_version }}/sbin/smbd'
+    chdir: '{{ __samba_src }}'
+    creates: '{{ __samba_bin }}/sbin/smbd'
 
-- name: 'Symlink {{ service_lib_dir }}/bin exists'
-  ansible.builtin.file:
-    src: 'bin-{{ samba_version }}'
-    dest: '{{ service_lib_dir }}/bin'
-    owner: root
-    group: root
-    state: link
-  notify: service restart
-
-- name: 'Config "{{ service_etc_dir }}/smb.conf" exists'
+- name: 'Config "{{ __samba_etc }}/smb.conf" exists'
   ansible.builtin.template:
     src: smb.conf.j2
-    dest: '{{ service_etc_dir }}/smb.conf'
+    dest: '{{ __samba_etc }}/smb.conf'
     owner: root
     group: root
     mode: u=rw,go=r
   notify: service restart
 
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
+- name: Package "avahi-daemon" is installed
+  when: __samba_shares | map(attribute="timemachine") is any
+  ansible.builtin.apt:
+    name: avahi-daemon
+    state: present
 
-- name: 'Service "{{ service_name }}" is started'
+- name: 'Service "avahi-daemon" is configured'
+  loop: '{{ __samba_shares | selectattr("timemachine") }}'
+  vars:
+    avahi_config: '/etc/avahi/services/{{ item.name | lower }}.service'
+  loop_control:
+    label: 'Config "{{ avahi_config }}" exists'
+  ansible.builtin.template:
+    src: avahi.conf.j2
+    dest: '{{ avahi_config }}'
+    owner: root
+    group: root
+    mode: u=rw,go=r
+  notify: avahi restart
+
+- name: 'Start service "{{ service_name }}"'
   ansible.builtin.systemd:
     name: '{{ service_name }}'
     state: started
@@ -71,44 +82,22 @@
   when: samba_users is defined
   loop: '{{ samba_users }}'
   loop_control:
-    label: 'User "{{ item.name }}" is valid'
+    label: 'User "{{ item.name }}" is authorized'
   ansible.builtin.shell: |
     set -e -o pipefail
-    if ! ./bin/smbclient -U {{ item.name }}%{{ item.password }} -L {{ samba_address }}; then
+    umask 0077
+    if ! ./smbclient -U {{ item.name }}%{{ item.password }} -L {{ samba_address }}; then
     {% if not ansible_check_mode %}
-      (echo "{{ item.password }}"; echo "{{ item.password }}") | ./bin/smbpasswd -a "{{ item.name }}"
+      (echo "{{ item.password }}"; echo "{{ item.password }}") | ./smbpasswd -a "{{ item.name }}"
+      chown -R {{ user_name }}:{{ user_name }} {{ __samba_var }}
     {% endif %}
       echo CHANGED
     fi
   args:
     executable: /bin/bash
-    chdir: '{{ service_lib_dir }}/bin'
+    chdir: '{{ __samba_bin }}/bin'
   check_mode: false
   register: __samba_authorized_output
   changed_when: >
     __samba_authorized_output.stdout_lines | last | default == "CHANGED"
   no_log: true
-
-- name: Package "avahi-daemon" is installed
-  ansible.builtin.apt:
-    name: avahi-daemon
-    state: present
-
-- name: 'Service "avahi" is configured'
-  loop: >
-    {{
-      samba_shares |
-      selectattr('timemachine', 'defined') |
-      selectattr("timemachine")
-    }}
-  loop_control:
-    label: 'Config "{{ config }}" exists'
-  vars:
-    config: '/etc/avahi/services/{{ item.name | lower }}.service'
-  ansible.builtin.template:
-    src: avahi.conf.j2
-    dest: '{{ config }}'
-    owner: root
-    group: root
-    mode: u=rw,go=r
-  notify: avahi restart

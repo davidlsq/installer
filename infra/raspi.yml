@@ -48,10 +48,10 @@
   become: true
   tags: data
   roles:
-    - role: lvm
+    - role: lvm_vg
       tags: data
-      lvm_vg: data
-      lvm_vgdisks:
+      lvm_vg_name: data
+      lvm_vg_disks:
         - '{{ disk_1 }}'
 
 - name: Installer
@@ -79,13 +79,11 @@
   become: true
   tags: pihole
   roles:
-    - role: lvm
-      tags: data
-      lvm_vg: data
-      lvm_lvs:
-        - name: pihole
-          size: 10G
-          mount: /mnt/data/pihole
+    - role: lvm_lv
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: pihole
+        lvm_lv_size: 10G
     - role: pihole
       pihole_var: /mnt/data/pihole
       pihole_user_id: 1010

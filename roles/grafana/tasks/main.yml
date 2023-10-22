@@ -1,8 +1,19 @@
 ---
 
-- name: 'Directory "{{ grafana_var_dir }}" is populated'
+- name: Include "archive" role
+  ansible.builtin.include_role:
+    name: archive
+  vars:
+    archive_url:
+      "https://dl.grafana.com/oss/release/\
+       grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    archive_dest: '{{ service_opt }}/bin-{{ grafana_version }}.tar.gz'
+    archive_content: '{{ __grafana_bin }}'
+    archive_creates: '{{ __grafana_bin }}/bin/grafana'
+    archive_transform: 'grafana-{{ grafana_version }}'
+
+- name: 'Directory "{{ grafana_data }}" is populated'
   loop:
-    - data
     - plugins
     - provisioning
     - provisioning/alerting
@@ -11,18 +22,18 @@
     - provisioning/notifiers
     - provisioning/plugins
   loop_control:
-    label: 'Directory "{{ grafana_var_dir }}/{{ item }}" exists'
+    label: 'Directory "{{ grafana_data }}/{{ item }}" exists'
   ansible.builtin.file:
-    path: '{{ grafana_var_dir }}/{{ item }}'
+    path: '{{ grafana_data }}/{{ item }}'
     state: directory
     owner: '{{ user_name }}'
     group: '{{ user_name }}'
     mode: u=rwx,go=
 
-- name: 'Config "{{ service_etc_dir }}/grafana.ini" exists'
+- name: 'Config "{{ __grafana_etc }}/grafana.ini" exists'
   ansible.builtin.template:
     src: grafana.ini.j2
-    dest: '{{ service_etc_dir }}/grafana.ini'
+    dest: '{{ __grafana_etc }}/grafana.ini'
     owner: root
     group: root
     mode: u=rw,go=r

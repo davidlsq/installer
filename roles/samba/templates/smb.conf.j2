@@ -6,29 +6,29 @@
   hide files = /lost+found/
   bind interfaces only = yes
   interfaces = {{ samba_address }}
-  min protocol = SMB2 
+  min protocol = SMB2
   force user = {{ user_name }}
   force group = {{ user_name }}
   create mask = 0600
   directory mask = 0700
   ea support = yes
-  vfs objects = fruit streams_xattr  
+  vfs objects = fruit streams_xattr
   fruit:metadata = stream
   fruit:model = MacSamba
   fruit:posix_rename = yes 
   fruit:veto_appledouble = no
   fruit:nfs_aces = no
-  fruit:wipe_intentionally_left_blank_rfork = yes 
-  fruit:delete_empty_adfiles = yes 
+  fruit:wipe_intentionally_left_blank_rfork = yes
+  fruit:delete_empty_adfiles = yes
 
-{% for share in samba_shares | zip(service_mounts) %}
-[{{ share[0].name }}]
-{% if share[0].timemachine | default(false) %}
+{% for item in __samba_shares %}
+[{{ item.name }}]
+{% if item.timemachine %}
   fruit:time machine = yes
 {% endif %}
-  valid users = {{ share[0].users | join(" ") }}
-  comment = {{ share[0].name }}
-  path = {{ share[1] }}
+  valid users = {{ item.users | join(" ") }}
+  comment = {{ item.name }}
+  path = {{ item.path }}
   browseable = yes
   writeable = yes
   spotlight = yes

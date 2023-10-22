@@ -1,15 +1,6 @@
 #!/bin/bash -e
 
-install files/install.tar.gz "${ROOTFS_DIR}/"
-
+CRON="@reboot /install/install.sh >> /install/install.log 2>&1"
 on_chroot << EOF
-  tar -zxf /install.tar.gz -C /
-  rm /install.tar.gz
-  python3 -m venv /install/ansible-venv
-  source /install/ansible-venv/bin/activate
-  python3 -m pip install ansible
-  chown -R root:root /install
-  chmod -R go=-rwx /install
-  chmod u=+x /install/install.sh
-  python3 -m pip cache purge
+crontab -l | grep -vF "$CRON" | { cat; echo "$CRON"; } | crontab -
 EOF

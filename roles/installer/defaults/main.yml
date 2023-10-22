@@ -1,3 +1,2 @@
 installer_git: https://github.com/davidlsq/installer.git
 installer_lib: /usr/lib/installer
-installer_venv: /usr/lib/installer-venv

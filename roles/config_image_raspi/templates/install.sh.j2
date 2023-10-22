@@ -13,7 +13,7 @@ if [ ! -f /install/expand.done ]; then
 fi
 
 if [ ! -f /install/playbook.done ]; then
-  source /install/ansible-venv/bin/activate
+  apt-get install -y python3 python-is-python3 ansible-core
   ANSIBLE_HOSTS="$(ls "/install/host_vars" | tr '\n' ',')"
   ansible-playbook -i "$ANSIBLE_HOSTS" -c local "/install/install.yml"
   touch /install/playbook.done

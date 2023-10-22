@@ -1,0 +1,4 @@
+---
+
+lvm_lv_opts: --type linear
+lvm_lv_mount: '/mnt/{{ lvm_vg_name }}/{{ lvm_lv_name }}'

@@ -2,4 +2,3 @@
 
 dependencies:
   - role: service
-  - role: archive

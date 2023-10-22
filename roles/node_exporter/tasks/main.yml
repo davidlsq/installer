@@ -1,0 +1,13 @@
+---
+
+- name: Include "archive" role
+  ansible.builtin.include_role:
+    name: archive
+  vars:
+    archive_url:
+      "https://github.com/prometheus/node_exporter/releases/download/\
+       v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ arch }}.tar.gz"
+    archive_dest: '{{ service_opt }}/bin-{{ node_exporter_version }}.tar.gz'
+    archive_content: '{{ __node_exporter_bin }}'
+    archive_creates: '{{ __node_exporter_bin }}/node_exporter'
+    archive_transform: 'node_exporter-{{ node_exporter_version }}.linux-{{ arch }}'

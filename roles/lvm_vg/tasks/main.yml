@@ -1,0 +1,13 @@
+---
+
+- name: 'Package "lvm2" is installed'
+  ansible.builtin.apt:
+    name: lvm2
+    state: present
+
+- name: 'Volume group "{{ lvm_vg_name }}" exists'
+  when: lvm_pvs is defined
+  community.general.lvg:
+    vg: '{{ lvm_vg_name }}'
+    pesize: 64
+    pvs: '{{ lvm_vg_disks | join(",") }}'
