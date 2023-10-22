@@ -1,4 +1,0 @@
----
-
-lvm_group: []
-lvm_lv_opts: --type linear

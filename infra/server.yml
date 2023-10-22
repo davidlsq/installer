@@ -67,17 +67,19 @@
   tags: data
   roles:
     - role: mdadm
-      mdadm_name: md0
-      mdadm_level: 5
-      mdadm_disks:
-        - '{{ disk_1 }}'
-        - '{{ disk_2 }}'
-        - '{{ disk_3 }}'
-    - role: lvm
+      vars:
+        mdadm_name: md0
+        mdadm_level: 5
+        mdadm_disks:
+          - '{{ disk_1 }}'
+          - '{{ disk_2 }}'
+          - '{{ disk_3 }}'
+    - role: lvm_vg
       tags: data
-      lvm_vg: data
-      lvm_vgdisks:
-        - /dev/md0
+      vars:
+        lvm_vg_name: data
+        lvm_vg_disks:
+          - /dev/md0
 
 - name: Prometheus
   hosts: server
@@ -85,23 +87,29 @@
   become: true
   tags: prometheus
   roles:
+    - role: lvm_lv
+      tags: data
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: prometheus
+        lvm_lv_size: 10G
     - role: prometheus
-  vars:
-    lvm_vg: data
-    user_id: '{{ user_id_prometheus }}'
-    prometheus_address: '{{ network_private_address }}'
-    prometheus_port: '{{ port_prometheus }}'
-    prometheus_retention_time: 90d
-    prometheus_scrape_configs:
-      - job_name: prometheus
-        static_configs:
-          - targets:
-              - '{{ network_private_address }}:{{ port_prometheus }}'
-      - job_name: node
-        static_configs:
-          - targets:
-              - '{{ network_private_address }}:{{ port_node_exporter }}'
-              - '{{ hostvars.raspi.network_private_address }}:{{ hostvars.raspi.port_node_exporter }}'
+      vars:
+        user_id: '{{ user_id_prometheus }}'
+        prometheus_data: /mnt/data/prometheus
+        prometheus_address: '{{ network_private_address }}'
+        prometheus_port: '{{ port_prometheus }}'
+        prometheus_retention_time: 90d
+        prometheus_scrape_configs:
+          - job_name: prometheus
+            static_configs:
+              - targets:
+                  - '{{ network_private_address }}:{{ port_prometheus }}'
+          - job_name: node
+            static_configs:
+              - targets:
+                  - '{{ network_private_address }}:{{ port_node_exporter }}'
+                  - '{{ hostvars.raspi.network_private_address }}:{{ hostvars.raspi.port_node_exporter }}'
 
 - name: Node Exporter
   hosts: server
@@ -110,9 +118,9 @@
   tags: node_exporter
   roles:
     - role: node_exporter
-  vars:
-    node_exporter_address: '{{ network_private_address }}'
-    node_exporter_port: '{{ port_node_exporter }}'
+      vars:
+        node_exporter_address: '{{ network_private_address }}'
+        node_exporter_port: '{{ port_node_exporter }}'
 
 - name: Grafana
   hosts: server
@@ -120,14 +128,19 @@
   become: true
   tags: grafana
   roles:
+    - role: lvm_lv
+      tags: data
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: grafana
+        lvm_lv_size: 10G
     - role: grafana
-  vars:
-    lvm_vg: data
-    user_id: '{{ user_id_grafana }}'
-    grafana_admin_name: '{{ user_name_regular }}'
-    grafana_admin_password: '{{ password_grafana }}'
-    grafana_address: '{{ network_private_address }}'
-    grafana_port: '{{ port_grafana }}'
+      vars:
+        grafana_data: /mnt/data/grafana
+        grafana_admin_name: '{{ user_name_regular }}'
+        grafana_admin_password: '{{ password_grafana }}'
+        grafana_address: '{{ network_private_address }}'
+        grafana_port: '{{ port_grafana }}'
 
 - name: Wireguard
   hosts: server
@@ -152,25 +165,35 @@
   gather_facts: false
   become: true
   tags: samba
-  vars:
-    lvm_vg: data
-    user_id: '{{ user_id_samba }}'
-    samba_address: '{{ network_private_address }}'
-    samba_users:
-      - name: '{{ user_name_regular }}'
-        password: '{{ password_samba }}'
-    samba_shares:
-      - name: TimeMachine
-        timemachine: true
-        size: 500G
-        users:
-          - '{{ user_name_regular }}'
-      - name: Share
-        size: 10G
-        users:
-          - '{{ user_name_regular }}'
   roles:
+    - role: lvm_lv
+      tags: data
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: timemachine
+        lvm_lv_size: 500G
+    - role: lvm_lv
+      tags: data
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: share
+        lvm_lv_size: 10G
     - role: samba
+      vars:
+        samba_address: '{{ network_private_address }}'
+        samba_users:
+          - name: '{{ user_name_regular }}'
+            password: '{{ password_samba }}'
+        samba_shares:
+          - name: TimeMachine
+            timemachine: true
+            path: /mnt/data/timemachine
+            users:
+              - '{{ user_name_regular }}'
+          - name: Share
+            path: /mnt/data/share
+            users:
+              - '{{ user_name_regular }}'
 
 - name: Media Softwares
   hosts: server
@@ -178,13 +201,12 @@
   become: true
   tags: media
   roles:
-    - role: lvm
+    - role: lvm_lv
       tags: data
-      lvm_vg: data
-      lvm_lvs:
-        - name: media
-          size: 15T
-          mount: /mnt/data/media
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: media
+        lvm_lv_size: 15T
     - role: user
       tags: [data, user]
       user_system: true
@@ -274,13 +296,12 @@
   become: true
   tags: public_network
   roles:
-    - role: lvm
+    - role: lvm_lv
       tags: [data, certbot]
-      lvm_vg: data
-      lvm_lvs:
-        - name: certbot
-          size: 64M
-          mount: /mnt/data/certbot
+      vars:
+        lvm_vg_name: data
+        lvm_lv_name: certbot
+        lvm_lv_size: 64M
     - role: certbot
       tags: certbot
       certbot_var: /mnt/data/certbot

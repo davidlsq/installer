@@ -1,0 +1,4 @@
+---
+
+__lvm_lv_volume: '{{ lvm_vg_name }}/{{ lvm_lv_name }}'
+__lvm_lv_service: '{{ lvm_lv_mount | replace("/", " ") | trim | replace(" ", "-") }}.mount'

@@ -1,3 +1,10 @@
 ---
 
+service_packages: []
+service_opt: '/opt/{{ service_name }}'
+service_chroot: '{{ service_opt }}/chroot'
+service_readonly: []
+service_readwrite: []
+service_config: {}
+
 user_name: '{{ service_name }}'

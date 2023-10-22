@@ -1,6 +1,9 @@
 ---
 
-prometheus_version: 2.47.1
+prometheus_version: 2.47.2
 prometheus_address: 127.0.0.1
 prometheus_port: 9000
-prometheus_lv_size: 10G
+prometheus_data: '{{ service_opt }}/data'
+
+service_name: prometheus
+service_chrooted: true

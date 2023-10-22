@@ -6,7 +6,7 @@
     name: user
   vars:
     user_system: true
-    user_notify: service restart
+    user_notify: systemd restart
 
 - name: 'Directory "/opt" exists'
   ansible.builtin.file:
@@ -16,41 +16,25 @@
     group: root
     mode: u=rwx,go=rx
 
-- name: 'Directory "{{ service_opt_dir }}" exists'
+- name: 'Directory "{{ service_opt }}" exists'
   ansible.builtin.file:
-    path: '{{ service_opt_dir }}'
+    path: '{{ service_opt }}'
     state: directory
     owner: root
     group: root
     mode: u=rwx,go=rx
 
-- name: 'Directory "{{ service_opt_dir }}" is populated'
-  loop:
-    - name: '{{ service_lib_dir }}'
-    - name: '{{ service_etc_dir }}'
-    - name: '{{ service_run_dir }}'
-      owner: '{{ user_name }}'
-      mode: u=rwx,go=
-    - name: '{{ service_var_dir }}'
-      owner: '{{ user_name }}'
-      mode: u=rwx,go=
-    - name: '{{ service_log_dir }}'
-      owner: '{{ user_name }}'
-      mode: u=rwx,go=
-  loop_control:
-    label: 'Directory "{{ item.name }}" exists'
+- name: 'Directories readonly exists'
+  loop: '{{ service_readonly | flatten }}'
   ansible.builtin.file:
-    path: '{{ item.name }}'
+    path: '{{ item }}'
     state: directory
-    owner: '{{ item.owner | default("root") }}'
-    group: '{{ item.owner | default("root") }}'
-    mode: '{{ item.mode | default("u=rwx,go=rx") }}'
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
 
-- name: 'Mount directories exists'
-  when: service_lvs | length > 0
-  loop: '{{ service_mounts }}'
-  loop_control:
-    label: 'Directory "{{ item }}" exists'
+- name: 'Directories readwrite exists'
+  loop: '{{ service_readwrite | flatten }}'
   ansible.builtin.file:
     path: '{{ item }}'
     state: directory
@@ -58,74 +42,42 @@
     group: '{{ user_name }}'
     mode: u=rwx,go=
 
-- name: Import "chown" role
-  ansible.builtin.import_role:
+- name: Include "chown" role
+  loop: '{{ service_readwrite | flatten }}'
+  ansible.builtin.include_role:
     name: chown
   vars:
-    chown_paths:
-      - '{{ service_run_dir }}'
-      - '{{ service_var_dir }}'
-      - '{{ service_log_dir }}'
+    chown_path: '{{ item }}'
     chown_user_name: '{{ user_name }}'
     chown_notify: service restart
 
-- name: Import "chown" role
-  when: service_lvs | length > 0
-  ansible.builtin.import_role:
-    name: chown
-  vars:
-    chown_paths: '{{ service_mounts }}'
-    chown_user_name: '{{ user_name }}'
-    chown_notify: service restart
-
-- name: Import "chroot" role
-  when: service_chroot
-  ansible.builtin.import_role:
+- name: Include "chroot" role
+  when: service_chrooted
+  ansible.builtin.include_role:
     name: chroot
   vars:
-    chroot_dir: '{{ service_chroot_dir }}'
+    chroot_path: '{{ service_chroot }}'
     chroot_packages: '{{ service_packages }}'
     chroot_notify: service restart
 
 - name: 'Service "{{ service_name }}" has its packages installed'
-  when: not service_chroot and service_packages is defined
+  when: not service_chrooted
   ansible.builtin.apt:
     name: '{{ service_packages }}'
     state: present
+  notify: service restart
 
-- name: 'Directory "{{ service_unit_dir }}" exists'
-  ansible.builtin.file:
-    path: '{{ service_unit_dir }}'
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,go=rx
-
-- name: 'Config "{{ service_unit_dir }}/00_service.conf" exists'
+- name: 'Config "/etc/systemd/system/{{ service_name }}.service" exists'
   ansible.builtin.template:
     src: service.conf.j2
-    dest: '{{ service_unit_dir }}/00_service.conf'
+    dest: '/etc/systemd/system/{{ service_name }}.service'
     owner: root
     group: root
     mode: u=rw,go=r
   notify: service restart
 
-- name: 'Config "{{ service_unit_dir }}/01_child.conf" exists'
-  when: service_config is defined
-  ansible.builtin.template:
-    src: child.conf.j2
-    dest: '{{ service_unit_dir }}/01_child.conf'
-    owner: root
-    group: root
-    mode: u=rw,go=r
-  notify: service restart
-
-- name: 'Config "{{ service_unit_file }}" exists'
-  ansible.builtin.lineinfile:
-    path: '{{ service_unit_file }}'
-    line: '[Install]'
-    owner: root
-    group: root
-    mode: u=rw,go=r
-    create: true
-  notify: service restart
+- name: 'Service "{{ service_name }}" is enabled'
+  ansible.builtin.systemd:
+    name: '{{ service_name }}'
+    daemon_reload: true
+    enabled: true

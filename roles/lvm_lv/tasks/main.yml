@@ -1,16 +1,16 @@
 ---
 
-- name: 'Logical volume "{{ lvm_vg }}/{{ lv.name }}" exists'
+- name: 'Logical volume "{{ __lvm_lv_volume }}" exists'
   community.general.lvol:
-    vg: '{{ lvm_vg }}'
-    lv: '{{ lv.name }}'
-    size: '{{ lv.size }}'
-    opts: '{{ lv.opts | default(lvm_lv_opts) }}'
+    vg: '{{ lvm_vg_name }}'
+    lv: '{{ lvm_lv_name }}'
+    size: '{{ lvm_lv_size }}'
+    opts: '{{ lvm_lv_opts }}'
     resizefs: true
 
-- name: 'Logical volume "{{ lvm_vg }}/{{ lv.name }}" is formatted'
+- name: 'Logical volume "{{ __lvm_lv_volume }}" is formatted'
   community.general.filesystem:
-    dev: '/dev/{{ lvm_vg }}/{{ lv.name }}'
+    dev: '/dev/{{ __lvm_lv_volume }}'
     fstype: ext4
     force: false
     opts: -m 0

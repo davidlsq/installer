@@ -3,4 +3,7 @@
 grafana_version: 10.1.4
 grafana_address: 127.0.0.1
 grafana_port: 9000
-grafana_lv_size: 10G
+grafana_data: '{{ service_opt }}/data'
+
+service_name: grafana
+service_chrooted: true

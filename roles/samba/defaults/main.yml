@@ -2,4 +2,6 @@
 
 samba_version: 4.19.2
 samba_address: 127.0.0.1
-samba_lv_size: 500G
+
+service_name: samba
+service_chrooted: false

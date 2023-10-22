@@ -1,9 +1,21 @@
 ---
 
-- name: 'Config "{{ service_etc_dir }}/prometheus.yml" exists'
+- name: Include "archive" role
+  ansible.builtin.include_role:
+    name: archive
+  vars:
+    archive_url:
+      "https://github.com/prometheus/prometheus/releases/download/\
+       v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    archive_dest: '{{ service_opt }}/bin-{{ prometheus_version }}.tar.gz'
+    archive_content: '{{ __prometheus_bin }}'
+    archive_creates: '{{ __prometheus_bin }}/prometheus'
+    archive_transform: 'prometheus-{{ prometheus_version }}.linux-amd64'
+
+- name: 'Config "{{ __prometheus_etc }}/prometheus.yml" exists'
   ansible.builtin.template:
     src: prometheus.yml.j2
-    dest: '{{ service_etc_dir }}/prometheus.yml'
+    dest: '{{ __prometheus_etc }}/prometheus.yml'
     owner: root
     group: root
     mode: u=rw,go=r

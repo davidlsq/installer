@@ -5,21 +5,21 @@
     name: debootstrap
     state: present
 
-- name: 'Chroot "{{ chroot_dir }}" exists'
+- name: 'Chroot "{{ chroot_path }}" exists'
   ansible.builtin.command: >
-    debootstrap bookworm "{{ chroot_dir }}"
+    debootstrap bookworm "{{ chroot_path }}"
   args:
-    creates: '{{ chroot_dir }}'
+    creates: '{{ chroot_path }}'
 
-- name: 'Chroot "{{ chroot_dir }}" has its packages installed'
+- name: 'Chroot "{{ chroot_path }}" has its packages installed'
   when: chroot_packages is defined
   vars:
     packages: '{{ chroot_packages | join(" ") }}'
   ansible.builtin.shell: |
     set -e -o pipefail
-    if ! chroot "{{ chroot_dir }}" dpkg -s {{ packages }}; then
+    if ! chroot "{{ chroot_path }}" dpkg -s {{ packages }}; then
     {% if not ansible_check_mode %}
-      chroot "{{ chroot_dir }}" apt-get install -y {{ packages }}
+      chroot "{{ chroot_path }}" apt-get install -y {{ packages }}
     {% endif %}
       echo CHANGED
     fi

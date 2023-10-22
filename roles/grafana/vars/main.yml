@@ -1,28 +1,23 @@
 ---
 
-grafana_var_dir: '{{ lvm_vg is defined | ternary(service_mounts[0], service_var_dir) }}'
+__grafana_bin: '{{ service_opt }}/bin-{{ grafana_version }}'
+__grafana_etc: '{{ service_opt }}/etc'
+__grafana_run: '{{ service_opt }}/run'
 
-service_name: grafana
-service_chroot: true
 service_packages:
   - ca-certificates
   - adduser
   - libfontconfig1
   - musl
 service_config:
-  Service:
-    ExecStart: |
-      {{ service_lib_dir }}/{{ archive_name }}/bin/grafana server \
-        --homepath={{ service_lib_dir }}/{{ archive_name }} \
-        --config={{ service_etc_dir }}/grafana.ini \
-        --pidfile={{ service_run_dir }}/pid
-service_lvs:
-  - name: data
-    size: '{{ grafana_lv_size }}'
-
-archive_url:
-  "https://dl.grafana.com/oss/release/\
-   grafana-{{ grafana_version }}.linux-amd64.tar.gz"
-archive_name: bin
-archive_version: '{{ grafana_version }}'
-archive_transform: 'grafana-{{ grafana_version }}'
+  ExecStart: |
+    {{ __grafana_bin }}/bin/grafana server \
+      --homepath={{ __grafana_bin }} \
+      --config={{ __grafana_etc }}/grafana.ini \
+      --pidfile={{ __grafana_run }}/pid
+service_readonly:
+  - '{{ __grafana_bin }}'
+  - '{{ __grafana_etc }}'
+service_readwrite:
+  - '{{ __grafana_run }}'
+  - '{{ grafana_data }}'
