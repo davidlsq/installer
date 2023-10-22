@@ -30,7 +30,7 @@
       tags: user
       user_id: '{{ user_id_regular }}'
       user_name: '{{ user_name_regular }}'
-      user_password: '{{ hash__regular }}'
+      user_password: '{{ hash_regular }}'
       user_key_pub: 'server/ssh_keys_{{ user_name_regular }}.pub'
       user_shell: /bin/zsh
       user_sudo_group: yes-no-password
