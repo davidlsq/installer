@@ -17,8 +17,6 @@ fi
 
 REPOSITORY="{{ installer_lib }}/repository"
 
-source "{{ installer_venv }}/bin/activate"
-
 rm -rf "$REPOSITORY"
 git clone --depth 1 --branch "$BRANCH" "{{ installer_git }}" "$REPOSITORY"
 
