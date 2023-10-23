@@ -1,149 +1,22 @@
-# Install package
+---
 
-- name: Package
-  ansible.builtin.apt:
-    name:
-      - libicu72
-      - libssl3
-      - jq
-    state: present
-
-# Create lib
-
-- name: Create lib directory
-  ansible.builtin.file:
-    path: '{{ jackett_lib }}'
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,go=rx
-
-- name: Check lib
+- name: Include "archive" role
   ansible.builtin.include_role:
-    name: check_archive
+    name: archive
   vars:
-    check_archive_url: '{{ jackett_archive }}'
-    check_archive_files:
-      - Jackett/jackett_launcher.sh
-    check_archive_creates: '{{ joal_lib }}/jackett_launcher.sh'
+    archive_url:
+      "https://github.com/Jackett/Jackett/releases/download/v{{ jackett_version }}/\
+       Jackett.Binaries.LinuxAMDx64.tar.gz"
+    archive_dest: '{{ service_opt }}/bin-{{ jackett_version }}.tar.gz'
+    archive_content: '{{ __jackett_bin }}'
+    archive_creates: '{{ __jackett_bin }}/jackett'
+    archive_transform: Jackett
 
-- name: Create lib
-  ansible.builtin.unarchive:
-    src: '{{ jackett_archive }}'
-    remote_src: true
-    dest: '{{ jackett_lib }}'
-    owner: root
-    group: root
-    mode: u+rw,go-w+r
-    creates: '{{ jackett_lib }}/jackett_launcher.sh'
-    extra_opts:
-      - --transform
-      - s/^Jackett//
-  when: not ansible_check_mode
-  register: create_lib
-
-# Create var
-
-- name: Create var directory
-  ansible.builtin.file:
-    path: '{{ jackett_var }}'
-    state: directory
-    owner: '{{ jackett_user }}'
-    group: '{{ jackett_user }}'
-    mode: ug=rwx,o=rx
-
-## Create api_key
-
-- name: Check api_key
-  ansible.builtin.stat:
-    path: '{{ jackett_var }}/api_key'
-  register: check_api_key
-
-- name: Create api_key
-  ansible.builtin.copy:
-    dest: '{{ jackett_var }}/api_key'
-    content: '{{ lookup("community.general.random_string", length=32, special=false, upper=false) }}'
-    owner: root
-    group: root
-    mode: u=rw,go=r
-  when: not check_api_key.stat.exists
-  no_log: true
-
-- name: Get api_key
-  ansible.builtin.command: >
-    cat {{ jackett_var }}/api_key
-  register: cat_api_key
-  changed_when: false
-  check_mode: false
-  no_log: true
-
-## Create instance_id
-
-- name: Check instance_id
-  ansible.builtin.stat:
-    path: '{{ jackett_var }}/instance_id'
-  register: check_instance_id
-
-- name: Create instance_id
-  ansible.builtin.copy:
-    dest: '{{ jackett_var }}/instance_id'
-    content: '{{ lookup("community.general.random_string", length=64, special=false, upper=false) }}'
-    owner: root
-    group: root
-    mode: u=rw,go=r
-  when: not check_instance_id.stat.exists
-  no_log: true
-
-- name: Get instance_id
-  ansible.builtin.command: >
-    cat {{ jackett_var }}/instance_id
-  register: cat_instance_id
-  changed_when: false
-  check_mode: false
-  no_log: true
-
-## Create config
-
-- name: Create config
+- name: 'Config "{{ __jackett_etc }}/ServerConfig.json" exists'
   ansible.builtin.template:
     src: ServerConfig.json.j2
-    dest: '{{ jackett_var }}/ServerConfig.json'
-    owner: '{{ jackett_user }}'
-    group: '{{ jackett_user }}'
-    mode: ugo=r
-  vars:
-    api_key: '{{ cat_api_key.stdout }}'
-    instance_id: '{{ cat_instance_id.stdout }}'
-  register: create_config
-  no_log: true
-
-# Create service
-
-- name: Create service
-  ansible.builtin.template:
-    src: service.j2
-    dest: '/etc/systemd/system/{{ jackett_name }}.service'
+    dest: '{{ __jackett_etc }}/ServerConfig.json'
     owner: root
     group: root
     mode: u=rw,go=r
-  register: create_service
-
-- name: Enable
-  ansible.builtin.systemd:
-    name: '{{ jackett_name }}'
-    enabled: true
-
-- name: Restart
-  ansible.builtin.systemd:
-    name: '{{ jackett_name }}'
-    daemon_reload: true
-    state: restarted
-  when: >
-    create_lib is changed or
-    create_config is changed or
-    create_service is changed
-
-- name: Start
-  ansible.builtin.systemd:
-    name: '{{ jackett_name }}'
-    state: started
+  notify: service restart

@@ -7,7 +7,12 @@
   ansible.builtin.copy:
     content: |
         {% for var in config_password_vars %}
+        {% set method = var.method | default("random") %}
+        {% if method == "random" %}
         {{ var.name }}: {{ lookup("vars", var.name, default=lookup("community.general.random_string", length=16, special=false)) }}
+        {% elif method == "token" %}
+        {{ var.name }}: {{ lookup("vars", var.name, default=lookup("community.general.random_string", length=var.length, special=false, upper=false)) }}
+        {% endif %}
         {% endfor %}
     dest: '{{ config_password_output }}'
   no_log: true

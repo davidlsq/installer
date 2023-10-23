@@ -251,14 +251,6 @@
       servarr_var: /mnt/data/media/prowlarr
       servarr_user: '{{ user_name_media }}'
       servarr_address: '{{ network_private_address }}'
-    - role: jackett
-      tags: jackett
-      jackett_name: jackett
-      jackett_port: '{{ port_jackett }}'
-      jackett_var: /mnt/data/media/jackett
-      jackett_user: '{{ user_name_media }}'
-      jackett_external: true
-      jackett_address: '{{ network_private_address }}'
     - role: servarr
       tags: [servarr, radarr]
       servarr_software: radarr
@@ -289,6 +281,22 @@
       sonarr_var: /mnt/data/media/sonarr-2
       sonarr_user: '{{ user_name_media }}'
       sonarr_address: '{{ network_private_address }}'
+
+- name: Jackett
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: jackett
+  roles:
+    - role: jackett
+      vars:
+        user_id: '{{ user_id_media }}'
+        user_name: '{{ user_name_media }}'
+        jackett_data: /mnt/data/media/jackett
+        jackett_address: '{{ network_private_address }}'
+        jackett_port: '{{ port_jackett }}'
+        jackett_key: '{{ password_jackett_key }}'
+        jackett_id: '{{ password_jackett_key }}'
 
 - name: Public Network
   hosts: server

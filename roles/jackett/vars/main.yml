@@ -1,0 +1,21 @@
+---
+
+__jackett_bin: '{{ service_opt }}/bin-{{ jackett_version }}'
+__jackett_etc: '{{ service_opt }}/etc'
+__jackett_run: '{{ service_opt }}/run'
+
+service_packages:
+  - ca-certificates
+  - libicu72
+  - libssl3
+  - jq
+service_config:
+  ExecStartPre: 'cp {{ __jackett_etc }}/ServerConfig.json {{ jackett_data }}/ServerConfig.json'
+  ExecStart: '{{ __jackett_bin }}/jackett --NoRestart --NoUpdates --PIDFile {{ __jackett_run }}/pid -d {{ jackett_data }}'
+  MemoryDenyWriteExecute: false
+service_readonly:
+  - '{{ __jackett_bin }}'
+  - '{{ __jackett_etc }}'
+service_readwrite:
+  - '{{ __jackett_run }}'
+  - '{{ jackett_data }}'
