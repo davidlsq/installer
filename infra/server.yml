@@ -300,6 +300,17 @@
         jackett_key: '{{ password_jackett_key }}'
         jackett_id: '{{ password_jackett_key }}'
 
+- name: Solverr
+  hosts: server
+  gather_facts: false
+  become: true
+  tags: solverr
+  roles:
+    - role: solverr
+      vars:
+        solverr_address: '{{ network_private_address }}'
+        solverr_port: '{{ port_solverr }}'
+
 - name: Public Network
   hosts: server
   gather_facts: false

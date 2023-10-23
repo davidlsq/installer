@@ -4,24 +4,24 @@ __prometheus_bin: '{{ service_opt }}/bin-{{ prometheus_version }}'
 __prometheus_etc: '{{ service_opt }}/etc'
 
 service_config:
-  ExecStart: |
-    {{ __prometheus_bin }}/prometheus \
-      --config.file={{ __prometheus_etc }}/prometheus.yml \
-      --storage.tsdb.path={{ prometheus_data }} \
-    {% if prometheus_retention_time is defined %}
-      --storage.tsdb.retention.time={{ prometheus_retention_time }} \
-    {% endif %}
-    {% if prometheus_retention_size is defined %}
-      --storage.tsdb.retention.size={{ prometheus_retention_size }} \
-    {% endif %}
-      --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
-      --enable-feature=memory-snapshot-on-shutdown \
-      --enable-feature=auto-gomaxprocs \
-      --enable-feature=exemplar-storage \
-      --enable-feature=no-default-scrape-port
-  ExecReload: /bin/kill -HUP $MAINPID
-  LimitNOFILE: 65000
-  TimeoutStopSec: 600
+  - ExecStart: |
+      {{ __prometheus_bin }}/prometheus \
+        --config.file={{ __prometheus_etc }}/prometheus.yml \
+        --storage.tsdb.path={{ prometheus_data }} \
+      {% if prometheus_retention_time is defined %}
+        --storage.tsdb.retention.time={{ prometheus_retention_time }} \
+      {% endif %}
+      {% if prometheus_retention_size is defined %}
+        --storage.tsdb.retention.size={{ prometheus_retention_size }} \
+      {% endif %}
+        --web.listen-address {{ prometheus_address }}:{{ prometheus_port }} \
+        --enable-feature=memory-snapshot-on-shutdown \
+        --enable-feature=auto-gomaxprocs \
+        --enable-feature=exemplar-storage \
+        --enable-feature=no-default-scrape-port
+  - ExecReload: /bin/kill -HUP $MAINPID
+  - LimitNOFILE: 65000
+  - TimeoutStopSec: 600
 service_readonly:
   - '{{ __prometheus_bin }}'
   - '{{ __prometheus_etc }}'

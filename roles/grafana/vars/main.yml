@@ -10,11 +10,11 @@ service_packages:
   - libfontconfig1
   - musl
 service_config:
-  ExecStart: |
-    {{ __grafana_bin }}/bin/grafana server \
-      --homepath={{ __grafana_bin }} \
-      --config={{ __grafana_etc }}/grafana.ini \
-      --pidfile={{ __grafana_run }}/pid
+  - ExecStart: |
+      {{ __grafana_bin }}/bin/grafana server \
+        --homepath={{ __grafana_bin }} \
+        --config={{ __grafana_etc }}/grafana.ini \
+        --pidfile={{ __grafana_run }}/pid
 service_readonly:
   - '{{ __grafana_bin }}'
   - '{{ __grafana_etc }}'

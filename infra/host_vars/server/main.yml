@@ -28,6 +28,7 @@ port_prometheus: 9000
 port_node_exporter: 9001
 port_grafana: 9002
 port_jackett: 8041
+port_solverr: 9004
 port_qbittorrent: 8010
 port_sabnzbd: 8020
 port_prowlarr: 8031

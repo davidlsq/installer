@@ -1,0 +1,8 @@
+---
+
+solverr_version: 3.3.6
+solverr_address: 127.0.0.1
+solverr_port: 9000
+
+service_name: solverr
+service_chrooted: true
