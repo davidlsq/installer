@@ -14,6 +14,7 @@
 - name: 'Directory "{{ __samba_var }}" is populated'
   loop:
     - state
+    - state/run
     - private
   loop_control:
     label: 'Directory "{{ __samba_var }}/{{ item }}" exists'
@@ -25,23 +26,28 @@
     mode: u=rwx,go=
 
 - name: 'Binaries "{{ __samba_bin }}" are compiled'
-  ansible.builtin.shell: |
-    set -e -o pipefail
-    ./bootstrap/generated-dists/debian12/bootstrap.sh > make.log 2>&1
-    ./configure \
-      --prefix="{{ __samba_bin }}" \
-      --sysconfdir="{{ __samba_etc }}" \
-      --with-piddir="{{ __samba_run }}" \
-      --localstatedir="{{ __samba_var }}/state" \
-      --with-privatedir="{{ __samba_var }}/private" \
-      --with-logfilebase="{{ __samba_log }}" \
-      >> make.log 2>&1
-    make -j 8 >> make.log 2>&1
-    make -j 8 install >> make.log 2>&1
-    chown -R {{ user_name }}:{{ user_name }} {{ __samba_var }}
+  vars:
+    service_run_script: |
+      set -e -o pipefail
+      ./bootstrap/generated-dists/debian12/bootstrap.sh
+      ./configure \
+        --prefix="{{ __samba_bin }}" \
+        --sysconfdir="{{ __samba_etc }}" \
+        --with-piddir="{{ __samba_run }}" \
+        --localstatedir="{{ __samba_var }}/state" \
+        --with-privatedir="{{ __samba_var }}/private" \
+        --with-logfilebase="{{ __samba_log }}"
+      make -j 8
+      make -j 8 install
+    service_run_user: root
+    service_run_chdir: '{{ __samba_src }}'
+    service_run_readwrite:
+      - '{{ __samba_src }}'
+      - '{{ __samba_bin }}'
+    service_run_log: '{{ __samba_src }}/build.log'
+  ansible.builtin.shell: '{{ service_run }}'
   args:
     executable: /bin/bash
-    chdir: '{{ __samba_src }}'
     creates: '{{ __samba_bin }}/sbin/smbd'
 
 - name: 'Config "{{ __samba_etc }}/smb.conf" exists'
@@ -78,24 +84,41 @@
     name: '{{ service_name }}'
     state: started
 
+- name: 'Chroot contains host users'
+  when: service_chrooted
+  loop:
+    - /etc/group
+    - /etc/passwd
+  ansible.builtin.copy:
+    src: '{{ item }}'
+    dest: '{{ service_chroot }}{{ item }}'
+    remote_src: true
+    owner: root
+    group: root
+    mode: u=rw,go=r
+
 - name: 'Users are authorized'
   when: samba_users is defined
   loop: '{{ samba_users }}'
-  loop_control:
-    label: 'User "{{ item.name }}" is authorized'
-  ansible.builtin.shell: |
-    set -e -o pipefail
-    umask 0077
-    if ! ./smbclient -U {{ item.name }}%{{ item.password }} -L {{ samba_address }}; then
-    {% if not ansible_check_mode %}
-      (echo "{{ item.password }}"; echo "{{ item.password }}") | ./smbpasswd -a "{{ item.name }}"
-      chown -R {{ user_name }}:{{ user_name }} {{ __samba_var }}
-    {% endif %}
-      echo CHANGED
-    fi
+  vars:
+    service_run_script: |
+      set -e -o pipefail
+      if ! ./smbclient -U {{ item.name }}%{{ item.password }} -L {{ samba_address }}; then
+      {% if not ansible_check_mode %}
+        (echo "{{ item.password }}"; echo "{{ item.password }}") | ./smbpasswd -a "{{ item.name }}"
+      {% endif %}
+        echo CHANGED
+      fi
+    service_run_user: root
+    service_run_chdir: '{{ __samba_bin }}/bin'
+    service_run_readonly:
+      - '{{ __samba_bin }}'
+      - '{{ __samba_etc }}'
+    service_run_readwrite:
+      - '{{ __samba_var }}'
+  ansible.builtin.shell: '{{ service_run }}'
   args:
     executable: /bin/bash
-    chdir: '{{ __samba_bin }}/bin'
   check_mode: false
   register: __samba_authorized_output
   changed_when: >

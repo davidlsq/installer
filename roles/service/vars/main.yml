@@ -1,0 +1,27 @@
+---
+
+service_run: |
+  set -e -o pipefail
+  systemd-run -P \
+  {% if service_run_chdir is defined %}
+    --working-directory={{ service_run_chdir }} \
+  {% endif %}
+  {% if service_chrooted is defined %}
+    -p RootDirectory={{ service_chroot }} \
+  {% for item in service_run_readonly | default([]) | flatten %}
+    -p BindReadOnlyPaths={{ item }} \
+  {% endfor %}
+  {% for item in service_run_readwrite | default([]) | flatten %}
+    -p BindPaths={{ item }} \
+  {% endfor %}
+  {% else %}
+  {% for item in service_run_readwrite | default([]) | flatten %}
+    -p ReadWritePaths={{ item }} \
+  {% endfor %}
+  {% endif %}
+  {% if service_run_user is defined %}
+    -p User={{ service_run_user }} -p Group={{ service_run_user }} \
+  {% endif %}
+  bash{% if service_run_log is defined %} > {{ service_run_log }} 2>&1 {% endif %}<< EOF
+  {{ service_run_script }}
+  EOF

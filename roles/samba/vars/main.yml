@@ -33,6 +33,7 @@ service_config:
   LimitCORE: infinity
   AmbientCapabilities: CAP_NET_BIND_SERVICE
   PrivateUsers: false
+  UMask: '0022'
 service_readonly:
   - '{{ __samba_bin }}'
   - '{{ __samba_etc }}'

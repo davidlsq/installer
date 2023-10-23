@@ -7,7 +7,7 @@
 
 - name: 'Chroot "{{ chroot_path }}" exists'
   ansible.builtin.command: >
-    debootstrap bookworm "{{ chroot_path }}"
+    debootstrap --cache-dir=/var/cache/apt/archives bookworm "{{ chroot_path }}"
   args:
     creates: '{{ chroot_path }}'
 

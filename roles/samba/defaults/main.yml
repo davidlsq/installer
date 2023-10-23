@@ -4,4 +4,4 @@ samba_version: 4.19.2
 samba_address: 127.0.0.1
 
 service_name: samba
-service_chrooted: false
+service_chrooted: true
