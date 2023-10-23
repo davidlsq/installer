@@ -1,0 +1,27 @@
+---
+
+__solverr_bin: '{{ service_opt }}/bin-{{ solverr_version }}'
+__solverr_etc: '{{ service_opt }}/etc'
+__solverr_var: '{{ service_opt }}/var'
+
+service_packages:
+  - chromium
+  - chromium-common
+  - chromium-driver
+  - xvfb
+  - dumb-init
+  - procps
+  - curl
+  - vim
+  - xauth
+service_config:
+  - Environment: 'HOME={{ __solverr_var }}'
+  - Environment: 'HOST={{ solverr_address }}'
+  - Environment: 'PORT={{ solverr_port }}'
+  - ExecStart: '{{ __solverr_bin }}/flaresolverr'
+  - MemoryDenyWriteExecute: false
+service_readonly:
+  - '{{ __solverr_bin }}'
+  - '{{ __solverr_etc }}'
+service_readwrite:
+  - '{{ __solverr_var }}'

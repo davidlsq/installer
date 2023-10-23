@@ -3,10 +3,10 @@
 __node_exporter_bin: '{{ service_opt }}/bin-{{ node_exporter_version }}'
 
 service_config:
-  ExecStart: |
-    {{ __node_exporter_bin }}/node_exporter \
-      --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
-      --collector.systemd \
-      --collector.processes
+  - ExecStart: |
+      {{ __node_exporter_bin }}/node_exporter \
+        --web.listen-address {{ node_exporter_address }}:{{ node_exporter_port }} \
+        --collector.systemd \
+        --collector.processes
 service_readonly:
   - '{{ __node_exporter_bin }}'

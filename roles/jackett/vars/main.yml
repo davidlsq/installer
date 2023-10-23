@@ -10,9 +10,9 @@ service_packages:
   - libssl3
   - jq
 service_config:
-  ExecStartPre: 'cp {{ __jackett_etc }}/ServerConfig.json {{ jackett_data }}/ServerConfig.json'
-  ExecStart: '{{ __jackett_bin }}/jackett --NoRestart --NoUpdates --PIDFile {{ __jackett_run }}/pid -d {{ jackett_data }}'
-  MemoryDenyWriteExecute: false
+  - ExecStartPre: 'cp {{ __jackett_etc }}/ServerConfig.json {{ jackett_data }}/ServerConfig.json'
+  - ExecStart: '{{ __jackett_bin }}/jackett --NoRestart --NoUpdates --PIDFile {{ __jackett_run }}/pid -d {{ jackett_data }}'
+  - MemoryDenyWriteExecute: false
 service_readonly:
   - '{{ __jackett_bin }}'
   - '{{ __jackett_etc }}'

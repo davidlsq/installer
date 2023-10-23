@@ -23,17 +23,17 @@ __samba_log: '{{ service_opt }}/log'
 __samba_share_paths: '{{ __samba_shares | map(attribute="path") }}'
 
 service_config:
-  Type: notify
-  ExecStart: |
-    {{ __samba_bin }}/sbin/smbd \
-      --foreground --no-process-group \
-      --debuglevel 3
-  ExecReload: /bin/kill -HUP $MAINPID
-  PIDFile: '{{ __samba_run }}/smbd.pid'
-  LimitCORE: infinity
-  AmbientCapabilities: CAP_NET_BIND_SERVICE
-  PrivateUsers: false
-  UMask: '0022'
+  - Type: notify
+  - ExecStart: |
+      {{ __samba_bin }}/sbin/smbd \
+        --foreground --no-process-group \
+        --debuglevel 3
+  - ExecReload: /bin/kill -HUP $MAINPID
+  - PIDFile: '{{ __samba_run }}/smbd.pid'
+  - LimitCORE: infinity
+  - AmbientCapabilities: CAP_NET_BIND_SERVICE
+  - PrivateUsers: false
+  - UMask: '0022'
 service_readonly:
   - '{{ __samba_bin }}'
   - '{{ __samba_etc }}'
