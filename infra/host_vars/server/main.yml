@@ -27,10 +27,10 @@ port_wireguard: 51820
 port_prometheus: 9000
 port_node_exporter: 9001
 port_grafana: 9002
+port_jackett: 8041
 port_qbittorrent: 8010
 port_sabnzbd: 8020
 port_prowlarr: 8031
-port_jackett: 8041
 port_radarr_1: 8051
 port_radarr_2: 8052
 port_sonarr_1: 8061

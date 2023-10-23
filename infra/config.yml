@@ -43,6 +43,12 @@
       config_password_vars:
         - name: password_samba
         - name: password_grafana
+        - name: password_jackett_key
+          method: token
+          length: 32
+        - name: password_jackett_id
+          method: token
+          length: 64
     - role: config_hash
       config_hash_output: '{{ config_dir }}/server_hash.yml'
       config_hash_vars:
