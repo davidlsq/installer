@@ -20,3 +20,12 @@
     group: root
     mode: u=rw,go=r
   notify: service restart
+
+- name: 'Config "{{ __jackett_etc }}/config.sh" exists'
+  ansible.builtin.template:
+    src: config.sh.j2
+    dest: '{{ __jackett_etc }}/config.sh'
+    owner: root
+    group: root
+    mode: u=rwx,go=rx
+  notify: service restart

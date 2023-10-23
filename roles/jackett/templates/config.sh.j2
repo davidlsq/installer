@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+if test -f "{{ jackett_data }}/ServerConfig.json"; then
+  jq '. += $config[]' "{{ jackett_data }}/ServerConfig.json" \
+    --slurpfile config "{{ __jackett_etc }}/ServerConfig.json" \
+    > "{{ jackett_data }}/ServerConfig.json.tmp"
+else
+  cp "{{ __jackett_etc }}/ServerConfig.json" "{{ jackett_data }}/ServerConfig.json.tmp"
+fi
+mv "{{ jackett_data }}/ServerConfig.json.tmp" "{{ jackett_data }}/ServerConfig.json"
