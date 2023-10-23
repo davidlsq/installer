@@ -136,6 +136,7 @@
         lvm_lv_size: 10G
     - role: grafana
       vars:
+        user_id: '{{ user_id_grafana }}'
         grafana_data: /mnt/data/grafana
         grafana_admin_name: '{{ user_name_regular }}'
         grafana_admin_password: '{{ password_grafana }}'
@@ -180,6 +181,7 @@
         lvm_lv_size: 10G
     - role: samba
       vars:
+        user_id: '{{ user_id_samba }}'
         samba_address: '{{ network_private_address }}'
         samba_users:
           - name: '{{ user_name_regular }}'
