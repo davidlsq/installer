@@ -2,7 +2,9 @@
 
 - name: Package
   ansible.builtin.apt:
-    name: make
+    name:
+      - make
+      - build-essential
     state: present
 
 # Create lib
