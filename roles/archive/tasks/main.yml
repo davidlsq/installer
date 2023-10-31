@@ -17,7 +17,8 @@
     group: root
     mode: u=rwx,go=rx
 
-- name: Archive "{{ archive_dest }}" is extracted into "{{ archive_content }}"
+- name: 'Archive "{{ archive_dest }}" is extracted into "{{ archive_content }}"'
+  when: not ansible_check_mode
   ansible.builtin.unarchive:
     remote_src: true
     src: '{{ archive_url }}'
