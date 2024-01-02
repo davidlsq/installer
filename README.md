@@ -107,3 +107,9 @@ Also used in github actions to run a playbook check run on PR code and a playboo
 ### Auto update
 
 A github action runs periodically to check the current software versions and creates PRs to update if needed
+
+## Some alternatives
+
+With less code, I could have more or less the same features (auto-install, configuration by code) by using [NixOs](https://nixos.org/) the linux distribution instead of debian
+
+With no code at all, I could use [UNRAID](https://unraid.net/)
