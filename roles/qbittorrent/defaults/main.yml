@@ -1,5 +1,5 @@
 qbittorrent_name: qbittorrent
-qbittorrent_version: 4.5.2-3
+qbittorrent_version: 4.5.2-3+deb12u1
 qbittorrent_var: '/var/lib/{{ qbittorrent_name }}'
 qbittorrent_address: 127.0.0.1
 qbittorrent_port: 8080
