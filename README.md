@@ -1,6 +1,6 @@
 # installer
 
-Collection of scripts to build image and iso installing all the softwares needed by the machines from my home infrastructure :
+Collection of scripts to build images installing all the softwares needed by the machines from my home infrastructure :
 - a raspberry
 - a debian server
 
@@ -82,3 +82,28 @@ echo "Include $(pwd)/infra/config/playbook/ssh_client" >> ~/.ssh/config
 ssh server.local
 ssh raspi.local
 ```
+
+## Some other features
+
+### Bitwarden push
+
+To push the dynamically generated secrets to bitwarden :
+
+```shell
+make bitwarden-push
+```
+
+### Run the ansible playbooks
+
+To update the home infrastructure machines without reinstalling everything with the images :
+
+```shell
+make playbook-check
+make playbook
+```
+
+Also used in github actions to run a playbook check run on PR code and a playbook run after merge
+
+### Auto update
+
+A github action runs periodically to check the current software versions and creates PRs to update if needed
