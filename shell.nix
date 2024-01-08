@@ -1,8 +1,8 @@
 let
   nixpkgs = builtins.fetchTarball {
-    name = "nixos-23.05-2c9c58e98243";
-    url = "https://github.com/NixOS/nixpkgs/archive/2c9c58e98243.tar.gz";
-    sha256 = "0mk8p5sr5b507q4045ssrjmc4rghkfxa1fzr25idj2z9gbyf1f3s";
+    name = "nixos-23.05-70bdadeb94ff";
+    url = "https://github.com/NixOS/nixpkgs/archive/70bdadeb94ff.tar.gz";
+    sha256 = "05cbl1k193c9la9xhlz4y6y8ijpb2mkaqrab30zij6z4kqgclsrd";
   };
   pkgs = import nixpkgs { };
   python-packages = p: [ p.ansible-core p.passlib ];
