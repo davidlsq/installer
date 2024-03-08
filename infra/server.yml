@@ -344,4 +344,6 @@
   roles:
     - role: network
       tags: network
-      network_dns: ['{{ network_local_dns }}']
+      network_dns:
+        - '{{ network_public_dns_1 }}'
+        - '{{ network_public_dns_2 }}'
