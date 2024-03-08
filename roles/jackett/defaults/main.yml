@@ -1,6 +1,6 @@
 ---
 
-jackett_version: 0.21.1468
+jackett_version: 0.21.1855
 jackett_address: 127.0.0.1
 jackett_port: 9000
 jackett_data: '{{ service_opt }}/data'
