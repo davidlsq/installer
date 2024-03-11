@@ -70,7 +70,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: dependabot
-        uses: marocchino/validate-dependabot@v2
+        uses: marocchino/validate-dependabot@v3
   playbook-check-infra-raspi:
     name: playbook-check-infra-raspi
     runs-on: ubuntu-latest
