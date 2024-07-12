@@ -1,4 +1,4 @@
-servarr_version: 5.3.6.8612
+servarr_version: 5.7.0.8882
 servarr_archive: 'https://github.com/Radarr/Radarr/releases/download/v{{ servarr_version }}/Radarr.master.{{ servarr_version }}.linux-core-x64.tar.gz'
 servarr_executable: Radarr
 servarr_config:
