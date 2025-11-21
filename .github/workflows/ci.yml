@@ -19,7 +19,7 @@ jobs:
       infra: ${{ steps.changes.outputs.infra }}
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: changes
         uses: dorny/paths-filter@v3
         id: changes
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: pre-commit
         uses: ./.github/actions/nix-shell
         with:
@@ -54,7 +54,7 @@ jobs:
     if: needs.changes.outputs.make == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: make
         uses: ./.github/actions/nix-shell
         with:
@@ -68,7 +68,7 @@ jobs:
     if: needs.changes.outputs.dependabot == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: dependabot
         uses: marocchino/validate-dependabot@v3
   playbook-check-infra-raspi:
@@ -79,7 +79,7 @@ jobs:
     if: needs.changes.outputs.infra == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: playbook-check-infra-raspi
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 22
@@ -95,7 +95,7 @@ jobs:
     if: needs.changes.outputs.infra == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: playbook-check-infra-server
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 23

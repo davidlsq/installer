@@ -15,7 +15,7 @@ jobs:
       infra: ${{ steps.changes.outputs.infra }}
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: changes
         uses: dorny/paths-filter@v3
         id: changes
@@ -33,7 +33,7 @@ jobs:
     if: needs.changes.outputs.infra == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: playbook-apply-infra-raspi
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 22
@@ -49,7 +49,7 @@ jobs:
     if: needs.changes.outputs.infra == 'true'
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: playbook-apply-infra-server
         run: >
           ./scripts/ssh-env.sh github@home.davidlsq.fr -p 23
